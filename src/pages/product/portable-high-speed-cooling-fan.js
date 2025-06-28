@@ -1,0 +1,310 @@
+// pages/product/c30-pro-smart-watch.js
+import React, { useState, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { GoShareAndroid } from 'react-icons/go';
+import Navbar from '@/components/common/Navbar';
+import Related from '@/components/checkout/Related';
+import CustomSection from '@/components/layout/CustomSection';
+import { products } from '@/utils/products';
+import { addToCart } from '@/store/cartSlice';
+import Footer from '@/components/common/Footer';
+import { useRouter } from 'next/router';
+
+// Find the specific product for this page
+const productData = products.find(
+  (p) => p.slug === 'portable-high-speed-cooling-fan'
+);
+
+const ProductDetails = ({ initialProduct }) => {
+  const dispatch = useDispatch();
+  const router = useRouter();
+  const [product, setProduct] = useState(initialProduct);
+  const [selectedColor, setSelectedColor] = useState('');
+  const [activeImage, setActiveImage] = useState('');
+  const [quantity, setQuantity] = useState(1);
+
+  useEffect(() => {
+    if (initialProduct) {
+      setProduct(initialProduct);
+      setSelectedColor(initialProduct.variants[0].color);
+      setActiveImage(initialProduct.variants[0].images[0]);
+    }
+  }, [initialProduct]);
+
+  const handleImageClick = (image) => {
+    setActiveImage(image);
+  };
+
+  const handleColorChange = (color) => {
+    setSelectedColor(color);
+    const variant = product.variants.find((v) => v.color === color);
+    setActiveImage(variant.images[0]);
+  };
+
+  const handleQuantityChange = (type) => {
+    if (type === 'increment' && quantity < 999) {
+      setQuantity(quantity + 1);
+    } else if (type === 'decrement' && quantity > 1) {
+      setQuantity(quantity - 1);
+    }
+  };
+
+  const handleBuyNow = () => {
+    if (product) {
+      dispatch(
+        addToCart({
+          id: product.id,
+          title: product.title,
+          slug: product.slug,
+          price: product.price,
+          selectedColor,
+          quantity,
+          image: activeImage,
+        })
+      );
+      router.push('/order');
+    }
+  };
+
+  if (!product) {
+    return <div>Product not found</div>;
+  }
+
+  const currentVariant = product.variants.find(
+    (v) => v.color === selectedColor
+  );
+
+  return (
+    <>
+      <Navbar />
+      <div>
+        <style jsx>{`
+          .image-transition {
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+          }
+          .image-transition:hover {
+            transform: scale(1.02);
+          }
+          .small-image {
+            transition: opacity 0.2s ease-in-out, border-color 0.2s ease-in-out;
+            border-width: 2px;
+          }
+          .small-image-active {
+            border-color: #3b82f6;
+            opacity: 1;
+          }
+          .small-image-inactive {
+            opacity: 0.7;
+            border-color: transparent;
+          }
+          .color-button {
+            transition: all 0.2s ease-in-out;
+          }
+          .color-button-active {
+            border-color: #3b82f6;
+            transform: scale(1.1);
+          }
+        `}</style>
+        <div className='py-8 container mx-auto px-4 lg:px-8'>
+          <div className='bg-white md:py-6 rounded-2xl md:rounded-xl shadow-lg'>
+            <div className='flex flex-col md:flex-row gap-4 md:gap-6 -mx-4'>
+              {/* Image Section */}
+              <div className='w-full md:w-3/4 px-4'>
+                <div className='p-2 md:p-0 md:grid md:grid-cols-4 gap-4'>
+                  {/* Main Image */}
+                  <div className='col-span-3 md:pl-6'>
+                    <img
+                      className='w-full h-[267px] md:h-[533px] object-cover rounded-lg image-transition'
+                      src={activeImage}
+                      alt={product.title}
+                    />
+                    {/* Small Images for Mobile */}
+                    <div className='flex justify-center gap-2 mt-4 md:hidden'>
+                      {currentVariant?.images?.map((image, index) => (
+                        <img
+                          key={index}
+                          className={`w-[80px] h-[80px] object-cover rounded-lg cursor-pointer small-image ${
+                            activeImage === image
+                              ? 'small-image-active'
+                              : 'small-image-inactive'
+                          }`}
+                          src={image}
+                          alt={`${product.title} Thumbnail ${index + 1}`}
+                          onClick={() => handleImageClick(image)}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  {/* Small Images for Desktop */}
+                  <div className='col-span-1 hidden md:flex flex-col items-center gap-4'>
+                    {currentVariant?.images?.map((image, index) => (
+                      <img
+                        key={index}
+                        className={`w-full h-[167px] object-cover rounded-lg cursor-pointer small-image ${
+                          activeImage === image
+                            ? 'small-image-active'
+                            : 'small-image-inactive'
+                        }`}
+                        src={image}
+                        alt={`${product.title} Thumbnail ${index + 1}`}
+                        onClick={() => handleImageClick(image)}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+              {/* Product Details */}
+              <div className='md:w-1/2 px-7 md:px-0 py-4'>
+                <h2 className='text-lg md:text-2xl font-semibold font-mont text-gray-800 md:mb-4'>
+                  {product.title}
+                </h2>
+                <p className='text-gray-600 text-sm mb-4 font-mont'>
+                  {product.description}
+                </p>
+
+                <div className='mb-6'>
+                  <span className='font-semibold text-gray-700'>Color</span>
+                  <div className='flex items-center gap-3 mt-4'>
+                    {product.variants.map((variant) => (
+                      <div
+                        key={variant.color}
+                        className={`border-2 flex items-center justify-center rounded-full p-1 cursor-pointer color-button ${
+                          selectedColor === variant.color
+                            ? 'color-button-active'
+                            : ''
+                        }`}
+                        onClick={() => handleColorChange(variant.color)}
+                      >
+                        <button
+                          className='w-[30px] h-[30px] rounded-full'
+                          style={{
+                            backgroundColor: variant.color.toLowerCase(),
+                          }}
+                        ></button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Price */}
+                <div className='flex items-center justify-start gap-2 text-md mb-6'>
+                  <span className='text-blue-600 font-bold text-xl'>
+                    ${product.price.toFixed(2)}
+                  </span>
+                  <span className='text-gray-500 font-normal text-lg line-through'>
+                    ${product.originalPrice.toFixed(2)}
+                  </span>
+                </div>
+
+                {/* Quantity */}
+                <div className='flex items-center justify-start gap-4 mb-6'>
+                  <div className='relative flex items-center max-w-[8rem] border border-gray-400 rounded-lg bg-white'>
+                    <button
+                      type='button'
+                      onClick={() => handleQuantityChange('decrement')}
+                      className='hover:bg-gray-200 rounded-s-lg py-3 px-4 h-11 focus:ring-gray-100 focus:ring-2 focus:outline-none'
+                    >
+                      <svg
+                        className='w-2 h-2 text-gray-900'
+                        aria-hidden='true'
+                        xmlns='http://www.w3.org/2000/svg'
+                        fill='none'
+                        viewBox='0 0 18 2'
+                      >
+                        <path
+                          stroke='currentColor'
+                          strokeLinecap='round'
+                          strokeLinejoin='round'
+                          strokeWidth='2'
+                          d='M1 1h16'
+                        />
+                      </svg>
+                    </button>
+                    <input
+                      type='text'
+                      value={quantity}
+                      readOnly
+                      className='h-11 text-center text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block w-full py-2.5'
+                    />
+                    <button
+                      type='button'
+                      onClick={() => handleQuantityChange('increment')}
+                      className='hover:bg-gray-200 rounded-e-lg py-3 px-4 h-11 focus:ring-gray-100 focus:ring-2 focus:outline-none'
+                    >
+                      <svg
+                        className='w-2 h-2 text-gray-900'
+                        aria-hidden='true'
+                        xmlns='http://www.w3.org/2000/svg'
+                        fill='none'
+                        viewBox='0 0 18 18'
+                      >
+                        <path
+                          stroke='currentColor'
+                          strokeLinecap='round'
+                          strokeLinejoin='round'
+                          strokeWidth='2'
+                          d='M9 1v16M1 9h16'
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                  <button
+                    onClick={handleBuyNow}
+                    className='flex items-center bg-blue-600 text-white justify-center gap-2 border border-blue-600 px-6 py-[12px] rounded-md font-mont font-semibold text-sm'
+                    disabled={!product.inStock}
+                  >
+                    <span>{product.inStock ? 'Buy Now' : 'Out of Stock'}</span>
+                  </button>
+                </div>
+
+                {/* Share */}
+                <div className='flex items-center justify-start gap-4'>
+                  <div className='border border-gray-300 p-1 rounded-lg'>
+                    <GoShareAndroid className='text-2xl' />
+                  </div>
+                  <span className='font-mont text-xs font-medium'>
+                    {product.inStock
+                      ? '(There are 24 products left)'
+                      : '(Out of stock)'}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <CustomSection>
+        <div className='px-3'>
+          <div className='bg-white p-5 rounded-lg'>
+            <div className='flex justify-between items-center mb-3'>
+              <h2 className='text-lg font-semibold'>Description</h2>
+            </div>
+            <div className='mt-10'>
+              <p className='text-gray-600 font-mont text-sm'>
+                {product.description}
+              </p>
+              <p className='py-5 text-gray-600 font-mont text-sm'>
+                Key Features:
+              </p>
+              <ul className='list-disc list-inside text-gray-600 font-mont text-sm'>
+                <li>Effective noise reduction</li>
+                <li>Smart Bluetooth</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </CustomSection>
+      {/* <Related /> */}
+      <Footer />
+    </>
+  );
+};
+
+export async function getStaticProps() {
+  if (!productData) {
+    return { notFound: true };
+  }
+  return { props: { initialProduct: productData } };
+}
+
+export default ProductDetails;

@@ -1,0 +1,546 @@
+import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import Navbar from '@/components/common/Navbar';
+import CustomSection from '@/components/layout/CustomSection';
+import { IoMdArrowBack } from 'react-icons/io';
+import CartCard from '@/components/checkout/CartCard';
+import HeaderSm from '@/components/common/HeaderSm';
+import Footer from '@/components/common/Footer';
+import PhoneInput from 'react-phone-number-input';
+import 'react-phone-number-input/style.css';
+import districtsData from '@/utils/districts.json';
+import DeliveryAndReturnPolicy from '@/components/CartPolicy';
+import Link from 'next/link';
+import { clearCart } from '@/store/cartSlice';
+import { useRouter } from 'next/router';
+
+function Cart() {
+  const dispatch = useDispatch();
+  const cartItems = useSelector((state) => state.cart.items);
+  const router = useRouter();
+  // Form state
+  const [formData, setFormData] = useState({
+    fullName: '',
+    phoneNumber: '',
+    district: '',
+    address: '',
+  });
+  const [errors, setErrors] = useState({});
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filteredDistricts, setFilteredDistricts] = useState(
+    districtsData.districts.slice(0, 5)
+  );
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
+  const [orderDetails, setOrderDetails] = useState(null); // Store order details for popup
+
+  // Pricing state
+  const [totalPrice, setTotalPrice] = useState(0);
+  const [shippingCharge, setShippingCharge] = useState(100); // Default to 100 Taka
+  const [grandTotal, setGrandTotal] = useState(0);
+
+  // Calculate totals based on cart items
+  useEffect(() => {
+    const total = cartItems.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0
+    );
+    setTotalPrice(total);
+    setGrandTotal(total + shippingCharge);
+  }, [cartItems, shippingCharge]);
+
+  // Handle form input changes
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+    validateField(name, value);
+  };
+
+  // Handle phone number change
+  const handlePhoneChange = (value) => {
+    setFormData({ ...formData, phoneNumber: value || '' });
+    validateField('phoneNumber', value || '');
+  };
+
+  // Handle district selection
+  const handleDistrictSelect = (district) => {
+    setFormData({ ...formData, district });
+    setSearchTerm(district);
+    setIsDropdownOpen(false);
+    validateField('district', district);
+    // Update shipping charge based on district
+    const newShippingCharge = district === 'Dhaka' ? 50 : 100;
+    setShippingCharge(newShippingCharge);
+    setGrandTotal(totalPrice + newShippingCharge);
+  };
+
+  // Handle district search
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    setFormData({ ...formData, district: value });
+    setIsDropdownOpen(true);
+
+    const filtered = districtsData.districts.filter((district) =>
+      district.name.toLowerCase().includes(value.toLowerCase())
+    );
+    setFilteredDistricts(filtered.slice(0, 5));
+  };
+
+  // Validate individual field
+  const validateField = (name, value) => {
+    let newErrors = { ...errors };
+
+    switch (name) {
+      case 'fullName':
+        if (!value.trim()) {
+          newErrors.fullName = 'Full name is required';
+        } else if (value.length < 2) {
+          newErrors.fullName = 'Full name must be at least 2 characters';
+        } else {
+          delete newErrors.fullName;
+        }
+        break;
+      case 'phoneNumber':
+        if (!value) {
+          newErrors.phoneNumber = 'Phone number is required';
+        } else if (!/^\+880\d{10}$/.test(value)) {
+          newErrors.phoneNumber =
+            'Please enter a valid Bangladesh phone number';
+        } else {
+          delete newErrors.phoneNumber;
+        }
+        break;
+      case 'district':
+        if (!value.trim()) {
+          newErrors.district = 'District is required';
+        } else if (!districtsData.districts.some((d) => d.name === value)) {
+          newErrors.district = 'Please select a valid district';
+        } else {
+          delete newErrors.district;
+        }
+        break;
+      case 'address':
+        if (!value.trim()) {
+          newErrors.address = 'Address is required';
+        } else if (value.length < 5) {
+          newErrors.address = 'Address must be at least 5 characters';
+        } else {
+          delete newErrors.address;
+        }
+        break;
+      default:
+        break;
+    }
+
+    setErrors(newErrors);
+  };
+
+  // Validate entire form on submit
+  const validateForm = () => {
+    const newErrors = {};
+    if (!formData.fullName.trim()) newErrors.fullName = 'Full name is required';
+    else if (formData.fullName.length < 2)
+      newErrors.fullName = 'Full name must be at least 2 characters';
+    if (!formData.phoneNumber)
+      newErrors.phoneNumber = 'Phone number is required';
+    else if (!/^\+880\d{10}$/.test(formData.phoneNumber))
+      newErrors.phoneNumber = 'Please enter a valid Bangladesh phone number';
+    if (!formData.district.trim()) newErrors.district = 'District is required';
+    else if (!districtsData.districts.some((d) => d.name === formData.district))
+      newErrors.district = 'Please select a valid district';
+    if (!formData.address.trim()) newErrors.address = 'Address is required';
+    else if (formData.address.length < 5)
+      newErrors.address = 'Address must be at least 5 characters';
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  // Handle form submission
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (validateForm()) {
+      // Extract last 5 digits of phone number
+      const phoneLastFive = formData.phoneNumber.slice(-5);
+      const order = {
+        user: { ...formData },
+        order: {
+          items: [...cartItems], // Create a copy to avoid mutation
+          totalPrice,
+          shippingCharge,
+          grandTotal,
+          orderDate: new Date().toISOString(),
+          orderId: `ORD-${phoneLastFive}`, // e.g., ORD-67890-174567890
+        },
+      };
+      console.log('Order Submitted:', order);
+      setOrderDetails(order);
+      setShowPopup(true);
+    }
+  };
+
+  // Handle popup close
+  const handleClosePopup = () => {
+    setShowPopup(false);
+
+    setOrderDetails(null);
+    dispatch(clearCart()); // Clear cart only when popup is closed
+    router.push('/'); // Redirect to home page
+  };
+
+  // Update filtered districts on mount
+  useEffect(() => {
+    setFilteredDistricts(districtsData.districts.slice(0, 5));
+  }, []);
+
+  return (
+    <div>
+      <div className='hidden md:block'>
+        <Navbar />
+      </div>
+      <HeaderSm>
+        <Link href='/'>
+          <IoMdArrowBack className='text-2xl' />
+        </Link>
+        <span className='text-xl font-semibold'>Order</span>
+        <div></div>
+      </HeaderSm>
+      <CustomSection>
+        <div className='mx-auto pt-16 md:pt-0'>
+          <div className='flex flex-col md:flex-row gap-5'>
+            {/* Cart Items */}
+            <div className='md:w-4/5'>
+              <div className='md:bg-white py-4 px-6 md:p-6 md:mb-4 md:rounded-lg md:shadow'>
+                <h2 className='text-lg font-semibold mb-4'>Your Cart</h2>
+                {cartItems.length === 0 ? (
+                  <div className='flex flex-col gap-4 items-center justify-center h-24'>
+                    <p className='text-gray-500'>Your cart is empty.</p>
+                    <Link
+                      href='/'
+                      className='text-white mt-2 bg-blue-700 rounded-lg px-4 py-2 text-sm font-semibold'
+                    >
+                      Continue Shopping
+                    </Link>
+                  </div>
+                ) : (
+                  cartItems.map((item) => (
+                    <CartCard
+                      key={`${item.id}-${item.selectedColor}`}
+                      item={item}
+                    />
+                  ))
+                )}
+                <div className='hidden md:block'>
+                  <DeliveryAndReturnPolicy />
+                </div>
+              </div>
+            </div>
+            {/* Checkout Form */}
+            <div className='md:w-1/3'>
+              <div className='bg-white rounded-lg shadow-md p-6 '>
+                <div className='pb-4'>
+                  <h2 className='text-lg font-semibold'>Proceed to Checkout</h2>
+                </div>
+                <form
+                  onSubmit={handleSubmit}
+                  className='border md:border-2 rounded-lg md:border-blue-400 p-4 bg-gray-50'
+                >
+                  <div className='space-y-4'>
+                    {/* Full Name */}
+                    <div>
+                      <label
+                        htmlFor='fullName'
+                        className='block text-sm font-medium text-gray-700 mb-1'
+                      >
+                        Full Name
+                      </label>
+                      <input
+                        type='text'
+                        id='fullName'
+                        name='fullName'
+                        value={formData.fullName}
+                        onChange={handleInputChange}
+                        placeholder='Enter Full Name'
+                        className='py-2 px-3 border w-full rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                      />
+                      {errors.fullName && (
+                        <p className='text-red-500 text-xs mt-1'>
+                          {errors.fullName}
+                        </p>
+                      )}
+                    </div>
+                    {/* Phone Number */}
+                    <div>
+                      <label
+                        htmlFor='phoneNumber'
+                        className='block text-sm font-medium text-gray-700 mb-1'
+                      >
+                        Phone Number
+                      </label>
+                      <PhoneInput
+                        id='phoneNumber'
+                        defaultCountry='BD'
+                        value={formData.phoneNumber}
+                        onChange={handlePhoneChange}
+                        placeholder='Enter Phone Number'
+                        className='py-2 px-3 border w-full rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                      />
+                      {errors.phoneNumber && (
+                        <p className='text-red-500 text-xs mt-1'>
+                          {errors.phoneNumber}
+                        </p>
+                      )}
+                    </div>
+                    {/* District */}
+                    <div className='relative'>
+                      <label
+                        htmlFor='district'
+                        className='block text-sm font-medium text-gray-700 mb-1'
+                      >
+                        District
+                      </label>
+                      <input
+                        type='text'
+                        id='district'
+                        name='district'
+                        value={searchTerm}
+                        onChange={handleSearchChange}
+                        onFocus={() => setIsDropdownOpen(true)}
+                        placeholder='Select District'
+                        className='py-2 px-3 border w-full rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                      />
+                      {isDropdownOpen && (
+                        <ul className='absolute z-10 w-full bg-white border border-gray-300 rounded-lg mt-1 max-h-60 overflow-y-auto shadow-lg'>
+                          {filteredDistricts.length > 0 ? (
+                            filteredDistricts.map((district) => (
+                              <li
+                                key={district.id}
+                                onClick={() =>
+                                  handleDistrictSelect(district.name)
+                                }
+                                className='px-3 py-2 text-sm hover:bg-blue-100 cursor-pointer'
+                              >
+                                {district.name}
+                              </li>
+                            ))
+                          ) : (
+                            <li className='px-3 py-2 text-sm text-gray-500'>
+                              No districts found
+                            </li>
+                          )}
+                        </ul>
+                      )}
+                      {errors.district && (
+                        <p className='text-red-500 text-xs mt-1'>
+                          {errors.district}
+                        </p>
+                      )}
+                    </div>
+                    {/* Address */}
+                    <div>
+                      <label
+                        htmlFor='address'
+                        className='block text-sm font-medium text-gray-700 mb-1'
+                      >
+                        Details Address
+                      </label>
+                      <input
+                        type='text'
+                        id='address'
+                        name='address'
+                        value={formData.address}
+                        onChange={handleInputChange}
+                        placeholder='Thana, Road No, House No'
+                        className='py-2 px-3 border w-full rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                      />
+                      {errors.address && (
+                        <p className='text-red-500 text-xs mt-1'>
+                          {errors.address}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  {/* Pricing Summary */}
+                  <div className='py-4 font-thin text-[16px] bg-blue-50 rounded-lg p-4 text-blue-800 my-5'>
+                    <div className='flex text-sm md:text-md justify-between mb-2'>
+                      <span>Total Price</span>
+                      <span>৳{totalPrice.toFixed(2)}</span>
+                    </div>
+                    <div className='flex text-sm md:text-md justify-between mb-2'>
+                      <span>Shipping Charge</span>
+                      <span>৳{shippingCharge.toFixed(2)}</span>
+                    </div>
+                    <hr className='my-2' />
+                    <div className='flex justify-between my-4'>
+                      <span className='font-semibold text-sm md:text-lg'>
+                        Grand Total
+                      </span>
+                      <span className='font-semibold text-sm md:text-lg'>
+                        ৳{grandTotal.toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    type='submit'
+                    disabled={
+                      Object.keys(errors).length > 0 ||
+                      !formData.fullName ||
+                      !formData.phoneNumber ||
+                      !formData.district ||
+                      !formData.address ||
+                      cartItems.length === 0
+                    }
+                    className='bg-blue-600 text-white py-3 px-4 rounded-lg w-full text-sm font-semibold disabled:bg-gray-400 disabled:cursor-not-allowed hover:bg-blue-700 transition-colors'
+                  >
+                    Confirm Order
+                  </button>
+                </form>
+              </div>
+            </div>
+            <div className='block md:hidden p-4'>
+              <DeliveryAndReturnPolicy />
+            </div>
+          </div>
+        </div>
+      </CustomSection>
+      <Footer />
+
+      {/* Thank You Popup */}
+      {showPopup && orderDetails && (
+        <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'>
+          <div className='bg-white rounded-lg shadow-2xl p-6 w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto'>
+            <div className='text-center'>
+              <svg
+                className='w-12 h-12 mx-auto mb-4 text-green-500'
+                fill='none'
+                stroke='currentColor'
+                viewBox='0 0 24 24'
+                xmlns='http://www.w3.org/2000/svg'
+              >
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth='2'
+                  d='M5 13l4 4L19 7'
+                />
+              </svg>
+              <h2 className='text-2xl font-bold text-blue-600 mb-2'>
+                Thank You for Your Order!
+              </h2>
+              <p className='text-gray-600 mb-6'>
+                Your order #{orderDetails.order.orderId} has been successfully
+                placed.
+              </p>
+            </div>
+            {/* Invoice-like Design */}
+            <div className='border rounded-lg bg-white shadow-sm'>
+              {/* Invoice Header */}
+              <div className='bg-gradient-to-r from-blue-50 to-blue-100 p-4 rounded-t-lg'>
+                <h3 className='text-lg font-semibold text-gray-800'>
+                  Order Invoice
+                </h3>
+                <p className='text-sm text-gray-600'>
+                  Order Date:{' '}
+                  {new Date(orderDetails.order.orderDate).toLocaleString()}
+                </p>
+              </div>
+              {/* Customer Details */}
+              {/* <div className='p-4 border-b'>
+                <h4 className='text-sm font-medium text-gray-700 mb-2'>
+                  Customer Details
+                </h4>
+                <div className='text-sm text-gray-600 space-y-1'>
+                  <p>
+                    <span className='font-medium'>Name:</span>{' '}
+                    {orderDetails.user.fullName}
+                  </p>
+                  <p>
+                    <span className='font-medium'>Phone:</span>{' '}
+                    {orderDetails.user.phoneNumber}
+                  </p>
+                  <p>
+                    <span className='font-medium'>District:</span>{' '}
+                    {orderDetails.user.district}
+                  </p>
+                  <p>
+                    <span className='font-medium'>Address:</span>{' '}
+                    {orderDetails.user.address}
+                  </p>
+                </div>
+              </div> */}
+              {/* Order Items */}
+              <div className='p-3 border-b'>
+                <h4 className='text-sm font-medium text-gray-700 mb-3'>
+                  Order Items
+                </h4>
+                {orderDetails.order.items.length === 0 ? (
+                  <p className='text-sm text-gray-500'>No items in order.</p>
+                ) : (
+                  <div className='space-y-3'>
+                    <div className='grid grid-cols-11 gap-2 text-xs font-medium text-gray-700 bg-gray-50 p-2 rounded'>
+                      <span className='col-span-4'>Item</span>
+                      <span className='col-span-3 text-center'>Variant</span>
+                      <span className='col-span-2 text-center'>Qty</span>
+                      <span className='col-span-2 text-right'>Total</span>
+                    </div>
+                    {orderDetails.order.items.map((item) => (
+                      <div
+                        key={`${item.id}-${item.selectedColor}`}
+                        className='grid grid-cols-11 gap-2 text-sm text-gray-600 items-center '
+                      >
+                        <span className='col-span-4 font-medium truncate'>
+                          {item.title}
+                        </span>
+                        <span className='col-span-3 text-center'>
+                          {item.selectedColor}
+                        </span>
+                        <span className='col-span-2 text-center'>
+                          {item.quantity}
+                        </span>
+                        <span className='col-span-2 text-right font-medium'>
+                          ৳{item.price * item.quantity}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+              {/* Pricing Summary */}
+              <div className='p-4'>
+                <div className='space-y-2 text-sm text-gray-600'>
+                  <div className='flex justify-between'>
+                    <span>Total Price</span>
+                    <span>৳{orderDetails.order.totalPrice.toFixed(2)}</span>
+                  </div>
+                  <div className='flex justify-between'>
+                    <span>Shipping Charge</span>
+                    <span>৳{orderDetails.order.shippingCharge.toFixed(2)}</span>
+                  </div>
+                  <div className='flex justify-between font-semibold text-gray-800 pt-2 border-t'>
+                    <span>Grand Total</span>
+                    <span>৳{orderDetails.order.grandTotal.toFixed(2)}</span>
+                  </div>
+                </div>
+              </div>
+              {/* Invoice Footer */}
+              <div className='p-4 bg-gray-50 rounded-b-lg text-center text-xs text-gray-500'>
+                <p>Thank you for shopping with us!</p>
+                <p>Contact us at support@example.com for any queries.</p>
+              </div>
+            </div>
+            {/* Close Button */}
+            <button
+              onClick={handleClosePopup}
+              className='mt-6 bg-blue-600 text-white py-2 px-4 rounded-lg w-full text-sm font-semibold hover:bg-blue-700 transition-colors'
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default Cart;
