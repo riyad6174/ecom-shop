@@ -25,8 +25,30 @@ const ProductDetails = ({ initialProduct }) => {
   useEffect(() => {
     if (initialProduct) {
       setProduct(initialProduct);
-      setSelectedColor(initialProduct.variants[0].color);
-      setActiveImage(initialProduct.images[0]); // Set first image as default
+      setSelectedColor(initialProduct.variants[0]?.color || '');
+      setActiveImage(initialProduct.images[0] || ''); // Set first image as default
+
+      // Push product view event to data layer
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        event: 'view_item',
+        ecommerce: {
+          items: [
+            {
+              item_id: initialProduct.id || 'unknown',
+              item_name: initialProduct.title || 'unknown',
+              price: initialProduct.price || 0,
+              original_price: initialProduct.originalPrice || 0,
+              item_category: 'Accessories', // Adjusted for tracker category
+              item_variant: initialProduct.variants
+                ? initialProduct.variants.map((v) => v.color).join(', ')
+                : 'unknown',
+            },
+          ],
+          currency: 'BDT', // Bangladeshi Taka
+          value: initialProduct.price || 0,
+        },
+      });
     }
   }, [initialProduct]);
 

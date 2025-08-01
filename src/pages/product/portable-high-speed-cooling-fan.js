@@ -25,8 +25,30 @@ const ProductDetails = ({ initialProduct }) => {
   useEffect(() => {
     if (initialProduct) {
       setProduct(initialProduct);
-      setSelectedColor(initialProduct.variants[0].color);
-      setActiveImage(initialProduct.images[0]); // Set first image as default
+      setSelectedColor(initialProduct.variants[0]?.color || '');
+      setActiveImage(initialProduct.images[0] || ''); // Set first image as default
+
+      // Push product view event to data layer
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        event: 'view_item',
+        ecommerce: {
+          items: [
+            {
+              item_id: initialProduct.id || 'unknown',
+              item_name: initialProduct.title || 'unknown',
+              price: initialProduct.price || 0,
+              original_price: initialProduct.originalPrice || 0,
+              item_category: 'Electronics', // Adjust based on your product taxonomy
+              item_variant: initialProduct.variants
+                ? initialProduct.variants.map((v) => v.color).join(', ')
+                : 'unknown',
+            },
+          ],
+          currency: 'BDT', // Bangladeshi Taka
+          value: initialProduct.price || 0,
+        },
+      });
     }
   }, [initialProduct]);
 
@@ -292,7 +314,7 @@ const ProductDetails = ({ initialProduct }) => {
               </p>
               <p className='text-gray-600 font-mont text-sm mt-4'>
                 Express your style with **six vibrant color options**: Black,
-                White, Gray, Pink, Blue, or Beige—pick the one that matches your
+                White, Gray, Pink, Blue, Beige—pick the one that matches your
                 mood! 🌈 Powered by a **long-lasting rechargeable battery**, it
                 keeps you cool for hours, whether you’re hiking, commuting, or
                 chilling at home. Stay cool, stay stylish, stay unstoppable with
