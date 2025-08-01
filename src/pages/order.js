@@ -238,6 +238,26 @@ function Cart() {
         console.log('Order Submitted:', order);
         setOrderDetails(order);
         setShowPopup(true);
+
+        // Push purchase event to data layer
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({
+          event: 'purchase',
+          ecommerce: {
+            transaction_id: order.order.orderId || 'ORD-UNKNOWN',
+            value: order.order.grandTotal || 0,
+            currency: 'BDT',
+            shipping: order.order.shippingCharge || 0,
+            items: order.order.items.map((item) => ({
+              item_id: item.id || 'unknown',
+              item_name: item.title || 'unknown',
+              price: item.price || 0,
+              quantity: item.quantity || 1,
+              item_variant: item.selectedColor || 'N/A',
+              item_category: item.category || 'Accessories', // Adjust based on product data
+            })),
+          },
+        });
       }
     } catch (error) {
       console.error('Fetch error:', error.name, error.message);
