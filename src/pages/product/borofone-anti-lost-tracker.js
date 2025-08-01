@@ -11,7 +11,7 @@ import { useRouter } from 'next/router';
 
 // Find the specific product for this page
 const productData = products.find(
-  (p) => p.slug === 'portable-high-speed-cooling-fan'
+  (p) => p.slug === 'borofone-anti-lost-tracker'
 );
 
 const ProductDetails = ({ initialProduct }) => {
@@ -39,7 +39,7 @@ const ProductDetails = ({ initialProduct }) => {
   };
 
   const handleQuantityChange = (type) => {
-    if (type === 'increment' && quantity < 100) {
+    if (type === 'increment' && quantity < 999) {
       setQuantity(quantity + 1);
     } else if (type === 'decrement' && quantity > 1) {
       setQuantity(quantity - 1);
@@ -184,10 +184,10 @@ const ProductDetails = ({ initialProduct }) => {
                 {/* Price */}
                 <div className='flex items-center justify-start gap-2 text-md mb-6'>
                   <span className='text-blue-600 font-bold text-xl'>
-                    ৳{product.price.toFixed(2)}
+                    ৳ {product.price.toFixed(2)}
                   </span>
                   <span className='text-gray-500 font-normal text-lg line-through'>
-                    ৳{product.originalPrice.toFixed(2)}
+                    ৳ {product.originalPrice.toFixed(2)}
                   </span>
                 </div>
 
@@ -259,7 +259,7 @@ const ProductDetails = ({ initialProduct }) => {
                   </div>
                   <span className='font-mont text-xs font-medium'>
                     {product.inStock
-                      ? '(There are 125 products left)'
+                      ? '(There are 60 products left)'
                       : '(Out of stock)'}
                   </span>
                 </div> */}
@@ -276,47 +276,106 @@ const ProductDetails = ({ initialProduct }) => {
             </div>
             <div className='mt-10'>
               <p className='text-gray-600 font-mont text-sm'>
-                Beat the heat with the **CoolBreeze Mini Portable Cooling Fan**,
-                your ultimate companion for instant refreshment! Featuring
-                **lightning-fast cooling technology**, this fan blasts away heat
-                in seconds, delivering a powerful, icy breeze that keeps you
-                cool even on the hottest days. ❄
+                Never lose track of your valuables with the **Borofone BS101
+                Intelligent Anti-Lost Tracker**, a sleek and compact device
+                designed to keep your essentials secure. Crafted with durable
+                ABS material, this lightweight tracker (only 7g) seamlessly
+                integrates with Apple’s Find My network, offering precise,
+                real-time location tracking for your keys, wallet, bag, or even
+                your pet.
               </p>
               <p className='text-gray-600 font-mont text-sm mt-4'>
-                Weighing just **183.6 grams**—lighter than your smartphone—this
-                **ultra-light and portable** fan slips effortlessly into your
-                bag or pocket, making it perfect for travel, work, or outdoor
-                adventures. Crafted from **premium ABS and aluminum alloy**, the
-                CoolBreeze Mini combines durability with a sleek, modern vibe
-                that feels as good as it looks. 💪
+                Equipped with a **210mAh CR2032 button battery**, the BS101
+                provides up to **9-12 months of battery life**, with easy
+                replacement to keep you worry-free. Its **intelligent
+                positioning** and **sound alert** features let you locate items
+                instantly via the Find My app on your iPhone, iPad, or iPod
+                touch (iOS 14.5+ or iPadOS 14.5+). The **compact design**
+                (38.5x32x9mm) makes it easy to attach to any item, while its
+                **IP65 water-resistant** build ensures durability in everyday
+                scenarios like rain or splashes.
               </p>
               <p className='text-gray-600 font-mont text-sm mt-4'>
-                Express your style with **six vibrant color options**: Black,
-                White, Gray, Pink, Blue, or Beige—pick the one that matches your
-                mood! 🌈 Powered by a **long-lasting rechargeable battery**, it
-                keeps you cool for hours, whether you’re hiking, commuting, or
-                chilling at home. Stay cool, stay stylish, stay unstoppable with
-                the CoolBreeze Mini!
+                Whether you’re a traveler, student, or busy professional, the
+                BS101 offers peace of mind with its **anti-loss reminder** that
+                notifies you if you leave your items behind. Stylish, reliable,
+                and user-friendly, the Borofone BS101 is your ultimate companion
+                for keeping what matters most within reach.
               </p>
               <p className='py-5 text-gray-600 font-mont text-sm mt-4'>
                 Key Features:
               </p>
               <ul className='list-disc list-inside text-gray-600 font-mont text-sm'>
-                <li>❄ Lightning-fast cooling technology for instant relief</li>
-                <li>🎒 Ultra-light at 183.6 grams for easy portability</li>
-                <li>💪 Premium ABS + aluminum alloy build for durability</li>
-                <li>
-                  🌈 Six stylish colors: Black, White, Gray, Pink, Blue, Beige
-                </li>
-                <li>
-                  🔋 Rechargeable battery for 7/8 hours of continuous cooling
-                </li>
-                <li>
-                  ⚙️ Adjustable speed settings from 0-200 for customized comfort
-                </li>
-                <li>🔌 USB-C charging for quick and convenient power-ups</li>
-                <li>🤫 Whisper-quiet operation for distraction-free use</li>
+                <li>📍 Seamless integration with Apple Find My network</li>
+                <li>🔊 Sound alert for quick item location</li>
+                <li>📱 Anti-loss notifications via smartphone</li>
+                <li>🔋 210mAh CR2032 battery with 9-12 months life</li>
+                <li>💧 IP65 water-resistant for daily durability</li>
+                <li>👜 Compact and lightweight (38.5x32x9mm, 7g)</li>
+                <li>🛠 Durable ABS construction</li>
+                <li>📲 Compatible with iOS 14.5+ and iPadOS 14.5+</li>
               </ul>
+            </div>
+          </div>
+
+          {/* User Manual */}
+          <div className='bg-white p-5 rounded-lg mt-6'>
+            <div className='flex justify-between items-center mb-3'>
+              <h2 className='text-lg font-semibold'>User Manual</h2>
+            </div>
+            <div className='mt-10'>
+              <p className='text-gray-600 font-mont text-sm'>
+                Get started with your **Borofone BS101 Anti-Lost Tracker** in
+                just a few simple steps:
+              </p>
+              <ol className='list-decimal list-inside text-gray-600 font-mont text-sm mt-4 space-y-2'>
+                <li>
+                  <span className='font-semibold'>Insert the Battery:</span>{' '}
+                  Open the back cover of the BS101 and insert the provided
+                  CR2032 button battery. Ensure the positive (+) side faces up,
+                  then securely close the cover.
+                </li>
+                <li>
+                  <span className='font-semibold'>Pair with Find My App:</span>{' '}
+                  On your iPhone, iPad, or iPod touch (iOS 14.5+ or iPadOS
+                  14.5+), open the **Find My** app. Press the button on the
+                  BS101 tracker until it beeps. In the app, tap “Add Item” and
+                  select “Other Supported Item.” Follow the on-screen
+                  instructions to pair the tracker with your Apple account.
+                </li>
+                <li>
+                  <span className='font-semibold'>Attach to Your Item:</span>{' '}
+                  Use the built-in keyring or adhesive mount to attach the BS101
+                  to your keys, bag, wallet, or pet collar.
+                </li>
+                <li>
+                  <span className='font-semibold'>Track Your Item:</span> Open
+                  the Find My app to view the tracker’s location in real-time.
+                  Use the “Play Sound” feature to trigger a beep if the item is
+                  nearby, or check the map for its last known location.
+                </li>
+                <li>
+                  <span className='font-semibold'>Enable Notifications:</span>{' '}
+                  In the Find My app, enable “Notify When Left Behind” to
+                  receive alerts if you move away from your tracker.
+                </li>
+                <li>
+                  <span className='font-semibold'>Replace Battery:</span> When
+                  the battery is low (after 9-12 months), replace it with a new
+                  CR2032 battery. No tools are required for the swap.
+                </li>
+              </ol>
+              <p className='text-gray-600 font-mont text-sm mt-4'>
+                <span className='font-semibold'>Note:</span> Ensure your device
+                is running iOS 14.5 or later for compatibility. Keep the tracker
+                away from extreme heat or prolonged water exposure to maintain
+                performance.
+              </p>
+              <p className='text-gray-600 font-mont text-sm mt-4'>
+                <span className='font-semibold'>Package Includes:</span>{' '}
+                Borofone BS101 Tracker, CR2032 Battery, User Manual, Adhesive
+                Mount
+              </p>
             </div>
           </div>
         </div>

@@ -24,8 +24,8 @@ function DeliveryAndReturnPolicy() {
                 </h4>
                 <p className='text-xs py-1'>
                   We strive to deliver your order as quickly as possible. Orders
-                  within Dhaka are delivered within 2-3 business days. For areas
-                  outside Dhaka, delivery takes 5-7 business days.
+                  within Dhaka are delivered within 1-2 business days. For areas
+                  outside Dhaka, delivery takes 2-3 business days.
                 </p>
               </div>
               <div>
@@ -33,8 +33,8 @@ function DeliveryAndReturnPolicy() {
                   Shipping Charges
                 </h4>
                 <p className='text-xs py-1'>
-                  A flat shipping fee of ৳50 applies for deliveries within
-                  Dhaka. For all other districts, the shipping fee is ৳100. Free
+                  A flat shipping fee of ৳60 applies for deliveries within
+                  Dhaka. For all other districts, the shipping fee is ৳120. Free
                   shipping may be available on select promotions.
                 </p>
               </div>
@@ -95,17 +95,17 @@ function DeliveryAndReturnPolicy() {
           <p className='text-gray-600 text-sm md:text-base'>
             Have questions? Reach out to us at{' '}
             <a
-              href='mailto:support@yourbrand.com'
+              href='mailto:support@sheiishop.com'
               className='text-blue-600 hover:underline'
             >
-              support@yourbrand.com
+              support@sheiishop.com
             </a>{' '}
             or call{' '}
             <a
               href='tel:+8801234567890'
               className='text-blue-600 hover:underline'
             >
-              +880 123 456 7890
+              +880 1814575428
             </a>
             .
           </p>

@@ -8,12 +8,14 @@ import { GoChevronDown } from 'react-icons/go';
 import Link from 'next/link';
 import { addToCart } from '@/store/cartSlice';
 import { products } from '@/utils/products';
+import { useRouter } from 'next/router';
 
 // Define categories based on product titles/models
 const categories = ['Smart Watches', 'Smart Rings'];
 
 function Products() {
   const dispatch = useDispatch();
+  const router = useRouter();
   const [filteredProducts, setFilteredProducts] = useState(products);
   const [sortOption, setSortOption] = useState('newest');
   const [viewMode, setViewMode] = useState('grid');
@@ -135,6 +137,7 @@ function Products() {
           image: product.thumbnail,
         })
       );
+      router.push('/order');
     };
 
     return (
@@ -187,17 +190,18 @@ function Products() {
             {product.inStock ? 'In Stock' : 'Out of Stock'}
           </p>
           <div className='mt-auto flex items-center justify-center'>
-            <button
-              onClick={handleAddToCart}
+            <Link
+              href={`/product/${product.slug}`}
+              // onClick={handleAddToCart}
               disabled={!product.inStock}
-              className={`mt-3 bg-accent text-white py-2 px-4 rounded-lg text-sm font-semibold w-full ${
+              className={`mt-3 bg-accent text-center text-white py-2 px-4 rounded-lg text-sm font-semibold w-full ${
                 product.inStock
                   ? 'hover:bg-blue-700'
                   : 'bg-gray-400 cursor-not-allowed'
               } transition-colors`}
             >
               Buy Now
-            </button>
+            </Link>
           </div>
         </div>
       </div>

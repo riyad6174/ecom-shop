@@ -1,52 +1,42 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/router';
-import { HiMiniChevronDown } from 'react-icons/hi2';
-import { GoBell } from 'react-icons/go';
-import { TfiHeart } from 'react-icons/tfi';
-import { IoCartOutline } from 'react-icons/io5';
+import { FaBars, FaTimes } from 'react-icons/fa';
 import Link from 'next/link';
-import { FaBars } from 'react-icons/fa6';
-import { BiSearch } from 'react-icons/bi';
-import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
+
 function Navbar() {
   const router = useRouter();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
 
   return (
     <>
-      {/* large device navbar */}
-      <nav className='hidden md:block'>
-        <div className='bg-white shadow-md'>
-          <div className=' container  py-4  flex items-center justify-center'>
-            <Link href='/'>
-              <img className='h-20' src='/assets/logo.png' alt='Logo' />
-            </Link>
-
-            {/* <div className='flex items-center space-x-6'>
-              <button className='flex items-center justify-center bg-gray-100 rounded-full px-5 py-2'>
-                2 x <IoCartOutline className='text-2xl text-gray-500' />
-              </button>
-            </div> */}
-          </div>
+      {/* Desktop Navbar */}
+      <nav className='hidden md:block bg-white shadow-md'>
+        <div className='container mx-auto py-4 flex items-center justify-center'>
+          <Link href='/'>
+            <img className='h-20' src='/assets/logo.png' alt='Logo' />
+          </Link>
         </div>
-
-        <div className='bg-gray-700 border-t py-3 px-6 flex justify-center space-x-6 text-gray-100 text-sm'>
+        <div className='bg-gray-700 py-3 px-6 flex justify-center space-x-8 text-gray-100 text-sm font-medium'>
           <Link
             href='/products'
             className={`${
               router.pathname === '/products'
-                ? 'text-blue-600 font-semibold'
-                : ''
+                ? 'text-blue-500 font-semibold'
+                : 'hover:text-blue-400 transition-colors'
             }`}
           >
             Products
           </Link>
-
           <Link
             href='/about-us'
             className={`${
               router.pathname === '/about-us'
-                ? 'text-blue-600 font-semibold'
-                : ''
+                ? 'text-blue-500 font-semibold'
+                : 'hover:text-blue-400 transition-colors'
             }`}
           >
             About Us
@@ -55,39 +45,74 @@ function Navbar() {
             href='/contact-us'
             className={`${
               router.pathname === '/contact-us'
-                ? 'text-blue-600 font-semibold'
-                : ''
+                ? 'text-blue-500 font-semibold'
+                : 'hover:text-blue-400 transition-colors'
             }`}
           >
             Contact Us
           </Link>
         </div>
       </nav>
-      {/* small device navbar */}
-      <nav className='block md:hidden'>
-        <div className='px-6 py-2 bg-white'>
-          <div className='flex items-center justify-center'>
-            {/* <button className='text-2xl text-gray-500'>
-              <FaBars />
-            </button> */}
-            <Link href='/'>
-              <img className='h-12' src='/assets/logo.png' alt='Logo' />
+
+      {/* Mobile Navbar */}
+      <nav className='block md:hidden bg-white shadow-md'>
+        <div className='px-6 py-3 flex items-center justify-between'>
+          <button
+            onClick={toggleMenu}
+            aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
+            className='text-2xl text-gray-600 hover:text-blue-500 transition-colors focus:outline-none'
+          >
+            {isMenuOpen ? <FaTimes /> : <FaBars />}
+          </button>
+          <Link href='/'>
+            <img className='h-12' src='/assets/logo.png' alt='Logo' />
+          </Link>
+          <div className='w-6'></div> {/* Spacer for alignment */}
+        </div>
+        {/* Mobile Menu */}
+        <div
+          className={`${
+            isMenuOpen
+              ? 'max-h-64 opacity-100 px-6 py-4 bg-gray-50 shadow-inner'
+              : 'max-h-0 opacity-0'
+          } overflow-hidden transition-all duration-300 ease-in-out`}
+        >
+          <div className='flex flex-col space-y-4 text-gray-700 text-base font-medium'>
+            <Link
+              href='/products'
+              onClick={() => setIsMenuOpen(false)}
+              className={`${
+                router.pathname === '/products'
+                  ? 'text-blue-500 font-semibold'
+                  : 'hover:text-blue-500 transition-colors'
+              }`}
+            >
+              Products
             </Link>
-            {/* <button>
-              <IoCartOutline className='text-2xl text-gray-500' />
-            </button> */}
+            <Link
+              href='/about-us'
+              onClick={() => setIsMenuOpen(false)}
+              className={`${
+                router.pathname === '/about-us'
+                  ? 'text-blue-500 font-semibold'
+                  : 'hover:text-blue-500 transition-colors'
+              }`}
+            >
+              About Us
+            </Link>
+            <Link
+              href='/contact-us'
+              onClick={() => setIsMenuOpen(false)}
+              className={`${
+                router.pathname === '/contact-us'
+                  ? 'text-blue-500 font-semibold'
+                  : 'hover:text-blue-500 transition-colors'
+              }`}
+            >
+              Contact Us
+            </Link>
           </div>
         </div>
-        {/* <div className='px-6 pt-2 pb-6 bg-white relative'>
-          <input
-            type='text'
-            placeholder='Search here'
-            className='w-full px-3 py-3 border rounded-xl bg-slate-50 focus:outline-none'
-          />
-          <button className='absolute text-sm top-[18px] right-10  text-white bg-primary px-4 py-[5px] rounded-md'>
-            Search
-          </button>
-        </div> */}
       </nav>
     </>
   );

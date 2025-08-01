@@ -3,6 +3,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import { Pagination, Autoplay } from 'swiper/modules';
+import Link from 'next/link';
 
 const Hero = () => {
   return (
@@ -17,27 +18,27 @@ const Hero = () => {
               // pagination={{ clickable: true }}
               autoplay={{ delay: 5000, disableOnInteraction: false }}
               speed={1000}
-              className='h-[580px] w-full rounded-xl overflow-hidden'
+              className='h-[500px] w-full rounded-xl overflow-hidden'
             >
               <SwiperSlide>
                 <img
-                  src='/assets/banner/ring.webp'
+                  src='/assets/banner/banner-tag.png'
                   alt='Winter Collection'
-                  className='h-full w-full object-cover rounded-xl'
+                  className='h-full w-full object-fit rounded-xl'
                 />
               </SwiperSlide>
-              {/* <SwiperSlide>
+              <SwiperSlide>
                 <img
-                  src='/assets/banner/watch.jpg'
+                  src='/assets/banner/fan-banner.png'
                   alt='Winter Collection Slide 2'
-                  className='h-full w-full object-cover rounded-xl'
+                  className='h-full w-full object-fit rounded-xl'
                 />
-              </SwiperSlide> */}
+              </SwiperSlide>
               <SwiperSlide>
                 <img
                   src='/assets/banner/watch2.webp'
                   alt='Winter Collection Slide 3'
-                  className='h-full w-full object-cover rounded-xl'
+                  className='h-full w-full object-fit rounded-xl'
                 />
               </SwiperSlide>
             </Swiper>
@@ -50,12 +51,15 @@ const Hero = () => {
               <img
                 src='/assets/banner/watch2.webp'
                 alt='Online Shopping'
-                className='h-[282px] w-full object-cover'
+                className='h-[262px] w-full object-cover'
               />
               <div className='absolute bottom-0 p-4'>
-                <button className='mt-2 bg-white text-blue-600 font-semibold py-2 px-4 rounded-md hover:bg-blue-100'>
+                <Link
+                  href={'/products'}
+                  className='mt-2 bg-white text-blue-600 font-semibold py-2 px-4 rounded-md hover:bg-blue-100'
+                >
                   Shop Now
-                </button>
+                </Link>
               </div>
             </div>
 
@@ -64,12 +68,15 @@ const Hero = () => {
               <img
                 src='/assets/banner/ring.webp'
                 alt='Trade-In Offer'
-                className='h-[282px] w-full object-cover'
+                className='h-[222px] w-full object-cover'
               />
               <div className='absolute bottom-0 p-4'>
-                <button className='mt-2 bg-white text-orange-600 font-semibold py-2 px-4 rounded-md hover:bg-orange-100'>
+                <Link
+                  href={'/products'}
+                  className='mt-2 bg-white text-orange-600 font-semibold py-2 px-4 rounded-md hover:bg-orange-100'
+                >
                   Shop Now
-                </button>
+                </Link>
               </div>
             </div>
           </div>
@@ -87,14 +94,14 @@ const Hero = () => {
         >
           <SwiperSlide>
             <img
-              src='/assets/banner/ring.webp'
+              src='/assets/banner/banner-tag.png'
               alt='Winter Collection'
               className='h-full w-full object-cover rounded-xl'
             />
           </SwiperSlide>
           <SwiperSlide>
             <img
-              src='/assets/banner/watch.jpg'
+              src='/assets/banner/fan-banner.png'
               alt='Winter Collection Slide 2'
               className='h-full w-full object-cover rounded-xl'
             />

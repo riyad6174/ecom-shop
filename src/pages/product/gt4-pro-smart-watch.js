@@ -1,4 +1,3 @@
-// pages/product/c30-pro-smart-watch.js
 import React, { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { GoShareAndroid } from 'react-icons/go';
@@ -11,7 +10,7 @@ import Footer from '@/components/common/Footer';
 import { useRouter } from 'next/router';
 
 // Find the specific product for this page
-const productData = products.find((p) => p.slug === 'c30-pro-smart-watch');
+const productData = products.find((p) => p.slug === 'gt4-pro-smart-watch');
 
 const ProductDetails = ({ initialProduct }) => {
   const dispatch = useDispatch();
@@ -25,7 +24,7 @@ const ProductDetails = ({ initialProduct }) => {
     if (initialProduct) {
       setProduct(initialProduct);
       setSelectedColor(initialProduct.variants[0].color);
-      setActiveImage(initialProduct.variants[0].images[0]);
+      setActiveImage(initialProduct.images[0]); // Set first image as default
     }
   }, [initialProduct]);
 
@@ -35,8 +34,6 @@ const ProductDetails = ({ initialProduct }) => {
 
   const handleColorChange = (color) => {
     setSelectedColor(color);
-    const variant = product.variants.find((v) => v.color === color);
-    setActiveImage(variant.images[0]);
   };
 
   const handleQuantityChange = (type) => {
@@ -67,10 +64,6 @@ const ProductDetails = ({ initialProduct }) => {
   if (!product) {
     return <div>Product not found</div>;
   }
-
-  const currentVariant = product.variants.find(
-    (v) => v.color === selectedColor
-  );
 
   return (
     <>
@@ -118,7 +111,7 @@ const ProductDetails = ({ initialProduct }) => {
                     />
                     {/* Small Images for Mobile */}
                     <div className='flex justify-center gap-2 mt-4 md:hidden'>
-                      {currentVariant?.images?.map((image, index) => (
+                      {product.images.slice(1).map((image, index) => (
                         <img
                           key={index}
                           className={`w-[80px] h-[80px] object-cover rounded-lg cursor-pointer small-image ${
@@ -135,7 +128,7 @@ const ProductDetails = ({ initialProduct }) => {
                   </div>
                   {/* Small Images for Desktop */}
                   <div className='col-span-1 hidden md:flex flex-col items-center gap-4'>
-                    {currentVariant?.images?.map((image, index) => (
+                    {product.images.slice(1).map((image, index) => (
                       <img
                         key={index}
                         className={`w-full h-[167px] object-cover rounded-lg cursor-pointer small-image ${
@@ -161,7 +154,9 @@ const ProductDetails = ({ initialProduct }) => {
                 </p>
 
                 <div className='mb-6'>
-                  <span className='font-semibold text-gray-700'>Color</span>
+                  <span className='font-semibold text-gray-700'>
+                    Choose a Color
+                  </span>
                   <div className='flex items-center gap-3 mt-4'>
                     {product.variants.map((variant) => (
                       <div
@@ -187,10 +182,10 @@ const ProductDetails = ({ initialProduct }) => {
                 {/* Price */}
                 <div className='flex items-center justify-start gap-2 text-md mb-6'>
                   <span className='text-blue-600 font-bold text-xl'>
-                    ${product.price.toFixed(2)}
+                    ৳ {product.price.toFixed(2)}
                   </span>
                   <span className='text-gray-500 font-normal text-lg line-through'>
-                    ${product.originalPrice.toFixed(2)}
+                    ৳ {product.originalPrice.toFixed(2)}
                   </span>
                 </div>
 
@@ -256,7 +251,7 @@ const ProductDetails = ({ initialProduct }) => {
                 </div>
 
                 {/* Share */}
-                <div className='flex items-center justify-start gap-4'>
+                {/* <div className='flex items-center justify-start gap-4'>
                   <div className='border border-gray-300 p-1 rounded-lg'>
                     <GoShareAndroid className='text-2xl' />
                   </div>
@@ -265,7 +260,7 @@ const ProductDetails = ({ initialProduct }) => {
                       ? '(There are 24 products left)'
                       : '(Out of stock)'}
                   </span>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>
@@ -279,14 +274,63 @@ const ProductDetails = ({ initialProduct }) => {
             </div>
             <div className='mt-10'>
               <p className='text-gray-600 font-mont text-sm'>
-                {product.description}
+                Elevate your fitness and connectivity with the GT4 PRO Smart
+                Watch, a premium men's smartwatch designed for an active
+                lifestyle. Featuring a vibrant 1.6-inch HD screen with a 360x360
+                resolution, this smartwatch delivers clear visuals and a smooth
+                touch experience. Its IP68 waterproof rating ensures durability
+                during intense workouts, outdoor adventures, or even swimming.
               </p>
-              <p className='py-5 text-gray-600 font-mont text-sm'>
+              <p className='text-gray-600 font-mont text-sm mt-4'>
+                Stay connected with Bluetooth calling and music control,
+                allowing you to make and receive calls or manage your playlist
+                directly from your wrist. The GT4 PRO is packed with advanced
+                health monitoring features, including heart rate tracking, blood
+                oxygen monitoring, blood pressure, sleep tracking, and stress
+                monitoring, keeping you informed about your well-being in
+                real-time. With 156 sports modes and a precise GPS tracker, it
+                accurately records steps, distance, calories, and motion tracks
+                for activities like running, cycling, and more. Additional
+                features include NFC for contactless payments, a compass for
+                navigation, and an AI voice assistant for hands-free control.
+                Customize your experience with downloadable watch faces, a QR
+                code for app connectivity, and smart features like message
+                notifications, remote camera control, and weather updates. The
+                360mAh battery offers up to 30 days of standby time or 3-5 days
+                of active use, ensuring long-lasting performance.
+              </p>
+              <p className='text-gray-600 font-mont text-sm mt-4'>
+                {' '}
+                Compatible with Android 5.0+ and iOS 9.0+, the GT4 PRO supports
+                multiple languages, including English, Spanish, German, and
+                more. The durable zinc alloy case and silicone strap provide
+                comfort and style, making it the perfect companion for fitness
+                enthusiasts and tech-savvy individuals alike.
+              </p>
+
+              <p className='py-5 text-gray-600 font-mont text-sm mt-4'>
                 Key Features:
               </p>
               <ul className='list-disc list-inside text-gray-600 font-mont text-sm'>
-                <li>Effective noise reduction</li>
-                <li>Smart Bluetooth</li>
+                <li>🏃 Pedometer/Distance/Calorie Burn Tracking</li>
+                <li>🎥 Video Remote Control</li>
+                <li>💓 Heart Rate Measurement</li>
+                <li>🩺 Blood Pressure, Blood Sugar Measurement</li>
+                <li>🧘 Breathing Exercise Trainer</li>
+                <li>🩸 Blood Oxygenation</li>
+                <li>😴 Sleep Monitoring</li>
+                <li>🌤 Weather Update</li>
+                <li>⚽ Sports</li>
+                <li>🧮 Calculator</li>
+                <li>📞 Bluetooth Calling</li>
+                <li>🧮 Calculator</li>
+                <li>🎶 Bluetooth Music</li>
+                <li>🧮 Calculator</li>
+                <li>🗣 Voice Assistant</li>
+                <li>⏱ Stopwatch</li>
+                <li>🧮 Calculator</li>
+                <li>🧭 Compass</li>
+                <li>📩 Real-time Message Alert</li>
               </ul>
             </div>
           </div>

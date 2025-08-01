@@ -1,46 +1,69 @@
-// products.js
 export const products = [
   {
     id: 1,
-    title: 'C30 Pro Smart Watch - Big Screen BT Call',
-    slug: 'c30-pro-smart-watch',
-    model: 'C30 PRO',
-    price: 3850.0,
-    originalPrice: 4850.0,
+    title: 'GT4 Pro Smart Watch - Big Screen BT Call',
+    slug: 'gt4-pro-smart-watch',
+    model: 'GT4 PRO',
+    price: 2600.0,
+    originalPrice: 3200.0,
     sectionType: 'hot',
     inStock: true,
-    thumbnail: '/assets/product/watch/watch1.jpeg',
+    thumbnail: '/assets/product/watch/watch1.jpg',
     description:
-      'C30 PRO Smart Watch Big Screen BT Call C30pro Outdoor Waterproof Sports Fitness Motion Monitoring Men Smartwatch',
-    variants: [
-      {
-        color: 'Black',
-        images: [
-          '/assets/product/watch/watch1.jpeg',
-          '/assets/product/watch/watch1.jpeg',
-          '/assets/product/watch/watch1.jpeg',
-          '/assets/product/watch/watch1.jpeg',
-        ],
-      },
-      {
-        color: 'White',
-        images: [
-          '/assets/product/watch/watch1_white_1.jpeg',
-          '/assets/product/watch/watch1_white_2.jpeg',
-          '/assets/product/watch/watch1_white_3.jpeg',
-          '/assets/product/watch/watch1_white_4.jpeg',
-        ],
-      },
-      {
-        color: 'Blue',
-        images: [
-          '/assets/product/watch/watch1_blue_1.jpeg',
-          '/assets/product/watch/watch1_blue_2.jpeg',
-          '/assets/product/watch/watch1_blue_3.jpeg',
-          '/assets/product/watch/watch1_blue_4.jpeg',
-        ],
-      },
+      'GT4 PRO Smart Watch Big Screen BT Call gt4pro Outdoor Waterproof Sports Fitness Motion Monitoring Men Smartwatch',
+    images: [
+      '/assets/product/watch/watch1.jpg',
+      '/assets/product/watch/watch2.jpg',
+      '/assets/product/watch/watch4.jpg',
+      '/assets/product/watch/watch3.jpg',
     ],
+    variants: [{ color: 'Black' }],
+  },
+  {
+    id: 3,
+    title: 'JF132-Portable High-speed Cooling Fan',
+    slug: 'portable-high-speed-cooling-fan',
+    model: 'JF132',
+    price: 1750.0,
+    originalPrice: 2200.0,
+    sectionType: 'hot',
+    inStock: true,
+    thumbnail: '/assets/product/fan/fan-black.avif',
+    description:
+      'JF132 Portable High-speed Cooling Fan with 0-200 Speed Settings, USB Rechargeable, and Adjustable Tilt for Personal Use',
+    images: [
+      '/assets/product/fan/fan-front-back.avif',
+      '/assets/product/fan/fan-white.avif',
+      '/assets/product/fan/fan-pink.avif',
+      '/assets/product/fan/fan-black.avif',
+    ],
+    variants: [
+      { color: 'Black' },
+      { color: 'White' },
+      { color: 'Gray' },
+      { color: 'Pink' },
+      { color: 'Beige' },
+    ],
+  },
+  {
+    id: 4,
+    title: 'Borofone BS101 Anti Lost Tracker',
+    slug: 'borofone-anti-lost-tracker',
+    model: 'BS101',
+    price: 1150.0,
+    originalPrice: 1400.0,
+    sectionType: 'hot',
+    inStock: true,
+    thumbnail: '/assets/product/tracker/tracker1.jpg',
+    description:
+      'Never lose your essentials with the Borofone BS101 Anti-Lost Tracker. This compact 7g device integrates with Apple’s Find My network for real-time location tracking.',
+    images: [
+      '/assets/product/tracker/tracker1.jpg',
+      '/assets/product/tracker/tracker2.jpg',
+      '/assets/product/tracker/tracker3.jpg',
+      '/assets/product/tracker/tracker4.jpg',
+    ],
+    variants: [{ color: 'Black' }],
   },
   {
     id: 2,
@@ -52,81 +75,15 @@ export const products = [
     sectionType: 'normal',
     inStock: false,
     thumbnail: '/assets/product/ring/ring1.jpeg',
-
     description:
       'A sleek and durable artificial leather jacket, ideal for a bold, modern look.',
-    variants: [
-      {
-        color: 'Black',
-        images: [
-          '/assets/product/ring/ring1_black_1.jpeg',
-          '/assets/product/ring/ring1_black_2.jpeg',
-          '/assets/product/ring/ring1_black_3.jpeg',
-          '/assets/product/ring/ring1_black_4.jpeg',
-        ],
-      },
-      {
-        color: 'White',
-        images: [
-          '/assets/product/ring/ring1_white_1.jpeg',
-          '/assets/product/ring/ring1_white_2.jpeg',
-          '/assets/product/ring/ring1_white_3.jpeg',
-          '/assets/product/ring/ring1_white_4.jpeg',
-        ],
-      },
-      {
-        color: 'Red',
-        images: [
-          '/assets/product/ring/ring1_red_1.jpeg',
-          '/assets/product/ring/ring1_red_2.jpeg',
-          '/assets/product/ring/ring1_red_3.jpeg',
-          '/assets/product/ring/ring1_red_4.jpeg',
-        ],
-      },
+    images: [
+      '/assets/product/ring/ring1_main.jpeg',
+      '/assets/product/ring/ring1_side1.jpeg',
+      '/assets/product/ring/ring1_side2.jpeg',
+      '/assets/product/ring/ring1_side3.jpeg',
     ],
-  },
-  {
-    id: 3,
-    title: 'JF132-Portable High-speed Cooling Fan',
-    slug: 'portable-high-speed-cooling-fan',
-    model: 'JF132',
-    price: 1750.0,
-    originalPrice: 2200.0,
-    sectionType: 'hot',
-    inStock: false,
-    thumbnail: '/assets/product/fan/fan-front-back.avif',
-
-    description:
-      'JF132 Portable High-speed Cooling Fan with 3 Speed Settings, USB Rechargeable, and Adjustable Tilt for Personal Use',
-    variants: [
-      {
-        color: 'Black',
-        images: [
-          '/assets/product/fan/fan-front-back.avif',
-          '/assets/product/fan/fan-black.avif',
-          '/assets/product/fan/fan-white.avif',
-          '/assets/product/fan/fan-white1.avif',
-        ],
-      },
-      {
-        color: 'White',
-        images: [
-          '/assets/product/ring/ring1_white_1.jpeg',
-          '/assets/product/ring/ring1_white_2.jpeg',
-          '/assets/product/ring/ring1_white_3.jpeg',
-          '/assets/product/ring/ring1_white_4.jpeg',
-        ],
-      },
-      {
-        color: 'Blue',
-        images: [
-          '/assets/product/ring/ring1_red_1.jpeg',
-          '/assets/product/ring/ring1_red_2.jpeg',
-          '/assets/product/ring/ring1_red_3.jpeg',
-          '/assets/product/ring/ring1_red_4.jpeg',
-        ],
-      },
-    ],
+    variants: [{ color: 'Black' }, { color: 'White' }, { color: 'Red' }],
   },
 ];
 

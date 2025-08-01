@@ -32,17 +32,19 @@ function Cart() {
   );
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
-  const [orderDetails, setOrderDetails] = useState(null); // Store order details for popup
+  const [orderDetails, setOrderDetails] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [submissionError, setSubmissionError] = useState(null);
 
   // Pricing state
   const [totalPrice, setTotalPrice] = useState(0);
-  const [shippingCharge, setShippingCharge] = useState(100); // Default to 100 Taka
+  const [shippingCharge, setShippingCharge] = useState(120);
   const [grandTotal, setGrandTotal] = useState(0);
 
   // Calculate totals based on cart items
   useEffect(() => {
     const total = cartItems.reduce(
-      (sum, item) => sum + item.price * item.quantity,
+      (sum, item) => sum + (item.price || 0) * (item.quantity || 1),
       0
     );
     setTotalPrice(total);
@@ -68,8 +70,7 @@ function Cart() {
     setSearchTerm(district);
     setIsDropdownOpen(false);
     validateField('district', district);
-    // Update shipping charge based on district
-    const newShippingCharge = district === 'Dhaka' ? 50 : 100;
+    const newShippingCharge = district === 'Dhaka' ? 60 : 120;
     setShippingCharge(newShippingCharge);
     setGrandTotal(totalPrice + newShippingCharge);
   };
@@ -80,7 +81,6 @@ function Cart() {
     setSearchTerm(value);
     setFormData({ ...formData, district: value });
     setIsDropdownOpen(true);
-
     const filtered = districtsData.districts.filter((district) =>
       district.name.toLowerCase().includes(value.toLowerCase())
     );
@@ -90,7 +90,6 @@ function Cart() {
   // Validate individual field
   const validateField = (name, value) => {
     let newErrors = { ...errors };
-
     switch (name) {
       case 'fullName':
         if (!value.trim()) {
@@ -132,7 +131,6 @@ function Cart() {
       default:
         break;
     }
-
     setErrors(newErrors);
   };
 
@@ -152,41 +150,109 @@ function Cart() {
     if (!formData.address.trim()) newErrors.address = 'Address is required';
     else if (formData.address.length < 5)
       newErrors.address = 'Address must be at least 5 characters';
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   // Handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (validateForm()) {
-      // Extract last 5 digits of phone number
-      const phoneLastFive = formData.phoneNumber.slice(-5);
-      const order = {
-        user: { ...formData },
-        order: {
-          items: [...cartItems], // Create a copy to avoid mutation
-          totalPrice,
-          shippingCharge,
-          grandTotal,
-          orderDate: new Date().toISOString(),
-          orderId: `ORD-${phoneLastFive}`, // e.g., ORD-67890-174567890
+    if (!validateForm()) return;
+
+    setIsLoading(true);
+    setSubmissionError(null);
+
+    const phoneLastFive = formData.phoneNumber
+      ? formData.phoneNumber.slice(-5)
+      : 'UNKNOWN';
+    const order = {
+      user: { ...formData },
+      order: {
+        items: [...cartItems],
+        totalPrice,
+        shippingCharge,
+        grandTotal,
+        orderDate: new Date().toISOString(),
+        orderId: `ORD-${phoneLastFive}`,
+      },
+    };
+
+    const sheetData = {
+      name: formData.fullName || '',
+      phone: formData.phoneNumber || '',
+      district: formData.district || '',
+      address: formData.address || '',
+      items: JSON.stringify(
+        cartItems.map((item) => ({
+          title: item.title || 'Unknown',
+          price: item.price || 0,
+          quantity: item.quantity || 1,
+          selectedColor: item.selectedColor || 'N/A',
+        }))
+      ),
+      totalPrice: totalPrice || 0,
+      shippingCharge: shippingCharge || 0,
+      grandTotal: grandTotal || 0,
+      orderId: `ORD-${phoneLastFive}` || 'ORD-UNKNOWN',
+      orderDate: new Date().toISOString(),
+      submissionTime: new Date().toISOString(),
+      sheetName: 'Orders',
+    };
+
+    console.log('sheetData:', JSON.stringify(sheetData, null, 2));
+    if (
+      !sheetData.name ||
+      !sheetData.phone ||
+      !sheetData.district ||
+      !sheetData.address
+    ) {
+      setSubmissionError('Please fill all required fields.');
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
+      console.log('Sending fetch request:', {
+        url: '/api/submit',
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(sheetData),
+      });
+      const response = await fetch('/api/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-      };
-      console.log('Order Submitted:', order);
-      setOrderDetails(order);
-      setShowPopup(true);
+        body: JSON.stringify(sheetData),
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error('API error response:', errorData);
+        setSubmissionError(errorData.message || 'Failed to submit order');
+      } else {
+        console.log('Order Submitted:', order);
+        setOrderDetails(order);
+        setShowPopup(true);
+      }
+    } catch (error) {
+      console.error('Fetch error:', error.name, error.message);
+      setSubmissionError('Error submitting order. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   // Handle popup close
   const handleClosePopup = () => {
     setShowPopup(false);
-
     setOrderDetails(null);
-    dispatch(clearCart()); // Clear cart only when popup is closed
-    router.push('/'); // Redirect to home page
+    dispatch(clearCart());
+    router.push('/');
   };
 
   // Update filtered districts on mount
@@ -238,7 +304,7 @@ function Cart() {
             </div>
             {/* Checkout Form */}
             <div className='md:w-1/3'>
-              <div className='bg-white rounded-lg shadow-md p-6 '>
+              <div className='bg-white rounded-lg shadow-md p-6'>
                 <div className='pb-4'>
                   <h2 className='text-lg font-semibold'>Proceed to Checkout</h2>
                 </div>
@@ -381,6 +447,12 @@ function Cart() {
                       </span>
                     </div>
                   </div>
+                  {/* Submission Error */}
+                  {submissionError && (
+                    <p className='text-red-500 text-sm mb-2'>
+                      {submissionError}
+                    </p>
+                  )}
                   <button
                     type='submit'
                     disabled={
@@ -389,11 +461,12 @@ function Cart() {
                       !formData.phoneNumber ||
                       !formData.district ||
                       !formData.address ||
-                      cartItems.length === 0
+                      cartItems.length === 0 ||
+                      isLoading
                     }
-                    className='bg-blue-600 text-white py-3 px-4 rounded-lg w-full text-sm font-semibold disabled:bg-gray-400 disabled:cursor-not-allowed hover:bg-blue-700 transition-colors'
+                    className='bg-orange-600 text-white py-3 px-4 rounded-lg w-full text-sm font-semibold disabled:bg-gray-400 disabled:cursor-not-allowed hover:bg-orange-700 transition-colors'
                   >
-                    Confirm Order
+                    {isLoading ? 'Confirming...' : 'Confirm Order'}
                   </button>
                 </form>
               </div>
@@ -405,7 +478,6 @@ function Cart() {
         </div>
       </CustomSection>
       <Footer />
-
       {/* Thank You Popup */}
       {showPopup && orderDetails && (
         <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'>
@@ -445,30 +517,6 @@ function Cart() {
                   {new Date(orderDetails.order.orderDate).toLocaleString()}
                 </p>
               </div>
-              {/* Customer Details */}
-              {/* <div className='p-4 border-b'>
-                <h4 className='text-sm font-medium text-gray-700 mb-2'>
-                  Customer Details
-                </h4>
-                <div className='text-sm text-gray-600 space-y-1'>
-                  <p>
-                    <span className='font-medium'>Name:</span>{' '}
-                    {orderDetails.user.fullName}
-                  </p>
-                  <p>
-                    <span className='font-medium'>Phone:</span>{' '}
-                    {orderDetails.user.phoneNumber}
-                  </p>
-                  <p>
-                    <span className='font-medium'>District:</span>{' '}
-                    {orderDetails.user.district}
-                  </p>
-                  <p>
-                    <span className='font-medium'>Address:</span>{' '}
-                    {orderDetails.user.address}
-                  </p>
-                </div>
-              </div> */}
               {/* Order Items */}
               <div className='p-3 border-b'>
                 <h4 className='text-sm font-medium text-gray-700 mb-3'>
@@ -487,7 +535,7 @@ function Cart() {
                     {orderDetails.order.items.map((item) => (
                       <div
                         key={`${item.id}-${item.selectedColor}`}
-                        className='grid grid-cols-11 gap-2 text-sm text-gray-600 items-center '
+                        className='grid grid-cols-11 gap-2 text-sm text-gray-600 items-center'
                       >
                         <span className='col-span-4 font-medium truncate'>
                           {item.title}
@@ -499,7 +547,7 @@ function Cart() {
                           {item.quantity}
                         </span>
                         <span className='col-span-2 text-right font-medium'>
-                          ৳{item.price * item.quantity}
+                          ৳{(item.price * item.quantity).toFixed(2)}
                         </span>
                       </div>
                     ))}
