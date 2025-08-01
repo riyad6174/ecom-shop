@@ -318,6 +318,30 @@ const ProductDetails = ({ initialProduct }) => {
                 <li>🤫 Whisper-quiet operation for distraction-free use</li>
               </ul>
             </div>
+            <div className='mt-10'>
+              <h3 className='text-lg font-semibold font-mont text-gray-800 mb-4'>
+                User Guide
+              </h3>
+              <div className='video-container max-w-full md:max-w-3xl mx-auto rounded-xl overflow-hidden video-player'>
+                <video
+                  className='w-full h-[500px]'
+                  controls
+                  // poster='/product/fan/userguide-poster.jpg'
+                >
+                  <source
+                    src='/assets/product/fan/userguide.mp4'
+                    type='video/mp4'
+                  />
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+              <p className='text-gray-600 font-mont text-sm mt-4'>
+                Watch the user guide above to learn how to set up and use your{' '}
+                <strong>JF132 Portable Cooling Fan</strong>. This video covers
+                unboxing, charging, adjusting speed settings, and maintenance
+                tips to ensure optimal performance.
+              </p>
+            </div>
           </div>
         </div>
       </CustomSection>
