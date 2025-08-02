@@ -34,7 +34,7 @@ export default function Document() {
         />
         {/* End Google Tag Manager */}
         {/* Meta Pixel Code */}
-        {/* <script
+        <script
           dangerouslySetInnerHTML={{
             __html: `
               !function(f,b,e,v,n,t,s)
@@ -51,7 +51,7 @@ export default function Document() {
               fbq('track', 'PageView');
             `,
           }}
-        /> */}
+        />
         {/* End Meta Pixel Code */}
       </Head>
       <body className='antialiased'>
@@ -69,16 +69,16 @@ export default function Document() {
 
         {/* End Google Tag Manager (noscript) */}
         {/* Meta Pixel (noscript) */}
-        {/* <noscript>
+        <noscript>
           <img
             height='1'
             width='1'
             style={{ display: 'none' }}
             src={`https://www.facebook.com/tr?id=${
-              process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID || '730930632906788'
+              process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID || '1158770882724996'
             }&ev=PageView&noscript=1`}
           />
-        </noscript> */}
+        </noscript>
         {/* End Meta Pixel (noscript) */}
         <Main />
         <NextScript />
