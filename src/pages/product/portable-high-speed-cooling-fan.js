@@ -429,6 +429,9 @@ const ProductDetails = ({ initialProduct }) => {
                 <video
                   className='w-full h-[500px]'
                   controls
+                  autoPlay
+                  muted
+                  playsInline
                   // poster='/product/fan/userguide-poster.jpg'
                 >
                   <source
