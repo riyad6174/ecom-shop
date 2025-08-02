@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { addToCart } from '@/store/cartSlice';
 import { products } from '@/utils/products';
 import { useRouter } from 'next/router';
+import Head from 'next/head';
 
 // Define categories based on product titles/models
 const categories = ['Smart Watches', 'Smart Rings'];
@@ -141,75 +142,137 @@ function Products() {
     };
 
     return (
-      <div
-        className={`bg-white rounded-lg shadow-md overflow-hidden transition-shadow duration-300 hover:shadow-lg ${
-          viewMode === 'list' ? 'flex w-full' : 'flex-col'
-        }`}
-      >
-        <Link href={`/product/${product.slug}`}>
-          <img
-            src={product.thumbnail}
-            alt={product.title}
-            className={`object-cover ${
-              viewMode === 'list'
-                ? 'w-32 h-32 rounded-l-lg'
-                : 'w-full h-48 rounded-t-lg'
-            }`}
-          />
-        </Link>
-        <div className={`p-4 ${viewMode === 'list' ? 'flex-1' : ''}`}>
+      <>
+        <div
+          className={`bg-white rounded-lg shadow-md overflow-hidden transition-shadow duration-300 hover:shadow-lg ${
+            viewMode === 'list' ? 'flex w-full' : 'flex-col'
+          }`}
+        >
           <Link href={`/product/${product.slug}`}>
-            <h3
-              className={`text-sm font-semibold text-gray-800 line-clamp-1 ${
-                viewMode === 'list' ? 'text-base' : ''
+            <img
+              src={product.thumbnail}
+              alt={product.title}
+              className={`object-cover ${
+                viewMode === 'list'
+                  ? 'w-32 h-32 rounded-l-lg'
+                  : 'w-full h-48 rounded-t-lg'
               }`}
-            >
-              {product.title}
-            </h3>
+            />
           </Link>
-          <p className='text-xs text-gray-500 mt-1'>
-            {product.title.includes('Smart Watch')
-              ? 'Smart Watches'
-              : 'Smart Rings'}
-          </p>
-          <div className='flex items-center gap-2 mt-2'>
-            <p className='text-sm font-bold text-accent'>
-              ৳{product.price.toFixed(2)}
-            </p>
-            {product.originalPrice > product.price && (
-              <p className='text-xs text-gray-500 line-through'>
-                ৳{product.originalPrice.toFixed(2)}
-              </p>
-            )}
-          </div>
-          <p
-            className={`text-xs ${
-              product.inStock ? 'text-green-500' : 'text-red-500'
-            } mt-1`}
-          >
-            {product.inStock ? 'In Stock' : 'Out of Stock'}
-          </p>
-          <div className='mt-auto flex items-center justify-center'>
-            <Link
-              href={`/product/${product.slug}`}
-              // onClick={handleAddToCart}
-              disabled={!product.inStock}
-              className={`mt-3 bg-accent text-center text-white py-2 px-4 rounded-lg text-sm font-semibold w-full ${
-                product.inStock
-                  ? 'hover:bg-blue-700'
-                  : 'bg-gray-400 cursor-not-allowed'
-              } transition-colors`}
-            >
-              Buy Now
+          <div className={`p-4 ${viewMode === 'list' ? 'flex-1' : ''}`}>
+            <Link href={`/product/${product.slug}`}>
+              <h3
+                className={`text-sm font-semibold text-gray-800 line-clamp-1 ${
+                  viewMode === 'list' ? 'text-base' : ''
+                }`}
+              >
+                {product.title}
+              </h3>
             </Link>
+            <p className='text-xs text-gray-500 mt-1'>
+              {product.title.includes('Smart Watch')
+                ? 'Smart Watches'
+                : 'Smart Rings'}
+            </p>
+            <div className='flex items-center gap-2 mt-2'>
+              <p className='text-sm font-bold text-accent'>
+                ৳{product.price.toFixed(2)}
+              </p>
+              {product.originalPrice > product.price && (
+                <p className='text-xs text-gray-500 line-through'>
+                  ৳{product.originalPrice.toFixed(2)}
+                </p>
+              )}
+            </div>
+            <p
+              className={`text-xs ${
+                product.inStock ? 'text-green-500' : 'text-red-500'
+              } mt-1`}
+            >
+              {product.inStock ? 'In Stock' : 'Out of Stock'}
+            </p>
+            <div className='mt-auto flex items-center justify-center'>
+              <Link
+                href={`/product/${product.slug}`}
+                // onClick={handleAddToCart}
+                disabled={!product.inStock}
+                className={`mt-3 bg-accent text-center text-white py-2 px-4 rounded-lg text-sm font-semibold w-full ${
+                  product.inStock
+                    ? 'hover:bg-blue-700'
+                    : 'bg-gray-400 cursor-not-allowed'
+                } transition-colors`}
+              >
+                Buy Now
+              </Link>
+            </div>
           </div>
         </div>
-      </div>
+      </>
     );
   };
 
   return (
     <div>
+      <Head>
+        <title>
+          All Products | Sheii Shop - Smart Watches, Rings & Gadgets
+        </title>
+        <meta
+          name='description'
+          content='Browse our full collection of smart watches, smart rings, and innovative gadgets. Affordable, stylish, and available now at Sheii Shop.'
+        />
+        <meta
+          name='keywords'
+          content='smart watches, smart rings, wearable gadgets, Sheii Shop, fashion tech, affordable electronics'
+        />
+        <meta name='robots' content='index, follow' />
+        <meta name='author' content='Sheii Shop' />
+
+        {/* Canonical */}
+        <link rel='canonical' href='https://www.sheiishop.com/products' />
+
+        {/* Open Graph */}
+        <meta property='og:title' content='All Products | Sheii Shop' />
+        <meta
+          property='og:description'
+          content='Explore our range of stylish smart watches, rings, and must-have gadgets. Shop online at Sheii Shop today.'
+        />
+        <meta
+          property='og:image'
+          content='https://www.sheiishop.com/assets/footer-logo.png'
+        />
+        <meta property='og:url' content='https://www.sheiishop.com/products' />
+        <meta property='og:type' content='website' />
+        <meta property='og:site_name' content='Sheii Shop' />
+
+        {/* Twitter Card */}
+        <meta name='twitter:card' content='summary_large_image' />
+        <meta name='twitter:title' content='All Products | Sheii Shop' />
+        <meta
+          name='twitter:description'
+          content='Shop the latest fashion tech — smart watches, rings, and more at Sheii Shop.'
+        />
+        <meta
+          name='twitter:image'
+          content='https://www.sheiishop.com/assets/footer-logo.png'
+        />
+
+        {/* Schema.org Structured Data for Product Collection Page */}
+        <script
+          type='application/ld+json'
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'CollectionPage',
+              name: 'All Products - Sheii Shop',
+              description:
+                'Explore our full catalog of smart wearables and gadgets. Affordable, stylish tech made for modern living.',
+              url: 'https://www.sheiishop.com/products',
+            }),
+          }}
+        />
+      </Head>
+
       <Navbar />
       <div className='container mx-auto py-3 md:py-20 px-4 '>
         <div className='flex flex-col md:flex-row gap-6'>

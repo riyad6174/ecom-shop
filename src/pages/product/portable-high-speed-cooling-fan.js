@@ -8,6 +8,7 @@ import { products } from '@/utils/products';
 import { addToCart } from '@/store/cartSlice';
 import Footer from '@/components/common/Footer';
 import { useRouter } from 'next/router';
+import Head from 'next/head';
 
 // Find the specific product for this page
 const productData = products.find(
@@ -91,6 +92,86 @@ const ProductDetails = ({ initialProduct }) => {
 
   return (
     <>
+      <Head>
+        <title>{product.title} | Sheii Shop</title>
+        <meta
+          name='description'
+          content={`Buy the ${product.title} at Sheii Shop. ${product.description}`}
+        />
+        <meta
+          name='keywords'
+          content={`portable fan, cooling gadget, ${
+            product.title
+          }, mini fan, ${product.variants
+            .map((v) => v.color)
+            .join(', ')}, USB fan`}
+        />
+        <meta name='author' content='Sheii Shop' />
+        <meta name='robots' content='index, follow' />
+        <link
+          rel='canonical'
+          href={`https://www.sheiishop.com/products/${product.slug}`}
+        />
+
+        {/* Open Graph */}
+        <meta property='og:title' content={`${product.title} | Sheii Shop`} />
+        <meta property='og:description' content={product.description} />
+        <meta property='og:type' content='product' />
+        <meta
+          property='og:image'
+          content={
+            product.images[0] ||
+            'https://www.sheiishop.com/assets/footer-logo.png'
+          }
+        />
+        <meta
+          property='og:url'
+          content={`https://www.sheiishop.com/products/${product.slug}`}
+        />
+        <meta property='og:site_name' content='Sheii Shop' />
+
+        {/* Twitter Card */}
+        <meta name='twitter:card' content='summary_large_image' />
+        <meta name='twitter:title' content={`${product.title} | Sheii Shop`} />
+        <meta name='twitter:description' content={product.description} />
+        <meta
+          name='twitter:image'
+          content={
+            product.images[0] ||
+            'https://www.sheiishop.com/assets/footer-logo.png'
+          }
+        />
+
+        {/* Structured Data */}
+        <script
+          type='application/ld+json'
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org/',
+              '@type': 'Product',
+              name: product.title,
+              image: product.images,
+              description: product.description,
+              sku: product.id,
+              brand: {
+                '@type': 'Brand',
+                name: 'Sheii Shop',
+              },
+              offers: {
+                '@type': 'Offer',
+                url: `https://www.sheiishop.com/products/${product.slug}`,
+                priceCurrency: 'BDT',
+                price: product.price,
+                availability: product.inStock
+                  ? 'https://schema.org/InStock'
+                  : 'https://schema.org/OutOfStock',
+                itemCondition: 'https://schema.org/NewCondition',
+              },
+            }),
+          }}
+        />
+      </Head>
+
       <Navbar />
       <div>
         <style jsx>{`

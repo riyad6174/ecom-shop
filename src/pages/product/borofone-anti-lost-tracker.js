@@ -8,6 +8,7 @@ import { products } from '@/utils/products';
 import { addToCart } from '@/store/cartSlice';
 import Footer from '@/components/common/Footer';
 import { useRouter } from 'next/router';
+import Head from 'next/head';
 
 // Find the specific product for this page
 const productData = products.find(
@@ -91,6 +92,60 @@ const ProductDetails = ({ initialProduct }) => {
 
   return (
     <>
+      <Head>
+        <title>{product.title} | Sheii Shop</title>
+        <meta
+          name='description'
+          content='Shop the Borofone BS101 Anti-Lost Tracker – Apple Find My compatible, compact, water-resistant, and reliable for everyday use.'
+        />
+        <meta property='og:title' content={`${product.title} | Sheii Shop`} />
+        <meta
+          property='og:description'
+          content='Track your valuables with the Borofone BS101 Anti-Lost Tracker. IP65 water-resistant, Apple Find My compatible, and long battery life.'
+        />
+        <meta
+          property='og:url'
+          content={`https://www.sheiishop.com/product/${product.slug}`}
+        />
+        <meta property='og:type' content='product' />
+        <meta property='og:image' content={product.images[0]} />
+        <meta name='twitter:card' content='summary_large_image' />
+        <meta name='twitter:title' content={`${product.title} | Sheii Shop`} />
+        <meta
+          name='twitter:description'
+          content='Track your valuables with the Borofone BS101 Anti-Lost Tracker. Long battery life, waterproof, iOS-compatible.'
+        />
+        <meta name='twitter:image' content={product.images[0]} />
+
+        <script
+          type='application/ld+json'
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'Product',
+              name: product.title,
+              image: product.images,
+              description:
+                'Borofone BS101 Anti-Lost Tracker with Apple Find My support, waterproof build, and up to 12 months of battery life.',
+              sku: product.id,
+              brand: {
+                '@type': 'Brand',
+                name: 'Borofone',
+              },
+              offers: {
+                '@type': 'Offer',
+                url: `https://www.sheiishop.com/product/${product.slug}`,
+                priceCurrency: 'BDT',
+                price: product.price,
+                availability: product.inStock
+                  ? 'https://schema.org/InStock'
+                  : 'https://schema.org/OutOfStock',
+                itemCondition: 'https://schema.org/NewCondition',
+              },
+            }),
+          }}
+        />
+      </Head>
       <Navbar />
       <div>
         <style jsx>{`
