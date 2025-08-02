@@ -408,9 +408,7 @@ const ProductDetails = ({ initialProduct }) => {
                 <li>❄ Lightning-fast cooling technology for instant relief</li>
                 <li>🎒 Ultra-light at 183.6 grams for easy portability</li>
                 <li>💪 Premium ABS + aluminum alloy build for durability</li>
-                <li>
-                  🌈 Six stylish colors: Black, White, Gray, Pink, Blue, Beige
-                </li>
+                <li>🌈 Five stylish colors: Black, White, Gray, Pink, Blue</li>
                 <li>
                   🔋 Rechargeable battery for 7/8 hours of continuous cooling
                 </li>
@@ -429,10 +427,7 @@ const ProductDetails = ({ initialProduct }) => {
                 <video
                   className='w-full h-[500px]'
                   controls
-                  autoPlay
-                  muted
-                  playsInline
-                  // poster='/product/fan/userguide-poster.jpg'
+                  poster='/assets/product/fan/userguide.jpg'
                 >
                   <source
                     src='/assets/product/fan/userguide.mp4'
