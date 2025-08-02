@@ -25,7 +25,7 @@ function Footer() {
             </p>
             <div className='flex gap-4'>
               <a
-                href='#'
+                href='https://www.facebook.com/share/1Y36dHzXAW/?mibextid=wwXIfr'
                 rel='noreferrer'
                 target='_blank'
                 className='group rounded-full p-2 transition-all duration-300 hover:bg-teal-500/20'
@@ -38,7 +38,7 @@ function Footer() {
                 />
               </a>
               <a
-                href='#'
+                href='http://wa.me/8801814575428'
                 rel='noreferrer'
                 target='_blank'
                 className='group rounded-full p-2 transition-all duration-300 hover:bg-teal-500/20'
