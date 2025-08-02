@@ -108,7 +108,7 @@ const ProductDetails = ({ initialProduct }) => {
         <meta name='author' content='Sheii Shop' />
         <link
           rel='canonical'
-          href={`https://www.sheiishop.com/products/${product.slug}`}
+          href={`https://www.sheiishop.com/product/${product.slug}`}
         />
 
         {/* Open Graph / Facebook */}
@@ -124,7 +124,7 @@ const ProductDetails = ({ initialProduct }) => {
         />
         <meta
           property='og:url'
-          content={`https://www.sheiishop.com/products/${product.slug}`}
+          content={`https://www.sheiishop.com/product/${product.slug}`}
         />
         <meta property='og:site_name' content='Sheii Shop' />
 
@@ -157,7 +157,7 @@ const ProductDetails = ({ initialProduct }) => {
               },
               offers: {
                 '@type': 'Offer',
-                url: `https://www.sheiishop.com/products/${product.slug}`,
+                url: `https://www.sheiishop.com/product/${product.slug}`,
                 priceCurrency: 'BDT',
                 price: product.price,
                 availability: product.inStock
