@@ -24,28 +24,26 @@ const ProductDetails = ({ initialProduct }) => {
   useEffect(() => {
     if (initialProduct) {
       setProduct(initialProduct);
-      setSelectedColor(initialProduct.variants[0]?.color || '');
-      setActiveImage(initialProduct.images[0] || ''); // Set first image as default
+      setSelectedColor(initialProduct.variants?.[0]?.color || '');
+      setActiveImage(initialProduct.images?.[0] || '');
 
       // Push product view event to data layer
       window.dataLayer = window.dataLayer || [];
       window.dataLayer.push({
         event: 'view_item',
         ecommerce: {
+          currency: 'BDT',
+          value: initialProduct.price || 0,
           items: [
             {
               item_id: initialProduct.id || 'unknown',
               item_name: initialProduct.title || 'unknown',
               price: initialProduct.price || 0,
               original_price: initialProduct.originalPrice || 0,
-              item_category: 'Wearables', // Adjusted for smartwatch category
-              item_variant: initialProduct.variants
-                ? initialProduct.variants.map((v) => v.color).join(', ')
-                : 'unknown',
+              item_category: 'Wearables',
+              item_variant: initialProduct.variants?.[0]?.color || 'unknown',
             },
           ],
-          currency: 'BDT', // Bangladeshi Taka
-          value: initialProduct.price || 0,
         },
       });
     }
@@ -68,26 +66,54 @@ const ProductDetails = ({ initialProduct }) => {
   };
 
   const handleBuyNow = () => {
-    if (product) {
-      dispatch(
-        addToCart({
-          id: product.id,
-          title: product.title,
-          slug: product.slug,
-          price: product.price,
-          selectedColor,
-          quantity,
-          image: activeImage,
-        })
-      );
-      router.push('/order');
+    if (!product) {
+      console.error('Product data is missing');
+      return;
     }
+
+    // Push add_to_cart event to data layer
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+      event: 'add_to_cart',
+      ecommerce: {
+        currency: 'BDT',
+        value: product.price * quantity || 0,
+        items: [
+          {
+            item_id: product.id || 'unknown',
+            item_name: product.title || 'unknown',
+            price: product.price || 0,
+            original_price: product.originalPrice || 0,
+            item_category: 'Wearables',
+            item_variant: selectedColor || 'unknown',
+            quantity: quantity || 1,
+          },
+        ],
+      },
+    });
+
+    // Dispatch to Redux store
+    dispatch(
+      addToCart({
+        id: product.id,
+        title: product.title,
+        slug: product.slug,
+        price: product.price,
+        selectedColor,
+        quantity,
+        image: activeImage,
+      })
+    );
+
+    // Redirect to order page
+    router.push('/order');
   };
 
   if (!product) {
     return <div>Product not found</div>;
   }
 
+  // Rest of the JSX remains unchanged
   return (
     <>
       <Head>
@@ -110,8 +136,6 @@ const ProductDetails = ({ initialProduct }) => {
           rel='canonical'
           href={`https://www.sheiishop.com/product/${product.slug}`}
         />
-
-        {/* Open Graph / Facebook */}
         <meta property='og:type' content='product' />
         <meta property='og:title' content={`${product.title} | Sheii Shop`} />
         <meta property='og:description' content={product.description} />
@@ -127,8 +151,6 @@ const ProductDetails = ({ initialProduct }) => {
           content={`https://www.sheiishop.com/product/${product.slug}`}
         />
         <meta property='og:site_name' content='Sheii Shop' />
-
-        {/* Twitter */}
         <meta name='twitter:card' content='summary_large_image' />
         <meta name='twitter:title' content={`${product.title} | Sheii Shop`} />
         <meta name='twitter:description' content={product.description} />
@@ -139,8 +161,6 @@ const ProductDetails = ({ initialProduct }) => {
             'https://www.sheiishop.com/assets/footer-logo.png'
           }
         />
-
-        {/* Schema.org Product Structured Data */}
         <script
           type='application/ld+json'
           dangerouslySetInnerHTML={{
@@ -202,17 +222,14 @@ const ProductDetails = ({ initialProduct }) => {
         <div className='py-8 container mx-auto px-4 lg:px-8'>
           <div className='bg-white md:py-6 rounded-2xl md:rounded-xl shadow-lg'>
             <div className='flex flex-col md:flex-row gap-4 md:gap-6 -mx-4'>
-              {/* Image Section */}
               <div className='w-full md:w-3/4 px-4'>
                 <div className='p-2 md:p-0 md:grid md:grid-cols-4 gap-4'>
-                  {/* Main Image */}
                   <div className='col-span-3 md:pl-6'>
                     <img
                       className='w-full h-[267px] md:h-[533px] object-cover rounded-lg image-transition'
                       src={activeImage}
                       alt={product.title}
                     />
-                    {/* Small Images for Mobile */}
                     <div className='flex justify-center gap-2 mt-4 md:hidden'>
                       {product.images.slice(1).map((image, index) => (
                         <img
@@ -229,7 +246,6 @@ const ProductDetails = ({ initialProduct }) => {
                       ))}
                     </div>
                   </div>
-                  {/* Small Images for Desktop */}
                   <div className='col-span-1 hidden md:flex flex-col items-center gap-4'>
                     {product.images.slice(1).map((image, index) => (
                       <img
@@ -247,7 +263,6 @@ const ProductDetails = ({ initialProduct }) => {
                   </div>
                 </div>
               </div>
-              {/* Product Details */}
               <div className='md:w-1/2 px-7 md:px-0 py-4'>
                 <h2 className='text-lg md:text-2xl font-semibold font-mont text-gray-800 md:mb-4'>
                   {product.title}
@@ -255,7 +270,6 @@ const ProductDetails = ({ initialProduct }) => {
                 <p className='text-gray-600 text-sm mb-4 font-mont'>
                   {product.description}
                 </p>
-
                 <div className='mb-6'>
                   <span className='font-semibold text-gray-700'>
                     Choose a Color
@@ -281,8 +295,6 @@ const ProductDetails = ({ initialProduct }) => {
                     ))}
                   </div>
                 </div>
-
-                {/* Price */}
                 <div className='flex items-center justify-start gap-2 text-md mb-6'>
                   <span className='text-blue-600 font-bold text-xl'>
                     ৳ {product.price.toFixed(2)}
@@ -291,8 +303,6 @@ const ProductDetails = ({ initialProduct }) => {
                     ৳ {product.originalPrice.toFixed(2)}
                   </span>
                 </div>
-
-                {/* Quantity */}
                 <div className='flex items-center justify-start gap-4 mb-6'>
                   <div className='relative flex items-center max-w-[8rem] border border-gray-400 rounded-lg bg-white'>
                     <button
@@ -352,18 +362,6 @@ const ProductDetails = ({ initialProduct }) => {
                     <span>{product.inStock ? 'Buy Now' : 'Out of Stock'}</span>
                   </button>
                 </div>
-
-                {/* Share */}
-                {/* <div className='flex items-center justify-start gap-4'>
-                  <div className='border border-gray-300 p-1 rounded-lg'>
-                    <GoShareAndroid className='text-2xl' />
-                  </div>
-                  <span className='font-mont text-xs font-medium'>
-                    {product.inStock
-                      ? '(There are 24 products left)'
-                      : '(Out of stock)'}
-                  </span>
-                </div> */}
               </div>
             </div>
           </div>
@@ -410,7 +408,6 @@ const ProductDetails = ({ initialProduct }) => {
                 comfort and style, making it the perfect companion for fitness
                 enthusiasts and tech-savvy individuals alike.
               </p>
-
               <p className='py-5 text-gray-600 font-mont text-sm mt-4'>
                 Key Features:
               </p>
@@ -426,12 +423,9 @@ const ProductDetails = ({ initialProduct }) => {
                 <li>⚽ Sports</li>
                 <li>🧮 Calculator</li>
                 <li>📞 Bluetooth Calling</li>
-                <li>🧮 Calculator</li>
                 <li>🎶 Bluetooth Music</li>
-                <li>🧮 Calculator</li>
                 <li>🗣 Voice Assistant</li>
                 <li>⏱ Stopwatch</li>
-                <li>🧮 Calculator</li>
                 <li>🧭 Compass</li>
                 <li>📩 Real-time Message Alert</li>
               </ul>
@@ -439,7 +433,6 @@ const ProductDetails = ({ initialProduct }) => {
           </div>
         </div>
       </CustomSection>
-      {/* <Related /> */}
       <Footer />
     </>
   );
