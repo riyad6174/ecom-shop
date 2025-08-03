@@ -148,7 +148,19 @@ function Products() {
             viewMode === 'list' ? 'flex w-full' : 'flex-col'
           }`}
         >
-          <Link href={`/product/${product.slug}`}>
+          {product.inStock ? (
+            <Link href={`/product/${product.slug}`}>
+              <img
+                src={product.thumbnail}
+                alt={product.title}
+                className={`object-cover ${
+                  viewMode === 'list'
+                    ? 'w-32 h-32 rounded-l-lg'
+                    : 'w-full h-48 rounded-t-lg'
+                }`}
+              />
+            </Link>
+          ) : (
             <img
               src={product.thumbnail}
               alt={product.title}
@@ -158,17 +170,25 @@ function Products() {
                   : 'w-full h-48 rounded-t-lg'
               }`}
             />
-          </Link>
+          )}
+
           <div className={`p-4 ${viewMode === 'list' ? 'flex-1' : ''}`}>
-            <Link href={`/product/${product.slug}`}>
-              <h3
-                className={`text-sm font-semibold text-gray-800 line-clamp-1 ${
-                  viewMode === 'list' ? 'text-base' : ''
-                }`}
-              >
+            {product.inStock ? (
+              <Link href={`/product/${product.slug}`}>
+                <h3
+                  className={`text-sm font-semibold text-gray-800 line-clamp-1 ${
+                    viewMode === 'list' ? 'text-base' : ''
+                  }`}
+                >
+                  {product.title}
+                </h3>
+              </Link>
+            ) : (
+              <h3 className='text-sm font-semibold text-gray-800 line-clamp-1'>
                 {product.title}
               </h3>
-            </Link>
+            )}
+
             <p className='text-xs text-gray-500 mt-1'>
               {product.title.includes('Smart Watch')
                 ? 'Smart Watches'

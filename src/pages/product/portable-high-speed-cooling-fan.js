@@ -8,7 +8,9 @@ import { products } from '@/utils/products';
 import { addToCart } from '@/store/cartSlice';
 import Footer from '@/components/common/Footer';
 import { useRouter } from 'next/router';
+// import FeatureImage from '@/assets/product/fan/fan-description.avif';
 import Head from 'next/head';
+import Image from 'next/image';
 
 // Find the specific product for this page
 const productData = products.find(
@@ -393,6 +395,12 @@ const ProductDetails = ({ initialProduct }) => {
                 CoolBreeze Mini combines durability with a sleek, modern vibe
                 that feels as good as it looks. 💪
               </p>
+              {/* <Image
+                src={FeatureImage}
+                width={1000}
+                height={1000}
+                alt='portable cooling fan feature image'
+              /> */}
               <p className='text-gray-600 font-mont text-sm mt-4'>
                 Express your style with **six vibrant color options**: Black,
                 White, Gray, Pink, Blue, Beige—pick the one that matches your
