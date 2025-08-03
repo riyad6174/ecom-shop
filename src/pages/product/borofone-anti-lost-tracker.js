@@ -71,6 +71,26 @@ const ProductDetails = ({ initialProduct }) => {
 
   const handleBuyNow = () => {
     if (product) {
+      // Push add_to_cart event to data layer
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        event: 'add_to_cart',
+        ecommerce: {
+          currency: 'BDT',
+          value: product.price * quantity || 0,
+          items: [
+            {
+              item_id: product.id || 'unknown',
+              item_name: product.title || 'unknown',
+              price: product.price || 0,
+              original_price: product.originalPrice || 0,
+              item_category: 'Wearables',
+              item_variant: selectedColor || 'unknown',
+              quantity: quantity || 1,
+            },
+          ],
+        },
+      });
       dispatch(
         addToCart({
           id: product.id,
