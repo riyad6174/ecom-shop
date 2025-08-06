@@ -401,8 +401,8 @@ const ProductDetails = ({ initialProduct }) => {
             </div>
             <div className='mt-10'>
               <p className='text-gray-600 font-mont text-sm'>
-                Beat the heat with the **CoolBreeze Mini Portable Cooling Fan**,
-                your ultimate companion for instant refreshment! Featuring
+                Beat the heat with the **JF132 Mini Portable Cooling Fan**, your
+                ultimate companion for instant refreshment! Featuring
                 **lightning-fast cooling technology**, this fan blasts away heat
                 in seconds, delivering a powerful, icy breeze that keeps you
                 cool even on the hottest days. ❄
@@ -412,8 +412,8 @@ const ProductDetails = ({ initialProduct }) => {
                 **ultra-light and portable** fan slips effortlessly into your
                 bag or pocket, making it perfect for travel, work, or outdoor
                 adventures. Crafted from **premium ABS and aluminum alloy**, the
-                CoolBreeze Mini combines durability with a sleek, modern vibe
-                that feels as good as it looks. 💪
+                JF132 Mini combines durability with a sleek, modern vibe that
+                feels as good as it looks. 💪
               </p>
               {/* <Image
                 src={FeatureImage}
@@ -427,7 +427,7 @@ const ProductDetails = ({ initialProduct }) => {
                 mood! 🌈 Powered by a **long-lasting rechargeable battery**, it
                 keeps you cool for hours, whether you’re hiking, commuting, or
                 chilling at home. Stay cool, stay stylish, stay unstoppable with
-                the CoolBreeze Mini!
+                the JF132 Mini!
               </p>
               <p className='py-5 text-gray-600 font-mont text-sm mt-4'>
                 Key Features:
