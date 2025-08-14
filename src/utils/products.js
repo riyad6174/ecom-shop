@@ -38,10 +38,10 @@ export const products = [
       '/assets/product/fan/fan-black.avif',
     ],
     variants: [
-      // { color: 'Black' },
+      { color: 'Black' },
       { color: 'White' },
-      // { color: 'Gray' },
-      // { color: 'Pink' },
+      { color: 'Gray' },
+      { color: 'Pink' },
       { color: 'cornflowerblue' },
       { color: 'Beige' },
     ],
