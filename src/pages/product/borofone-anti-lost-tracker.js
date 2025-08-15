@@ -116,12 +116,12 @@ const ProductDetails = ({ initialProduct }) => {
         <title>{product.title} | Sheii Shop</title>
         <meta
           name='description'
-          content='Shop the Borofone BS101 Anti-Lost Tracker – Apple Find My compatible, compact, water-resistant, and reliable for everyday use.'
+          content='Shop the Borofone BC101 Anti-Lost Tracker – Apple Find My compatible, compact, water-resistant, and reliable for everyday use.'
         />
         <meta property='og:title' content={`${product.title} | Sheii Shop`} />
         <meta
           property='og:description'
-          content='Track your valuables with the Borofone BS101 Anti-Lost Tracker. IP65 water-resistant, Apple Find My compatible, and long battery life.'
+          content='Track your valuables with the Borofone BC101 Anti-Lost Tracker. IP65 water-resistant, Apple Find My compatible, and long battery life.'
         />
         <meta
           property='og:url'
@@ -133,7 +133,7 @@ const ProductDetails = ({ initialProduct }) => {
         <meta name='twitter:title' content={`${product.title} | Sheii Shop`} />
         <meta
           name='twitter:description'
-          content='Track your valuables with the Borofone BS101 Anti-Lost Tracker. Long battery life, waterproof, iOS-compatible.'
+          content='Track your valuables with the Borofone BC101 Anti-Lost Tracker. Long battery life, waterproof, iOS-compatible.'
         />
         <meta name='twitter:image' content={product.images[0]} />
 
@@ -146,7 +146,7 @@ const ProductDetails = ({ initialProduct }) => {
               name: product.title,
               image: product.images,
               description:
-                'Borofone BS101 Anti-Lost Tracker with Apple Find My support, waterproof build, and up to 12 months of battery life.',
+                'Borofone BC101 Anti-Lost Tracker with Apple Find My support, waterproof build, and up to 12 months of battery life.',
               sku: product.id,
               brand: {
                 '@type': 'Brand',
@@ -373,7 +373,7 @@ const ProductDetails = ({ initialProduct }) => {
             </div>
             <div className='mt-10'>
               <p className='text-gray-600 font-mont text-sm'>
-                Never lose track of your valuables with the **Borofone BS101
+                Never lose track of your valuables with the **Borofone BC101
                 Intelligent Anti-Lost Tracker**, a sleek and compact device
                 designed to keep your essentials secure. Crafted with durable
                 ABS material, this lightweight tracker (only 7g) seamlessly
@@ -382,7 +382,7 @@ const ProductDetails = ({ initialProduct }) => {
                 your pet.
               </p>
               <p className='text-gray-600 font-mont text-sm mt-4'>
-                Equipped with a **210mAh CR2032 button battery**, the BS101
+                Equipped with a **210mAh CR2032 button battery**, the BC101
                 provides up to **9-12 months of battery life**, with easy
                 replacement to keep you worry-free. Its **intelligent
                 positioning** and **sound alert** features let you locate items
@@ -394,9 +394,9 @@ const ProductDetails = ({ initialProduct }) => {
               </p>
               <p className='text-gray-600 font-mont text-sm mt-4'>
                 Whether you’re a traveler, student, or busy professional, the
-                BS101 offers peace of mind with its **anti-loss reminder** that
+                BC101 offers peace of mind with its **anti-loss reminder** that
                 notifies you if you leave your items behind. Stylish, reliable,
-                and user-friendly, the Borofone BS101 is your ultimate companion
+                and user-friendly, the Borofone BC101 is your ultimate companion
                 for keeping what matters most within reach.
               </p>
               <p className='py-5 text-gray-600 font-mont text-sm mt-4'>
@@ -422,13 +422,13 @@ const ProductDetails = ({ initialProduct }) => {
             </div>
             <div className='mt-10'>
               <p className='text-gray-600 font-mont text-sm'>
-                Get started with your **Borofone BS101 Anti-Lost Tracker** in
+                Get started with your **Borofone BC101 Anti-Lost Tracker** in
                 just a few simple steps:
               </p>
               <ol className='list-decimal list-inside text-gray-600 font-mont text-sm mt-4 space-y-2'>
                 <li>
                   <span className='font-semibold'>Insert the Battery:</span>{' '}
-                  Open the back cover of the BS101 and insert the provided
+                  Open the back cover of the BC101 and insert the provided
                   CR2032 button battery. Ensure the positive (+) side faces up,
                   then securely close the cover.
                 </li>
@@ -436,13 +436,13 @@ const ProductDetails = ({ initialProduct }) => {
                   <span className='font-semibold'>Pair with Find My App:</span>{' '}
                   On your iPhone, iPad, or iPod touch (iOS 14.5+ or iPadOS
                   14.5+), open the **Find My** app. Press the button on the
-                  BS101 tracker until it beeps. In the app, tap “Add Item” and
+                  BC101 tracker until it beeps. In the app, tap “Add Item” and
                   select “Other Supported Item.” Follow the on-screen
                   instructions to pair the tracker with your Apple account.
                 </li>
                 <li>
                   <span className='font-semibold'>Attach to Your Item:</span>{' '}
-                  Use the built-in keyring or adhesive mount to attach the BS101
+                  Use the built-in keyring or adhesive mount to attach the BC101
                   to your keys, bag, wallet, or pet collar.
                 </li>
                 <li>
@@ -470,7 +470,7 @@ const ProductDetails = ({ initialProduct }) => {
               </p>
               <p className='text-gray-600 font-mont text-sm mt-4'>
                 <span className='font-semibold'>Package Includes:</span>{' '}
-                Borofone BS101 Tracker, CR2032 Battery, User Manual, Adhesive
+                Borofone BC101 Tracker, CR2032 Battery, User Manual, Adhesive
                 Mount
               </p>
             </div>
