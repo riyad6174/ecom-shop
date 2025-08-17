@@ -43,7 +43,7 @@ export const products = [
       { color: 'Gray' },
       { color: 'Pink' },
       { color: 'cornflowerblue' },
-      { color: 'Beige' },
+      // { color: 'Beige' },
     ],
   },
   {
