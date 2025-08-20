@@ -40,7 +40,7 @@ export const products = [
     variants: [
       { color: 'Black' },
       { color: 'White' },
-      { color: 'Gray' },
+      // { color: 'Gray' },
       { color: 'Pink' },
       { color: 'cornflowerblue' },
       // { color: 'Beige' },
