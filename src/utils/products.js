@@ -32,13 +32,13 @@ export const products = [
     description:
       'JF132 Portable High-speed Cooling Fan with 0-200 Speed Settings, USB Rechargeable, and Adjustable Tilt for Personal Use',
     images: [
-      '/assets/product/fan/fan-front-back.avif',
-      '/assets/product/fan/fan-white.avif',
-      '/assets/product/fan/fan-pink.avif',
-      '/assets/product/fan/fan-black.avif',
+      '/assets/product/fan/fan-white-bg.png',
+      '/assets/product/fan/fan-pink-bg.png',
+      '/assets/product/fan/fan-blue.png',
+      '/assets/product/fan/ice.png',
     ],
     variants: [
-      { color: 'Black' },
+      // { color: 'Black' },
       { color: 'White' },
       // { color: 'Gray' },
       { color: 'Pink' },

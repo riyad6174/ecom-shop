@@ -232,7 +232,7 @@ const ProductDetails = ({ initialProduct }) => {
                   {/* Main Image */}
                   <div className='col-span-3 md:pl-6'>
                     <img
-                      className='w-full h-[267px] md:h-[533px] object-cover rounded-lg image-transition'
+                      className='w-full h-[300px] md:h-[533px] object-cover rounded-lg image-transition'
                       src={activeImage}
                       alt={product.title}
                     />
@@ -399,7 +399,12 @@ const ProductDetails = ({ initialProduct }) => {
             <div className='flex justify-between items-center mb-3'>
               <h2 className='text-lg font-semibold'>Description</h2>
             </div>
-            <div className='mt-10'>
+            <div className='mt-5'>
+              <img
+                className='w-full h-[300px] md:h-[400px] object-cover rounded-lg mb-4'
+                src='/assets/product/fan/ice.png'
+                alt='portable cooling fan description image'
+              />
               <p className='text-gray-600 font-mont text-sm'>
                 Beat the heat with the **JF132 Mini Portable Cooling Fan**, your
                 ultimate companion for instant refreshment! Featuring
@@ -415,12 +420,11 @@ const ProductDetails = ({ initialProduct }) => {
                 JF132 Mini combines durability with a sleek, modern vibe that
                 feels as good as it looks. 💪
               </p>
-              {/* <Image
-                src={FeatureImage}
-                width={1000}
-                height={1000}
-                alt='portable cooling fan feature image'
-              /> */}
+              <img
+                className='w-full h-[350px] md:h-[400px] object-cover rounded-lg my-4'
+                src='/assets/product/fan/fan-description.avif'
+                alt='portable cooling fan description image'
+              />
               <p className='text-gray-600 font-mont text-sm mt-4'>
                 Express your style with **six vibrant color options**: Black,
                 White, Gray, Pink, Blue, Beige—pick the one that matches your
