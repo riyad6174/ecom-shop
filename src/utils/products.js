@@ -42,7 +42,7 @@ export const products = [
       { color: 'White' },
       // { color: 'Gray' },
       { color: 'Pink' },
-      { color: 'cornflowerblue' },
+      // { color: 'cornflowerblue' },
       // { color: 'Beige' },
     ],
   },
