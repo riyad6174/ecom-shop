@@ -4,7 +4,7 @@ export const products = [
     title: 'GT4 Pro Smart Watch - Big Screen BT Call',
     slug: 'gt4-pro-smart-watch',
     model: 'GT4 PRO',
-    price: 2600.0,
+    price: 2750.0,
     originalPrice: 3200.0,
     sectionType: 'hot',
     inStock: true,
