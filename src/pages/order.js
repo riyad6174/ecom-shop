@@ -187,7 +187,7 @@ function Cart() {
           title: item.title || 'Unknown',
           price: item.price || 0,
           quantity: item.quantity || 1,
-          selectedColor: item.selectedColor || 'N/A',
+          selectedColor: item.selectedColor || item.selectedVariantValue,
         }))
       ),
       totalPrice: totalPrice || 0,
@@ -253,7 +253,7 @@ function Cart() {
               item_name: item.title || 'unknown',
               price: item.price || 0,
               quantity: item.quantity || 1,
-              item_variant: item.selectedColor || 'N/A',
+              item_variant: item.selectedColor || item.selectedVariantValue,
               item_category: item.category || 'Accessories', // Adjust based on product data
             })),
           },
@@ -561,7 +561,7 @@ function Cart() {
                           {item.title}
                         </span>
                         <span className='col-span-3 text-center'>
-                          {item.selectedColor}
+                          {item.selectedColor || item.selectedVariantValue}
                         </span>
                         <span className='col-span-2 text-center'>
                           {item.quantity}

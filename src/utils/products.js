@@ -48,23 +48,23 @@ export const products = [
   },
   {
     id: 4,
-    title: 'Borofone BC101 Anti Lost Tracker',
-    slug: 'borofone-anti-lost-tracker',
-    model: 'BC101',
-    price: 1150.0,
-    originalPrice: 1400.0,
+    title: 'Hoco/Borofone Android/iOS Anti Lost Tracker',
+    slug: 'anti-lost-tracker',
+    model: 'E96A/BC101',
+    price: 990.0,
+    originalPrice: 1350.0,
     sectionType: 'hot',
     inStock: true,
-    thumbnail: '/assets/product/tracker/tracker1.jpg',
+    thumbnail: '/assets/product/tracker/main.webp',
     description:
-      'Never lose your essentials with the Borofone BC101 Anti-Lost Tracker. This compact 7g device integrates with Apple’s Find My network for real-time location tracking.',
+      'Hoco E96A Smart Finder হলো একটি স্মার্ট ও আধুনিক সলিউশন যা আপনার মূল্যবান জিনিসপত্র হারিয়ে যাওয়া থেকে রক্ষা করবে।',
     images: [
+      '/assets/product/tracker/tracker1.webp',
       '/assets/product/tracker/tracker1.jpg',
-      '/assets/product/tracker/tracker2.jpg',
       '/assets/product/tracker/tracker3.jpg',
       '/assets/product/tracker/tracker4.jpg',
-    ],
-    variants: [{ color: 'Black' }, { color: 'White' }],
+    ], // 💡 UPDATED VARIANTS TO USE 'TYPE' INSTEAD OF 'COLOR'
+    variants: [{ type: 'Android' }, { type: 'iOS' }],
   },
   {
     id: 2,

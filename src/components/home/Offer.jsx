@@ -25,7 +25,7 @@ function Offer() {
           <span className='text-2xl font-bold'>Sale 250 TAKA off</span>
           <div className='flex'>
             <Link
-              href={'/product/borofone-anti-lost-tracker'}
+              href={'/product/anti-lost-tracker'}
               className='bg-dark text-white px-3 py-2 text-xs rounded-lg'
             >
               Shop Now

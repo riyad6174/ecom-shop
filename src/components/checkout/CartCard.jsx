@@ -8,7 +8,10 @@ const CartCard = ({ item }) => {
 
   const handleRemove = () => {
     dispatch(
-      removeFromCart({ id: item.id, selectedColor: item.selectedColor })
+      removeFromCart({
+        id: item.id,
+        selectedColor: item.selectedColor || item.selectedVariantValue,
+      })
     );
   };
 
@@ -26,7 +29,10 @@ const CartCard = ({ item }) => {
           {item.title}
         </h3>
         <p className='text-xs text-gray-500 mt-1'>
-          Variant: <span className='font-medium'>{item.selectedColor}</span>
+          Variant:{' '}
+          <span className='font-medium'>
+            {item.selectedColor || item.selectedVariantValue}
+          </span>
         </p>
         <p className='text-xs text-gray-500'>
           Quantity: <span className='font-medium'>{item.quantity}</span>
