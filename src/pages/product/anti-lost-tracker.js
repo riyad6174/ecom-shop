@@ -38,7 +38,7 @@ const ProductDetails = ({ initialProduct }) => {
   const dispatch = useDispatch();
   const router = useRouter();
   const [product, setProduct] = useState(initialProduct);
-  const [selectedVariantValue, setSelectedVariantValue] = useState('');
+  const [selectedColor, setselectedColor] = useState('');
   const [activeImage, setActiveImage] = useState('');
   const [quantity, setQuantity] = useState(1);
   const [variantKey, setVariantKey] = useState(null);
@@ -48,7 +48,7 @@ const ProductDetails = ({ initialProduct }) => {
       setProduct(initialProduct);
       const key = getVariantKey(initialProduct.variants);
       setVariantKey(key);
-      setSelectedVariantValue(
+      setselectedColor(
         initialProduct.variants[0] ? initialProduct.variants[0][key] : ''
       );
       setActiveImage(initialProduct.images[0] || '');
@@ -90,7 +90,7 @@ const ProductDetails = ({ initialProduct }) => {
   };
 
   const handleVariantChange = (value) => {
-    setSelectedVariantValue(value);
+    setselectedColor(value);
   };
 
   const handleQuantityChange = (type) => {
@@ -117,7 +117,7 @@ const ProductDetails = ({ initialProduct }) => {
                 price: product.price || 0,
                 original_price: product.originalPrice || 0,
                 item_category: 'Wearables',
-                item_variant: selectedVariantValue || 'unknown',
+                item_variant: selectedColor || 'unknown',
                 quantity: quantity || 1,
               },
             ],
@@ -130,7 +130,7 @@ const ProductDetails = ({ initialProduct }) => {
           title: product.title,
           slug: product.slug,
           price: product.price,
-          selectedVariantValue,
+          selectedColor,
           quantity,
           image: activeImage,
           variantKey,
@@ -186,7 +186,7 @@ const ProductDetails = ({ initialProduct }) => {
     {
       question: 'ট্র্যাকার হারিয়ে গেলে কি লোকেশন দেখা যাবে?',
       answer:
-        'অবশ্যই! এটি Google Find My Device (Android-এর জন্য) অথবা Apple Find My (iOS-এর জন্য) নেটওয়ার্ক ব্যবহার করে। ফলে অন্য ব্যবহারকারীদের ডিভাইসের মাধ্যমে ট্র্যাকারটির লোকেশন ম্যাপে দেখা যাবে।',
+        'অবশ্যই! এটি Google Find Hub (Android-এর জন্য) অথবা Apple Find My (iOS-এর জন্য) নেটওয়ার্ক ব্যবহার করে। ফলে অন্য ব্যবহারকারীদের ডিভাইসের মাধ্যমে ট্র্যাকারটির লোকেশন ম্যাপে দেখা যাবে।',
     },
     {
       question: 'ব্যাটারি কতদিন চলে এবং এটি কি পরিবর্তন করা যায়?',
@@ -219,7 +219,7 @@ const ProductDetails = ({ initialProduct }) => {
         <title>Borofone BC101 Anti-Lost Tracker | Sheii Shop</title>
         <meta
           name='description'
-          content='Discover the Borofone BC101 Anti-Lost Tracker at Sheii Shop. Compatible with Apple Find My and Google Find My Device, IP65 water-resistant, with up to 12 months battery life.'
+          content='Discover the Borofone BC101 Anti-Lost Tracker at Sheii Shop. Compatible with Apple Find My and Google Find Hub, IP65 water-resistant, with up to 12 months battery life.'
         />
         <meta
           property='og:title'
@@ -254,7 +254,7 @@ const ProductDetails = ({ initialProduct }) => {
               name: product.title,
               image: product.images,
               description:
-                'Borofone BC101 Anti-Lost Tracker with Apple Find My and Google Find My Device support, IP65 water-resistant, and up to 12 months of battery life.',
+                'Borofone BC101 Anti-Lost Tracker with Apple Find My and Google Find Hub support, IP65 water-resistant, and up to 12 months of battery life.',
               sku: product.id,
               brand: {
                 '@type': 'Brand',
@@ -375,7 +375,7 @@ const ProductDetails = ({ initialProduct }) => {
                                 ? 'p-1'
                                 : 'px-4 py-2 text-gray-800 border-gray-300 hover:bg-gray-100'
                             } ${
-                              selectedVariantValue === value
+                              selectedColor === value
                                 ? 'variant-button-active'
                                 : ''
                             }`}
@@ -469,9 +469,9 @@ const ProductDetails = ({ initialProduct }) => {
               আপনার মূল্যবান জিনিসপত্রের খোঁজ রাখুন{' '}
               <strong>Hoco/Borofone অ্যান্টি-লস্ট ট্র্যাকার</strong>-এর মাধ্যমে।
               এটি একটি মসৃণ ও কম্প্যাক্ট ডিভাইস যা আপনার জিনিসপত্র সুরক্ষিত
-              রাখতে সাহায্য করবে। এটি <strong>Google Find My Device</strong>{' '}
-              (Android) এবং <strong>Apple Find My</strong> (iOS)-এর সাথে কাজ
-              করার জন্য ডিজাইন করা হয়েছে।
+              রাখতে সাহায্য করবে। এটি <strong>Google Find Hub</strong> (Android)
+              এবং <strong>Apple Find My</strong> (iOS)-এর সাথে কাজ করার জন্য
+              ডিজাইন করা হয়েছে।
             </p>
             <p className='py-4 sm:py-5 text-gray-600 font-mont text-sm sm:text-base font-semibold'>
               মূল বৈশিষ্ট্যসমূহ:
@@ -481,7 +481,7 @@ const ProductDetails = ({ initialProduct }) => {
                 <span className='font-semibold'>
                   Works with Android Find My Device:
                 </span>{' '}
-                সরাসরি Google Find My Device অ্যাপে ট্র্যাক করা যাবে।
+                সরাসরি Google Find Hub অ্যাপে ট্র্যাক করা যাবে।
               </li>
               <li className='flex flex-col md:flex row items-start md:items-start gap-3'>
                 <span className='font-semibold'>Works with Apple Find My:</span>{' '}
@@ -539,7 +539,7 @@ const ProductDetails = ({ initialProduct }) => {
                     <ul className='list-disc list-inside ml-5 mt-1 space-y-1'>
                       <li>
                         <strong>Android-এর জন্য:</strong> আপনার ফোনে{' '}
-                        <strong>Google Find My Device</strong> অ্যাপটি খুলুন এবং
+                        <strong>Google Find Hub</strong> অ্যাপটি খুলুন এবং
                         কাছাকাছি ডিভাইস হিসেবে ট্র্যাকারটি যুক্ত করুন।
                       </li>
                       <li>
