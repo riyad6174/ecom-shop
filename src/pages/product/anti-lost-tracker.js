@@ -216,18 +216,18 @@ const ProductDetails = ({ initialProduct }) => {
   return (
     <>
       <Head>
-        <title>Borofone BC101 Anti-Lost Tracker | Sheii Shop</title>
+        <title>Hoco/Borofone Anti-Lost Tracker | Sheii Shop</title>
         <meta
           name='description'
-          content='Discover the Borofone BC101 Anti-Lost Tracker at Sheii Shop. Compatible with Apple Find My and Google Find Hub, IP65 water-resistant, with up to 12 months battery life.'
+          content='Discover the Hoco/Borofone  Anti-Lost Tracker at Sheii Shop. Compatible with Apple Find My and Google Find Hub, IP65 water-resistant, with up to 12 months battery life.'
         />
         <meta
           property='og:title'
-          content='Borofone BC101 Anti-Lost Tracker | Sheii Shop'
+          content='Hoco/Borofone  Anti-Lost Tracker | Sheii Shop'
         />
         <meta
           property='og:description'
-          content='Keep track of your valuables with the Borofone BC101 Anti-Lost Tracker. Supports iOS and Android, IP65 water-resistant, and long-lasting battery.'
+          content='Keep track of your valuables with the Hoco/Borofone Anti-Lost Tracker. Supports iOS and Android, IP65 water-resistant, and long-lasting battery.'
         />
         <meta
           property='og:url'
@@ -238,11 +238,11 @@ const ProductDetails = ({ initialProduct }) => {
         <meta name='twitter:card' content='summary_large_image' />
         <meta
           name='twitter:title'
-          content='Borofone BC101 Anti-Lost Tracker | Sheii Shop'
+          content='Hoco/Borofone  Anti-Lost Tracker | Sheii Shop'
         />
         <meta
           name='twitter:description'
-          content='Track your keys, bags, or wallet with the Borofone BC101 Anti-Lost Tracker. IP65 water-resistant, iOS/Android compatible, long battery life.'
+          content='Track your keys, bags, or wallet with the Hoco/Borofone Anti-Lost Tracker. IP65 water-resistant, iOS/Android compatible, long battery life.'
         />
         <meta name='twitter:image' content={product.images[0]} />
         <script
@@ -253,8 +253,7 @@ const ProductDetails = ({ initialProduct }) => {
               '@type': 'Product',
               name: product.title,
               image: product.images,
-              description:
-                'Borofone BC101 Anti-Lost Tracker with Apple Find My and Google Find Hub support, IP65 water-resistant, and up to 12 months of battery life.',
+              description: 'Hoco/Borofone  Anti-Lost Tracker | Sheii Shop',
               sku: product.id,
               brand: {
                 '@type': 'Brand',
