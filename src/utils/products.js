@@ -61,8 +61,8 @@ export const products = [
     images: [
       '/assets/product/tracker/tracker1.webp',
       '/assets/product/tracker/tracker1.jpg',
-      '/assets/product/tracker/tracker3.jpg',
-      '/assets/product/tracker/tracker4.jpg',
+      '/assets/product/tracker/main2.webp',
+      '/assets/product/tracker/main.webp',
     ], // 💡 UPDATED VARIANTS TO USE 'TYPE' INSTEAD OF 'COLOR'
     variants: [{ type: 'Android' }, { type: 'iOS' }],
   },
