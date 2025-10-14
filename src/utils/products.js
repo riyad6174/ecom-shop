@@ -1,6 +1,26 @@
 export const products = [
   {
     id: 1,
+    title: 'Adjustable Polarized Sunglass',
+    slug: 'adjustable-tint-polarized-sunglass',
+    model: 'Black',
+    price: 1400.0,
+    originalPrice: 1850.0,
+    sectionType: 'hot',
+    inStock: true,
+    thumbnail: '/assets/product/glass/sunglass_main.jpg',
+    description:
+      '১-৯ বিভিন্ন লেভেলে আপনার সুবিধা অনুযায়ী এডজাস্ট করুন। স্টাইলিশ সানগ্লাসটি আপনাকে দিবে চোখের প্রশান্তি।',
+    images: [
+      '/assets/product/glass/sunglass_main.jpg',
+      '/assets/product/glass/sunglass5.jpg',
+      '/assets/product/glass/sunglass6.jpg',
+      '/assets/product/glass/sunglass4.jpg',
+    ],
+    variants: [{ color: 'Black' }, { color: 'Silver' }, { color: 'Wheat' }],
+  },
+  {
+    id: 1,
     title: 'GT4 Pro Smart Watch - Big Screen BT Call',
     slug: 'gt4-pro-smart-watch',
     model: 'GT4 PRO',
