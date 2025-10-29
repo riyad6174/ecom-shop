@@ -225,9 +225,14 @@ const ProductDetails = ({ initialProduct }) => {
       text: '৩৫W ভার্সন নিয়েছি, ইউরোপ ট্রিপে পারফেক্ট কাজ করেছে! সব ডিভাইস চার্জ হয়েছে দ্রুত, কোনো সমস্যা নেই। খুবই ডুরেবল।',
     },
     {
-      name: 'নীলিমা আহমেদ',
+      name: 'Muskura R',
       rating: 4,
-      text: '৬৫W অ্যাডাপ্টার দিয়ে ল্যাপটপও চার্জ করছি। বিভিন্ন দেশের সকেটে ফিট হয়েছে, কিন্তু একটু ভারী লাগে ব্যাগে। তবু সুপার প্রোডাক্ট!',
+      text: '65w adapter er fast charge ta darun. Laptop o khub bhalo vabe charge kore. Travel er jonne perfect size.',
+    },
+    {
+      name: 'Mugdho',
+      rating: 4,
+      text: '25W version ta kinlam. Small size and lightweight. Perfect for my phone and tablet while traveling.',
     },
   ];
 
@@ -383,9 +388,11 @@ const ProductDetails = ({ initialProduct }) => {
                 product.variants.length > 0 &&
                 variantKey && (
                   <div className='mb-6'>
-                    <span className='font-semibold text-gray-700 text-sm sm:text-base'>
-                      {variantTitle}
-                    </span>
+                    <div className='flex items-center justify-between'>
+                      <span className='font-semibold text-gray-700 text-sm sm:text-base'>
+                        {variantTitle}
+                      </span>
+                    </div>
                     <div className='flex flex-col md:flex-row items-start md:items-center gap-3 mt-4 flex-wrap'>
                       {product.variants.map((variant, index) => {
                         const value = getVariantValue(variant);
