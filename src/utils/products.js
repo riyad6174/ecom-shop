@@ -33,11 +33,11 @@ export const products = [
     originalPrice: 1550.0,
     sectionType: 'hot',
     inStock: true,
-    thumbnail: '/assets/product/adapter/20w.jpg',
+    thumbnail: '/assets/product/adapter/20w-main.png',
     description:
       '২০ ওয়াট ইউনিভার্সাল ট্রাভেল অ্যাডাপ্টর যেটি আপনার যেকোনো ডিভাইস চার্জিং এর জন্য পারফেক্ট সলিউশন।',
     images: [
-      '/assets/product/adapter/20w.jpg',
+      '/assets/product/adapter/25w.jpg',
       '/assets/product/adapter/35w.png',
       '/assets/product/adapter/45w.jpg',
       '/assets/product/adapter/65w.jpg',
@@ -57,7 +57,7 @@ export const products = [
     description:
       '৩৫ ওয়াট ইউনিভার্সাল ট্রাভেল অ্যাডাপ্টর যেটি আপনার যেকোনো ডিভাইস চার্জিং এর জন্য পারফেক্ট সলিউশন।',
     images: [
-      '/assets/product/adapter/20w.jpg',
+      '/assets/product/adapter/25w.jpg',
       '/assets/product/adapter/35w.png',
       '/assets/product/adapter/45w.jpg',
       '/assets/product/adapter/65w.jpg',
@@ -77,7 +77,7 @@ export const products = [
     description:
       '৩৫ ওয়াট ইউনিভার্সাল ট্রাভেল অ্যাডাপ্টর যেটি আপনার যেকোনো ডিভাইস চার্জিং এর জন্য পারফেক্ট সলিউশন।',
     images: [
-      '/assets/product/adapter/20w.jpg',
+      '//assets/product/adapter/25w.jpg',
       '/assets/product/adapter/35w.png',
       '/assets/product/adapter/45w.jpg',
       '/assets/product/adapter/65w.jpg',
@@ -97,7 +97,7 @@ export const products = [
     description:
       '৩৫ ওয়াট ইউনিভার্সাল ট্রাভেল অ্যাডাপ্টর যেটি আপনার যেকোনো ডিভাইস চার্জিং এর জন্য পারফেক্ট সলিউশন।',
     images: [
-      '/assets/product/adapter/20w.jpg',
+      '/assets/product/adapter/25w.jpg',
       '/assets/product/adapter/35w.png',
       '/assets/product/adapter/45w.jpg',
       '/assets/product/adapter/65w.jpg',
