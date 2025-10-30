@@ -42,14 +42,14 @@ const ProductDetails = ({ initialProduct }) => {
 
   // Variant-specific pricing data
   const variantData = {
-    '25W': { price: 1290, originalPrice: 1550 },
+    '20W': { price: 1290, originalPrice: 1550 },
     '35W': { price: 1550, originalPrice: 1850 },
     '45W': { price: 1650, originalPrice: 2050 },
     '65W': { price: 2299, originalPrice: 2900 },
   };
 
   const variantToIndex = {
-    '25W': 0,
+    '20W': 0,
     '35W': 1,
     '45W': 2,
     '65W': 3,
@@ -204,7 +204,7 @@ const ProductDetails = ({ initialProduct }) => {
     {
       question: 'এটি কি দ্রুত চার্জিং সাপোর্ট করে?',
       answer:
-        'হ্যাঁ, PD (Power Delivery) এবং QC (Quick Charge) প্রোটোকল সাপোর্ট করে। ২৫W থেকে ৬৫W পর্যন্ত আউটপুট, যা আপনার স্মার্টফোন, ট্যাবলেট বা ল্যাপটপ দ্রুত চার্জ করবে।',
+        'হ্যাঁ, PD (Power Delivery) এবং QC (Quick Charge) প্রোটোকল সাপোর্ট করে। ২০W থেকে ৬৫W পর্যন্ত আউটপুট, যা আপনার স্মার্টফোন, ট্যাবলেট বা ল্যাপটপ দ্রুত চার্জ করবে।',
     },
     {
       question: 'অ্যাডাপ্টারটি কি নিরাপদ?',
@@ -232,26 +232,26 @@ const ProductDetails = ({ initialProduct }) => {
     {
       name: 'Mugdho',
       rating: 4,
-      text: '25W version ta kinlam. Small size and lightweight. Perfect for my phone and tablet while traveling.',
+      text: '20W version ta kinlam. Small size and lightweight. Perfect for my phone and tablet while traveling.',
     },
   ];
 
   // Default schema price to first variant for SEO
-  const defaultSchemaPrice = variantData['25W']
-    ? variantData['25W'].price
+  const defaultSchemaPrice = variantData['20W']
+    ? variantData['20W'].price
     : product.price;
 
   return (
     <>
       <Head>
-        <title>25W-65W Universal Travel Adapter | GenZ Shop</title>
+        <title>20W-65W Universal Travel Adapter | Sheii Shop</title>
         <meta
           name='description'
-          content='Discover the 25W-65W Universal Travel Adapter at GenZ Shop. Compatible worldwide plugs, fast charging PD/QC, compact design for travel.'
+          content='Discover the 20W-65W Universal Travel Adapter at Sheii Shop. Compatible worldwide plugs, fast charging PD/QC, compact design for travel.'
         />
         <meta
           property='og:title'
-          content='25W-65W Universal Travel Adapter | GenZ Shop'
+          content='20W-65W Universal Travel Adapter | Sheii Shop'
         />
         <meta
           property='og:description'
@@ -259,14 +259,14 @@ const ProductDetails = ({ initialProduct }) => {
         />
         <meta
           property='og:url'
-          content={`https://www.genzshop.store/product/${product.slug}`}
+          content={`https://www.Sheiishop.store/product/${product.slug}`}
         />
         <meta property='og:type' content='product' />
         <meta property='og:image' content={product.images[0]} />
         <meta name='twitter:card' content='summary_large_image' />
         <meta
           name='twitter:title'
-          content='25W-65W Universal Travel Adapter | GenZ Shop'
+          content='20W-65W Universal Travel Adapter | Sheii Shop'
         />
         <meta
           name='twitter:description'
@@ -281,7 +281,7 @@ const ProductDetails = ({ initialProduct }) => {
               '@type': 'Product',
               name: product.title,
               image: product.images,
-              description: '25W-65W Universal Travel Adapter | GenZ Shop',
+              description: '20W-65W Universal Travel Adapter | Sheii Shop',
               sku: product.id,
               brand: {
                 '@type': 'Brand',
@@ -289,7 +289,7 @@ const ProductDetails = ({ initialProduct }) => {
               },
               offers: {
                 '@type': 'Offer',
-                url: `https://www.genzshop.store/product/${product.slug}`,
+                url: `https://www.Sheiishop.store/product/${product.slug}`,
                 priceCurrency: 'BDT',
                 price: defaultSchemaPrice,
                 availability: product.inStock
@@ -519,7 +519,7 @@ const ProductDetails = ({ initialProduct }) => {
                 <span className='font-semibold flex items-center gap-2'>
                   <BsThunderbolt /> Fast Charging:
                 </span>{' '}
-                PD 3.0 এবং QC 3.0 সাপোর্ট, ২৫W-৬৫W আউটপুট।
+                PD 3.0 এবং QC 3.0 সাপোর্ট, ২০W-৬৫W আউটপুট।
               </li>
               <li className='flex flex-col md:flex-row items-start md:items-center gap-3'>
                 <span className='font-semibold flex items-center gap-2'>
@@ -546,7 +546,7 @@ const ProductDetails = ({ initialProduct }) => {
               <h3 className='text-md font-semibold mb-3'>পণ্যের গ্যালারি</h3>
               <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
                 {[
-                  '/assets/product/adapter/25w.jpg',
+                  '/assets/product/adapter/20W.jpg',
                   '/assets/product/adapter/35w.png',
                   '/assets/product/adapter/45w.jpg',
                   '/assets/product/adapter/65w.jpg',
@@ -561,7 +561,7 @@ const ProductDetails = ({ initialProduct }) => {
                       className='w-full h-36 object-cover hover:scale-105 transition-transform duration-300'
                     />
                     <p className='absolute bottom-1 left-1 bg-black bg-opacity-50 text-white text-xs px-1 rounded'>
-                      {index === 0 && '25W'} {index === 1 && '35W'}{' '}
+                      {index === 0 && '20W'} {index === 1 && '35W'}{' '}
                       {index === 2 && '45W'} {index === 3 && '65W'}
                     </p>
                   </div>

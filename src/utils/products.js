@@ -1,7 +1,7 @@
 export const products = [
   {
     id: 8,
-    title: '25W, 35w, 45w, 65w Univarsal Travel Adapter ',
+    title: '20W, 35w, 45w, 65w Univarsal Travel Adapter ',
     slug: 'universal-travel-adapter',
     model: 'Black',
     price: 1290.0,
@@ -10,7 +10,7 @@ export const products = [
     inStock: true,
     thumbnail: '/assets/product/adapter/all.png',
     description:
-      '২০W/২৫W, ৩৫W, ৪৫W, ৬৫W ওয়াট ইউনিভার্সাল ট্রাভেল অ্যাডাপ্টর যেটি আপনার যেকোনো ডিভাইস চার্জিং এর জন্য পারফেক্ট সলিউশন।',
+      '২০W, ৩৫W, ৪৫W, ৬৫W ওয়াট ইউনিভার্সাল ট্রাভেল অ্যাডাপ্টর যেটি আপনার যেকোনো ডিভাইস চার্জিং এর জন্য পারফেক্ট সলিউশন।',
     images: [
       '/assets/product/adapter/25w-main.png',
       '/assets/product/adapter/35w-main.png',
@@ -18,7 +18,7 @@ export const products = [
       '/assets/product/adapter/65w-main.png',
     ],
     variants: [
-      { type: '25W' },
+      { type: '20W' },
       { type: '35W' },
       { type: '45W' },
       { type: '65W' },
@@ -35,14 +35,14 @@ export const products = [
     inStock: true,
     thumbnail: '/assets/product/adapter/25w.jpg',
     description:
-      '২৫ ওয়াট ইউনিভার্সাল ট্রাভেল অ্যাডাপ্টর যেটি আপনার যেকোনো ডিভাইস চার্জিং এর জন্য পারফেক্ট সলিউশন।',
+      '২০ ওয়াট ইউনিভার্সাল ট্রাভেল অ্যাডাপ্টর যেটি আপনার যেকোনো ডিভাইস চার্জিং এর জন্য পারফেক্ট সলিউশন।',
     images: [
       '/assets/product/adapter/25w.jpg',
       '/assets/product/adapter/35w.png',
       '/assets/product/adapter/45w.jpg',
       '/assets/product/adapter/65w.jpg',
     ],
-    variants: [{ type: '25W' }],
+    variants: [{ type: '20W' }],
   },
   {
     id: 4,
@@ -109,7 +109,7 @@ export const products = [
     title: 'Adjustable Polarized Sunglass',
     slug: 'adjustable-tint-polarized-sunglass',
     model: 'Black',
-    price: 1350.0,
+    price: 1390.0,
     originalPrice: 2000.0,
     sectionType: 'hot',
     inStock: true,
