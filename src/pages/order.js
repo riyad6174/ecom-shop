@@ -312,7 +312,9 @@ function Cart() {
                 ) : (
                   cartItems.map((item) => (
                     <CartCard
-                      key={`${item.id}-${item.selectedColor}`}
+                      key={`${item.id}-${
+                        item.selectedColor || item.selectedVariantValue
+                      }`}
                       item={item}
                     />
                   ))
