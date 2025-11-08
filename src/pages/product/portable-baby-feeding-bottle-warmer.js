@@ -224,7 +224,7 @@ const ProductDetails = ({ initialProduct }) => {
                 <div className='p-2 md:p-0 md:grid md:grid-cols-4 gap-4'>
                   <div className='col-span-3 md:pl-6'>
                     <img
-                      className='w-full h-[267px] md:h-[533px] object-cover rounded-lg image-transition'
+                      className='w-full h-[320px] md:h-[533px] object-cover rounded-lg image-transition'
                       src={activeImage}
                       alt={product.title}
                     />
