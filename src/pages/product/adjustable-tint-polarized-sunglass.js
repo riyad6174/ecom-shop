@@ -276,7 +276,7 @@ const ProductDetails = ({ initialProduct }) => {
                     {product.variants.map((variant) => (
                       <div
                         key={variant.color}
-                        className={`border-2 flex items-center justify-center rounded-full p-1 cursor-pointer color-button ${
+                        className={`border-2  flex items-center justify-center rounded-full p-1 cursor-pointer color-button ${
                           selectedColor === variant.color
                             ? 'color-button-active'
                             : ''
@@ -289,6 +289,7 @@ const ProductDetails = ({ initialProduct }) => {
                             backgroundColor: variant.color.toLowerCase(),
                           }}
                         ></button>
+                        <span className='px-1'>{variant.color}</span>
                       </div>
                     ))}
                   </div>
