@@ -286,7 +286,10 @@ const ProductDetails = ({ initialProduct }) => {
                         <button
                           className='w-[30px] h-[30px] rounded-full'
                           style={{
-                            backgroundColor: variant.color.toLowerCase(),
+                            backgroundColor:
+                              variant.color.toLowerCase() == 'golden'
+                                ? 'wheat'
+                                : variant.color.toLowerCase(),
                           }}
                         ></button>
                         <span className='px-1'>{variant.color}</span>

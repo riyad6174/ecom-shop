@@ -142,7 +142,7 @@ export const products = [
       '/assets/product/glass/sunglass6.jpg',
       '/assets/product/glass/sunglass4.jpg',
     ],
-    variants: [{ color: 'Black' }, { color: 'Silver' }, { color: 'Gold' }],
+    variants: [{ color: 'Black' }, { color: 'Silver' }, { color: 'Golden' }],
   },
   // {
   //   id: 1,
