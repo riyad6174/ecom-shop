@@ -500,112 +500,148 @@ function Cart() {
         </div>
       </CustomSection>
       <Footer />
-      {/* Thank You Popup */}
+      {/* Redesigned Thank You Popup */}
       {showPopup && orderDetails && (
-        <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'>
-          <div className='bg-white rounded-lg shadow-2xl p-6 w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto'>
-            <div className='text-center'>
-              <svg
-                className='w-12 h-12 mx-auto mb-4 text-green-500'
-                fill='none'
-                stroke='currentColor'
-                viewBox='0 0 24 24'
-                xmlns='http://www.w3.org/2000/svg'
-              >
-                <path
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  strokeWidth='2'
-                  d='M5 13l4 4L19 7'
-                />
-              </svg>
-              <h2 className='text-2xl font-bold text-blue-600 mb-2'>
-                Thank You for Your Order!
+        <div className='fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4'>
+          <div className='bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[95vh] overflow-y-auto transform transition-all duration-300 scale-100'>
+            {/* Header Section */}
+            <div className='text-center p-6 pb-4 bg-gradient-to-b from-orange-50 to-white rounded-t-2xl border-b border-orange-100'>
+              <div className='w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4'>
+                <svg
+                  className='w-8 h-8 text-orange-600'
+                  fill='none'
+                  stroke='currentColor'
+                  viewBox='0 0 24 24'
+                >
+                  <path
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth='2'
+                    d='M5 13l4 4L19 7'
+                  />
+                </svg>
+              </div>
+              <h2 className='text-2xl font-bold text-gray-900 mb-2'>
+                Order Confirmed! 🎉
               </h2>
-              <p className='text-gray-600 mb-6'>
-                Your order #{orderDetails.order.orderId} has been successfully
-                placed.
+              <p className='text-gray-600 text-sm mb-1'>
+                Your order has been placed successfully.
+              </p>
+              <div className='bg-orange-100 px-3 py-1 rounded-full inline-flex items-center gap-2 text-xs font-medium text-orange-800'>
+                <span>Order ID:</span>
+                <span className='font-semibold'>
+                  #{orderDetails.order.orderId}
+                </span>
+              </div>
+              <p className='text-xs text-gray-500 mt-2'>
+                Placed on{' '}
+                {new Date(orderDetails.order.orderDate).toLocaleDateString(
+                  'en-GB',
+                  {
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric',
+                  }
+                )}
               </p>
             </div>
-            {/* Invoice-like Design */}
-            <div className='border rounded-lg bg-white shadow-sm'>
-              {/* Invoice Header */}
-              <div className='bg-gradient-to-r from-blue-50 to-blue-100 p-4 rounded-t-lg'>
-                <h3 className='text-lg font-semibold text-gray-800'>
-                  Order Invoice
+
+            {/* Order Summary Section */}
+            <div className='p-6 space-y-6'>
+              {/* Items Summary */}
+              <div>
+                <h3 className='text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2'>
+                  <span className='w-2 h-2 bg-green-500 rounded-full'></span>
+                  Order Items ({orderDetails.order.items.length})
                 </h3>
-                <p className='text-sm text-gray-600'>
-                  Order Date:{' '}
-                  {new Date(orderDetails.order.orderDate).toLocaleString()}
-                </p>
-              </div>
-              {/* Order Items */}
-              <div className='p-3 border-b'>
-                <h4 className='text-sm font-medium text-gray-700 mb-3'>
-                  Order Items
-                </h4>
-                {orderDetails.order.items.length === 0 ? (
-                  <p className='text-sm text-gray-500'>No items in order.</p>
-                ) : (
-                  <div className='space-y-3'>
-                    <div className='grid grid-cols-11 gap-2 text-xs font-medium text-gray-700 bg-gray-50 p-2 rounded'>
-                      <span className='col-span-4'>Item</span>
-                      <span className='col-span-3 text-center'>Variant</span>
-                      <span className='col-span-2 text-center'>Qty</span>
-                      <span className='col-span-2 text-right'>Total</span>
-                    </div>
-                    {orderDetails.order.items.map((item) => (
-                      <div
-                        key={`${item.id}-${item.selectedColor}`}
-                        className='grid grid-cols-11 gap-2 text-sm text-gray-600 items-center'
-                      >
-                        <span className='col-span-4 font-medium truncate'>
+                <div className='space-y-3 max-h-40 overflow-y-auto'>
+                  {orderDetails.order.items.map((item, index) => (
+                    <div
+                      key={`${item.id}-${item.selectedColor}-${index}`}
+                      className='flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-200'
+                    >
+                      <div className='w-12 h-12 bg-gray-200 rounded-lg flex-shrink-0' />{' '}
+                      {/* Placeholder image */}
+                      <div className='flex-1 min-w-0'>
+                        <p className='font-medium text-gray-900 text-sm truncate'>
                           {item.title}
-                        </span>
-                        <span className='col-span-3 text-center'>
-                          {item.selectedColor || item.selectedVariantValue}
-                        </span>
-                        <span className='col-span-2 text-center'>
-                          {item.quantity}
-                        </span>
-                        <span className='col-span-2 text-right font-medium'>
-                          ৳{(item.price * item.quantity).toFixed(2)}
-                        </span>
+                        </p>
+                        <p className='text-xs text-gray-500'>
+                          {item.selectedColor ||
+                            item.selectedVariantValue ||
+                            'Standard'}
+                        </p>
+                        <p className='text-xs text-gray-500'>
+                          Qty: {item.quantity}
+                        </p>
                       </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-              {/* Pricing Summary */}
-              <div className='p-4'>
-                <div className='space-y-2 text-sm text-gray-600'>
-                  <div className='flex justify-between'>
-                    <span>Total Price</span>
-                    <span>৳{orderDetails.order.totalPrice.toFixed(2)}</span>
-                  </div>
-                  <div className='flex justify-between'>
-                    <span>Shipping Charge</span>
-                    <span>৳{orderDetails.order.shippingCharge.toFixed(2)}</span>
-                  </div>
-                  <div className='flex justify-between font-semibold text-gray-800 pt-2 border-t'>
-                    <span>Grand Total</span>
-                    <span>৳{orderDetails.order.grandTotal.toFixed(2)}</span>
-                  </div>
+                      <div className='text-right flex-shrink-0'>
+                        <p className='font-semibold text-gray-900 text-sm'>
+                          ৳{(item.price * item.quantity).toFixed(2)}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-              {/* Invoice Footer */}
-              <div className='p-4 bg-gray-50 rounded-b-lg text-center text-xs text-gray-500'>
-                <p>Thank you for shopping with us!</p>
-                <p>Contact us at support@example.com for any queries.</p>
+
+              {/* Pricing Summary */}
+              <div className='bg-blue-50 p-4 rounded-xl space-y-3'>
+                <div className='flex justify-between text-sm text-gray-700'>
+                  <span>Subtotal</span>
+                  <span>৳{orderDetails.order.totalPrice.toFixed(2)}</span>
+                </div>
+                <div className='flex justify-between text-sm text-gray-700'>
+                  <span>Shipping</span>
+                  <span>৳{orderDetails.order.shippingCharge.toFixed(2)}</span>
+                </div>
+                <div className='flex justify-between pt-2 border-t border-blue-200 font-semibold text-lg text-gray-900'>
+                  <span>Total</span>
+                  <span>৳{orderDetails.order.grandTotal.toFixed(2)}</span>
+                </div>
               </div>
+
+              {/* Next Steps */}
+              {/* <div className='space-y-3'>
+                <h4 className='text-sm font-semibold text-gray-900'>
+                  What happens next?
+                </h4>
+                <ul className='space-y-2 text-xs text-gray-600'>
+                  <li className='flex items-center gap-2'>
+                    <span className='w-1.5 h-1.5 bg-green-400 rounded-full'></span>
+                    We'll send a confirmation SMS to{' '}
+                    {formData.phoneNumber?.slice(-10)} shortly.
+                  </li>
+                  <li className='flex items-center gap-2'>
+                    <span className='w-1.5 h-1.5 bg-blue-400 rounded-full'></span>
+                    Your order will be processed within 24 hours.
+                  </li>
+                  <li className='flex items-center gap-2'>
+                    <span className='w-1.5 h-1.5 bg-purple-400 rounded-full'></span>
+                    Track your order anytime via WhatsApp or call us.
+                  </li>
+                </ul>
+              </div> */}
             </div>
-            {/* Close Button */}
-            <button
-              onClick={handleClosePopup}
-              className='mt-6 bg-blue-600 text-white py-2 px-4 rounded-lg w-full text-sm font-semibold hover:bg-blue-700 transition-colors'
-            >
-              Close
-            </button>
+
+            {/* Footer Actions */}
+            <div className='p-6 pt-0 border-t border-gray-100 bg-gray-50 rounded-b-2xl'>
+              <button
+                onClick={handleClosePopup}
+                className='w-full bg-orange-600 text-white py-3 px-6 rounded-xl font-semibold text-sm hover:bg-orange-700 transition-colors shadow-md'
+              >
+                Continue Shopping
+              </button>
+              <p className='text-center text-xs text-gray-500 mt-3'>
+                Need help? Contact us at{' '}
+                <a
+                  href='tel:+8801814575428'
+                  className='text-orange-600 hover:underline'
+                >
+                  +8801814575428
+                </a>
+              </p>
+            </div>
           </div>
         </div>
       )}

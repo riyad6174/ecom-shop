@@ -44,6 +44,26 @@ export const products = [
       { type: '65W' },
     ],
   },
+  {
+    id: 4,
+    title: 'Hoco E101 Dual Mode Anti Lost Tracker',
+    slug: 'anti-lost-tracker',
+    model: 'E96A/BC101',
+    price: 1020.0,
+    originalPrice: 1450.0,
+    sectionType: 'hot',
+    inStock: true,
+    thumbnail: '/assets/product/tracker/main.webp',
+    description:
+      'Hoco E101 Smart Finder হলো একটি স্মার্ট ও আধুনিক সলিউশন যা আপনার মূল্যবান জিনিসপত্র হারিয়ে যাওয়া থেকে রক্ষা করবে।',
+    images: [
+      '/assets/product/tracker/dual-1.webp',
+      '/assets/product/tracker/main2.webp',
+      '/assets/product/tracker/main.webp',
+      '/assets/product/tracker/dual-2.webp',
+    ], // 💡 UPDATED VARIANTS TO USE 'TYPE' INSTEAD OF 'COLOR'
+    variants: [{ type: 'Android + iOS' }, { type: 'iOS' }],
+  },
   // {
   //   id: 2,
   //   title: '20W Univarsal Travel Adapter ',
@@ -172,7 +192,7 @@ export const products = [
     price: 1599.0,
     originalPrice: 1750.0,
     sectionType: 'hot',
-    inStock: true,
+    inStock: false,
     thumbnail: '/assets/product/fan/fan-black.avif',
     description:
       'JF132 Portable High-speed Cooling Fan with 0-200 Speed Settings, USB Rechargeable, and Adjustable Tilt for Personal Use',
@@ -211,26 +231,7 @@ export const products = [
   //   ], // 💡 UPDATED VARIANTS TO USE 'TYPE' INSTEAD OF 'COLOR'
   //   variants: [{ type: 'Android' }, { type: 'iOS' }],
   // },
-  {
-    id: 4,
-    title: 'Hoco/Borofone Android/iOS Anti Lost Tracker',
-    slug: 'anti-lost-tracker',
-    model: 'E96A/BC101',
-    price: 990.0,
-    originalPrice: 1350.0,
-    sectionType: 'hot',
-    inStock: true,
-    thumbnail: '/assets/product/tracker/main.webp',
-    description:
-      'Hoco E96A Smart Finder হলো একটি স্মার্ট ও আধুনিক সলিউশন যা আপনার মূল্যবান জিনিসপত্র হারিয়ে যাওয়া থেকে রক্ষা করবে।',
-    images: [
-      '/assets/product/tracker/tracker1.webp',
-      '/assets/product/tracker/tracker1.jpg',
-      '/assets/product/tracker/main2.webp',
-      '/assets/product/tracker/main.webp',
-    ], // 💡 UPDATED VARIANTS TO USE 'TYPE' INSTEAD OF 'COLOR'
-    variants: [{ type: 'Android' }, { type: 'iOS' }],
-  },
+
   // {
   //   id: 2,
   //   title: 'Da Smart Ring Model A',
