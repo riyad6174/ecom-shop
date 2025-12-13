@@ -4,7 +4,7 @@ export const products = [
     title: 'Portable Electric Dental Water Flosser',
     slug: 'portable-electric-dental-water-flosser',
     model: 'Standard',
-    price: 1590.0,
+    price: 1650.0,
     originalPrice: 2150.0,
     sectionType: 'hot',
     inStock: true,
@@ -18,7 +18,7 @@ export const products = [
       '/assets/product/flosser/3.jpg',
       // '/assets/product/flosser/4.jpg',
     ],
-    variants: [{ color: 'White' }, { color: 'Blue' }, { color: 'Pink' }],
+    variants: [{ color: 'White' }, { color: 'Green' }, { color: 'Pink' }],
   },
   {
     id: 9,
