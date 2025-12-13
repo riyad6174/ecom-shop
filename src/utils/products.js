@@ -1,5 +1,26 @@
 export const products = [
   {
+    id: 10,
+    title: 'Portable Electric Dental Water Flosser',
+    slug: 'portable-electric-dental-water-flosser',
+    model: 'Standard',
+    price: 1590.0,
+    originalPrice: 2150.0,
+    sectionType: 'hot',
+    inStock: true,
+    thumbnail: '/assets/product/flosser/4.jpg',
+    description:
+      'Experience deep cleaning with 80-120PSI water pressure, effectively removing plaque and bacteria while improving oral hygiene.',
+    images: [
+      '/assets/product/flosser/4.jpg',
+      '/assets/product/flosser/2.jpg',
+      '/assets/product/flosser/1.jpg',
+      '/assets/product/flosser/3.jpg',
+      // '/assets/product/flosser/4.jpg',
+    ],
+    variants: [{ color: 'White' }, { color: 'Blue' }, { color: 'Pink' }],
+  },
+  {
     id: 9,
     title: '6000mAh-Portable Baby feeding Bottle Warmer',
     slug: 'portable-baby-feeding-bottle-warmer',
