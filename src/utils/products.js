@@ -18,7 +18,7 @@ export const products = [
       '/assets/product/flosser/3.jpg',
       // '/assets/product/flosser/4.jpg',
     ],
-    variants: [{ color: 'White' }, { color: 'Green' }, { color: 'Pink' }],
+    variants: [{ color: 'White' }],
   },
   {
     id: 9,
