@@ -18,6 +18,7 @@ module.exports = {
         sans: ['Inter', 'sans-serif'], // Default font
         serif: ['Merriweather', 'serif'],
         mont: ['Montserrat', 'serif'],
+        noto: ['Noto Serif Bengali', 'serif'],
       },
       container: {
         center: true,
