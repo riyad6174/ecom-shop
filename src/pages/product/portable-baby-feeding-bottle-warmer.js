@@ -34,7 +34,7 @@ const faqs = [
   {
     question: 'চার্জিং সময় কতটুকু?',
     answer:
-      'টাইপ সি ফাস্ট চার্জিং সাপোর্ট করে, যা ২-৩ ঘণ্টায় ফুল চার্জ হয়ে যায়।',
+      'টাইপ সি ফাস্ট চার্জিং সাপোর্ট করে, যা ১ ঘণ্টায় ফুল চার্জ হয়ে যায়।',
   },
   {
     question: 'এটি নিরাপদ কি না শিশুর জন্য?',
@@ -500,7 +500,7 @@ const ProductDetails = ({ initialProduct }) => {
                       ধীর এবং অস্থির, টাইপ সি সাপোর্ট নেই
                     </td>
                     <td className='border border-gray-300 px-4 py-2 text-center text-sm text-green-600'>
-                      টাইপ সি ফাস্ট চার্জিং, ২-৩ ঘণ্টায় ফুল চার্জ
+                      টাইপ সি ফাস্ট চার্জিং, ১ ঘণ্টায় ফুল চার্জ
                     </td>
                   </tr>
                   <tr className='hover:bg-gray-50'>
@@ -525,17 +525,6 @@ const ProductDetails = ({ initialProduct }) => {
                       উন্নত এবং হালকা ওজন, টেকসই
                     </td>
                   </tr>
-                  <tr className='hover:bg-gray-50'>
-                    <td className='border border-gray-300 px-4 py-2 text-sm text-gray-600 font-medium'>
-                      পোর্টেবিলিটি
-                    </td>
-                    <td className='border border-gray-300 px-4 py-2 text-center text-sm text-red-600'>
-                      ভারী এবং অসুবিধাজনক
-                    </td>
-                    <td className='border border-gray-300 px-4 py-2 text-center text-sm text-green-600'>
-                      হালকা এবং ট্রাভেল-ফ্রেন্ডলি
-                    </td>
-                  </tr>
                 </tbody>
               </table>
             </div>
@@ -548,13 +537,12 @@ const ProductDetails = ({ initialProduct }) => {
 
       {/* Image Section */}
       <CustomSection>
-        <div className='px-3'>
+        <div className='px-3 mb-2'>
           <div className='bg-white rounded-lg overflow-hidden shadow-md'>
             <img
-              className='w-full h-[400px] md:h-[500px] object-cover'
+              className='w-full h-[420px] md:h-full object-cover'
               src={
-                '/assets/product/warmer/compare.jpg' ||
-                '/images/placeholder.jpg'
+                '/assets/product/warmer/comp.jpeg' || '/images/placeholder.jpg'
               }
               alt='Product Usage'
             />
