@@ -25,7 +25,7 @@ export const products = [
     title: '6000mAh-Portable Baby feeding Bottle Warmer',
     slug: 'portable-baby-feeding-bottle-warmer',
     model: 'Black',
-    price: 2390.0,
+    price: 1990.0,
     originalPrice: 3050.0,
     sectionType: 'hot',
     inStock: true,
