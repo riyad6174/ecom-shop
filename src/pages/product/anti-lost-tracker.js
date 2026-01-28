@@ -120,7 +120,7 @@ const ProductDetails = ({ initialProduct }) => {
       });
     }
 
-    // Dispatch to Redux store - USE THE SAME STRUCTURE AS FIRST PRODUCT
+    // Dispatch to Redux store - always add 1 item, quantity can be changed in dialog
     dispatch(
       addToCart({
         id: product.id,
@@ -128,7 +128,7 @@ const ProductDetails = ({ initialProduct }) => {
         slug: product.slug,
         price: product.price,
         selectedColor: selectedVariant, // Send as selectedColor to match cartSlice structure
-        quantity,
+        quantity: 1,
         image: activeImage,
       })
     );
@@ -136,6 +136,9 @@ const ProductDetails = ({ initialProduct }) => {
     // Open order dialog instead of navigating
     setIsOrderDialogOpen(true);
     setIsAddingToCart(false);
+
+    // Reset quantity to 1 for next purchase
+    setQuantity(1);
   };
 
   if (!product) {

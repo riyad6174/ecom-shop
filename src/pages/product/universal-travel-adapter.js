@@ -155,6 +155,7 @@ const ProductDetails = ({ initialProduct }) => {
         },
       });
     }
+    // Always add 1 item, quantity can be changed in dialog
     dispatch(
       addToCart({
         id: product.id,
@@ -162,7 +163,7 @@ const ProductDetails = ({ initialProduct }) => {
         slug: product.slug,
         price: selectedVariantData.price,
         selectedColor,
-        quantity,
+        quantity: 1,
         image: activeImage,
         variantKey,
       })
@@ -171,6 +172,9 @@ const ProductDetails = ({ initialProduct }) => {
     // Open order dialog instead of navigating
     setIsOrderDialogOpen(true);
     setIsAddingToCart(false);
+
+    // Reset quantity to 1 for next purchase
+    setQuantity(1);
   };
 
   if (!product) {

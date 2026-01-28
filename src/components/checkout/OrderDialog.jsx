@@ -5,7 +5,7 @@ import { HiOutlineTrash } from 'react-icons/hi';
 import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import districtsData from '@/utils/districts.json';
-import { clearCart, removeFromCart } from '@/store/cartSlice';
+import { clearCart, removeFromCart, updateQuantity } from '@/store/cartSlice';
 
 const OrderDialog = ({ isOpen, onClose }) => {
   const dispatch = useDispatch();
@@ -359,6 +359,18 @@ const OrderDialog = ({ isOpen, onClose }) => {
     dispatch(removeFromCart({ id: item.id, selectedColor: item.selectedColor }));
   };
 
+  // Handle quantity change for cart items
+  const handleItemQuantityChange = (item, type) => {
+    const newQuantity = type === 'increment' ? item.quantity + 1 : item.quantity - 1;
+    if (newQuantity >= 1) {
+      dispatch(updateQuantity({
+        id: item.id,
+        selectedColor: item.selectedColor,
+        quantity: newQuantity,
+      }));
+    }
+  };
+
   if (!isVisible) return null;
 
   return (
@@ -385,7 +397,7 @@ const OrderDialog = ({ isOpen, onClose }) => {
             bg-white w-full md:w-[800px] lg:w-[900px]
             absolute md:relative
             bottom-0 md:bottom-auto md:top-0 md:right-0
-            h-[95vh] md:h-full
+            max-h-[85vh] md:max-h-full md:h-full
             rounded-t-xl md:rounded-none
             shadow-2xl
             flex flex-col
@@ -455,8 +467,32 @@ const OrderDialog = ({ isOpen, onClose }) => {
                             <p className='text-xs text-gray-500'>
                               {item.selectedColor || item.selectedVariantValue || 'Standard'}
                             </p>
-                            <div className='flex items-center justify-between mt-1'>
-                              <p className='text-xs text-gray-500'>Qty: {item.quantity}</p>
+                            <div className='flex items-center justify-between mt-2'>
+                              {/* Quantity Controls */}
+                              <div className='flex items-center border border-gray-300 rounded-lg'>
+                                <button
+                                  onClick={() => handleItemQuantityChange(item, 'decrement')}
+                                  disabled={item.quantity <= 1}
+                                  className='px-2 py-1 text-gray-600 hover:bg-gray-100 rounded-l-lg disabled:opacity-40 disabled:cursor-not-allowed'
+                                  aria-label='Decrease quantity'
+                                >
+                                  <svg className='w-3 h-3' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                                    <path strokeLinecap='round' strokeLinejoin='round' strokeWidth='2' d='M20 12H4' />
+                                  </svg>
+                                </button>
+                                <span className='px-3 py-1 text-sm font-medium text-gray-900 min-w-[32px] text-center'>
+                                  {item.quantity}
+                                </span>
+                                <button
+                                  onClick={() => handleItemQuantityChange(item, 'increment')}
+                                  className='px-2 py-1 text-gray-600 hover:bg-gray-100 rounded-r-lg'
+                                  aria-label='Increase quantity'
+                                >
+                                  <svg className='w-3 h-3' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                                    <path strokeLinecap='round' strokeLinejoin='round' strokeWidth='2' d='M12 4v16m8-8H4' />
+                                  </svg>
+                                </button>
+                              </div>
                               <p className='font-semibold text-gray-900 text-sm'>
                                 ৳{((item.price || 0) * (item.quantity || 1)).toFixed(2)}
                               </p>
@@ -513,7 +549,7 @@ const OrderDialog = ({ isOpen, onClose }) => {
                         value={formData.fullName}
                         onChange={handleInputChange}
                         placeholder='Enter Full Name'
-                        className='py-2.5 px-3 border w-full rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all'
+                        className='py-2.5 px-3 border w-full rounded-lg text-base bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all'
                       />
                       {errors.fullName && (
                         <p className='text-red-500 text-xs mt-1'>{errors.fullName}</p>
@@ -534,7 +570,7 @@ const OrderDialog = ({ isOpen, onClose }) => {
                         value={formData.phoneNumber}
                         onChange={handlePhoneChange}
                         placeholder='Enter Phone Number'
-                        className='py-2.5 px-3 border w-full rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                        className='py-2.5 px-3 border w-full rounded-lg text-base bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
                       />
                       {errors.phoneNumber && (
                         <p className='text-red-500 text-xs mt-1'>{errors.phoneNumber}</p>
@@ -557,7 +593,7 @@ const OrderDialog = ({ isOpen, onClose }) => {
                         onChange={handleSearchChange}
                         onFocus={() => setIsDropdownOpen(true)}
                         placeholder='Select District'
-                        className='py-2.5 px-3 border w-full rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                        className='py-2.5 px-3 border w-full rounded-lg text-base bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
                       />
                       {isDropdownOpen && (
                         <ul className='absolute z-20 w-full bg-white border border-gray-300 rounded-lg mt-1 max-h-48 overflow-y-auto shadow-lg'>
@@ -598,7 +634,7 @@ const OrderDialog = ({ isOpen, onClose }) => {
                         value={formData.address}
                         onChange={handleInputChange}
                         placeholder='Thana, Road No, House No'
-                        className='py-2.5 px-3 border w-full rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                        className='py-2.5 px-3 border w-full rounded-lg text-base bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
                       />
                       {errors.address && (
                         <p className='text-red-500 text-xs mt-1'>{errors.address}</p>
