@@ -39,6 +39,7 @@ const ProductDetails = ({ initialProduct }) => {
   const [activeImage, setActiveImage] = useState('');
   const [quantity, setQuantity] = useState(1);
   const [variantKey, setVariantKey] = useState(null);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
 
   // Variant-specific pricing data
   const variantData = {
@@ -129,42 +130,48 @@ const ProductDetails = ({ initialProduct }) => {
   };
 
   const handleBuyNow = () => {
-    if (product) {
-      if (typeof window !== 'undefined') {
-        window.dataLayer = window.dataLayer || [];
-        window.dataLayer.push({
-          event: 'add_to_cart',
-          ecommerce: {
-            currency: 'BDT',
-            value: selectedVariantData.price * quantity,
-            items: [
-              {
-                item_id: product.id || 'unknown',
-                item_name: product.title || 'unknown',
-                price: selectedVariantData.price,
-                original_price: selectedVariantData.originalPrice,
-                item_category: 'Accessories',
-                item_variant: selectedColor || 'unknown',
-                quantity: quantity || 1,
-              },
-            ],
-          },
-        });
-      }
-      dispatch(
-        addToCart({
-          id: product.id,
-          title: product.title,
-          slug: product.slug,
-          price: selectedVariantData.price,
-          selectedColor,
-          quantity,
-          image: activeImage,
-          variantKey,
-        })
-      );
-      router.push('/order');
+    if (!product || isAddingToCart) return;
+
+    setIsAddingToCart(true);
+
+    if (typeof window !== 'undefined') {
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        event: 'add_to_cart',
+        ecommerce: {
+          currency: 'BDT',
+          value: selectedVariantData.price * quantity,
+          items: [
+            {
+              item_id: product.id || 'unknown',
+              item_name: product.title || 'unknown',
+              price: selectedVariantData.price,
+              original_price: selectedVariantData.originalPrice,
+              item_category: 'Accessories',
+              item_variant: selectedColor || 'unknown',
+              quantity: quantity || 1,
+            },
+          ],
+        },
+      });
     }
+    dispatch(
+      addToCart({
+        id: product.id,
+        title: product.title,
+        slug: product.slug,
+        price: selectedVariantData.price,
+        selectedColor,
+        quantity,
+        image: activeImage,
+        variantKey,
+      })
+    );
+
+    // Delay navigation to allow tracking pixels to complete
+    setTimeout(() => {
+      router.push('/order');
+    }, 300);
   };
 
   if (!product) {
@@ -473,10 +480,20 @@ const ProductDetails = ({ initialProduct }) => {
                 </div>
                 <button
                   onClick={handleBuyNow}
-                  className='flex items-center bg-[#2563eb] text-white justify-center gap-2 border border-primary px-4 sm:px-6 py-2 sm:py-3 rounded-md font-mont font-semibold text-sm'
-                  disabled={!product.inStock}
+                  className='flex items-center bg-[#2563eb] text-white justify-center gap-2 border border-primary px-4 sm:px-6 py-2 sm:py-3 rounded-md font-mont font-semibold text-sm disabled:opacity-70'
+                  disabled={!product.inStock || isAddingToCart}
                 >
-                  <span>{product.inStock ? 'এখনই কিনুন' : 'স্টক নেই'}</span>
+                  {isAddingToCart ? (
+                    <>
+                      <svg className='animate-spin h-4 w-4 text-white' xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24'>
+                        <circle className='opacity-25' cx='12' cy='12' r='10' stroke='currentColor' strokeWidth='4'></circle>
+                        <path className='opacity-75' fill='currentColor' d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'></path>
+                      </svg>
+                      <span>Processing...</span>
+                    </>
+                  ) : (
+                    <span>{product.inStock ? 'এখনই কিনুন' : 'স্টক নেই'}</span>
+                  )}
                 </button>
               </div>
               <p className='text-sm text-gray-600 font-semibold'>
