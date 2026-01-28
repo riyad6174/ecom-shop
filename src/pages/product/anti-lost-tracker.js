@@ -17,20 +17,20 @@ import CustomSection from '@/components/layout/CustomSection';
 import { products } from '@/utils/products';
 import { addToCart } from '@/store/cartSlice';
 import Footer from '@/components/common/Footer';
-import { useRouter } from 'next/router';
 import Head from 'next/head';
+import OrderDialog from '@/components/checkout/OrderDialog';
 
 // Find the specific product for this page
 const productData = products.find((p) => p.slug === 'anti-lost-tracker');
 
 const ProductDetails = ({ initialProduct }) => {
   const dispatch = useDispatch();
-  const router = useRouter();
   const [product, setProduct] = useState(initialProduct);
   const [selectedVariant, setSelectedVariant] = useState('Android + iOS');
   const [activeImage, setActiveImage] = useState('');
   const [quantity, setQuantity] = useState(1);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [isOrderDialogOpen, setIsOrderDialogOpen] = useState(false);
 
   useEffect(() => {
     if (initialProduct) {
@@ -133,10 +133,9 @@ const ProductDetails = ({ initialProduct }) => {
       })
     );
 
-    // Delay navigation to allow tracking pixels to complete
-    setTimeout(() => {
-      router.push('/order');
-    }, 300);
+    // Open order dialog instead of navigating
+    setIsOrderDialogOpen(true);
+    setIsAddingToCart(false);
   };
 
   if (!product) {
@@ -832,6 +831,12 @@ const ProductDetails = ({ initialProduct }) => {
         </div>
       </CustomSection>
       <Footer />
+
+      {/* Order Dialog */}
+      <OrderDialog
+        isOpen={isOrderDialogOpen}
+        onClose={() => setIsOrderDialogOpen(false)}
+      />
     </>
   );
 };

@@ -1,11 +1,17 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import { FaBars, FaTimes } from 'react-icons/fa';
+import { FiShoppingCart } from 'react-icons/fi';
+import { useSelector } from 'react-redux';
 import Link from 'next/link';
+import OrderDialog from '@/components/checkout/OrderDialog';
 
 function Navbar() {
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isOrderDialogOpen, setIsOrderDialogOpen] = useState(false);
+  const cartItems = useSelector((state) => state.cart.items);
+  const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -67,7 +73,19 @@ function Navbar() {
           <Link href='/'>
             <img className='h-12' src='/assets/logo.png' alt='Logo' />
           </Link>
-          <div className='w-6'></div> {/* Spacer for alignment */}
+          {/* Cart Icon */}
+          <button
+            onClick={() => setIsOrderDialogOpen(true)}
+            className='relative p-2 text-gray-600 hover:text-orange-500 transition-colors'
+            aria-label='Open cart'
+          >
+            <FiShoppingCart className='text-2xl' />
+            {totalItems > 0 && (
+              <span className='absolute -top-1 -right-1 bg-orange-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center'>
+                {totalItems > 9 ? '9+' : totalItems}
+              </span>
+            )}
+          </button>
         </div>
         {/* Mobile Menu */}
         <div
@@ -114,6 +132,12 @@ function Navbar() {
           </div>
         </div>
       </nav>
+
+      {/* Order Dialog */}
+      <OrderDialog
+        isOpen={isOrderDialogOpen}
+        onClose={() => setIsOrderDialogOpen(false)}
+      />
     </>
   );
 }
