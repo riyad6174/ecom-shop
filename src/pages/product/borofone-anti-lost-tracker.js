@@ -59,6 +59,7 @@ const ProductDetails = ({ initialProduct }) => {
       // GTM Data Layer Push (only on client-side)
       if (typeof window !== 'undefined') {
         window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({ ecommerce: null });
         window.dataLayer.push({
           event: 'view_item',
           ecommerce: {
@@ -111,6 +112,7 @@ const ProductDetails = ({ initialProduct }) => {
 
     if (typeof window !== 'undefined') {
       window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({ ecommerce: null });
       window.dataLayer.push({
         event: 'add_to_cart',
         ecommerce: {

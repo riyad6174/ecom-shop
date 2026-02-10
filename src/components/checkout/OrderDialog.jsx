@@ -30,7 +30,7 @@ const OrderDialog = ({ isOpen, onClose }) => {
   const [errors, setErrors] = useState({});
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredDistricts, setFilteredDistricts] = useState(
-    districtsData.districts.slice(0, 5)
+    districtsData.districts.slice(0, 5),
   );
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [orderDetails, setOrderDetails] = useState(null);
@@ -52,6 +52,29 @@ const OrderDialog = ({ isOpen, onClose }) => {
           setIsAnimating(true);
         });
       });
+      // Push begin_checkout event to data layer
+      if (cartItems.length > 0) {
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({ ecommerce: null });
+        window.dataLayer.push({
+          event: 'begin_checkout',
+          ecommerce: {
+            currency: 'BDT',
+            value: cartItems.reduce(
+              (sum, item) => sum + (item.price || 0) * (item.quantity || 1),
+              0,
+            ),
+            items: cartItems.map((item) => ({
+              item_id: item.id || 'unknown',
+              item_name: item.title || 'unknown',
+              price: item.price || 0,
+              quantity: item.quantity || 1,
+              item_variant: item.selectedColor || item.selectedVariantValue,
+              item_category: item.category || 'Accessories',
+            })),
+          },
+        });
+      }
       // Prevent body scroll when dialog is open
       document.body.style.overflow = 'hidden';
     } else {
@@ -74,7 +97,7 @@ const OrderDialog = ({ isOpen, onClose }) => {
   useEffect(() => {
     const total = cartItems.reduce(
       (sum, item) => sum + (item.price || 0) * (item.quantity || 1),
-      0
+      0,
     );
     setTotalPrice(total);
     setGrandTotal(total + shippingCharge);
@@ -133,7 +156,7 @@ const OrderDialog = ({ isOpen, onClose }) => {
     setFormData({ ...formData, district: value });
     setIsDropdownOpen(true);
     const filtered = districtsData.districts.filter((district) =>
-      district.name.toLowerCase().includes(value.toLowerCase())
+      district.name.toLowerCase().includes(value.toLowerCase()),
     );
     setFilteredDistricts(filtered.slice(0, 5));
   };
@@ -155,7 +178,8 @@ const OrderDialog = ({ isOpen, onClose }) => {
         if (!value) {
           newErrors.phoneNumber = 'Phone number is required';
         } else if (!/^\+880\d{10}$/.test(value)) {
-          newErrors.phoneNumber = 'Please enter a valid Bangladesh phone number';
+          newErrors.phoneNumber =
+            'Please enter a valid Bangladesh phone number';
         } else {
           delete newErrors.phoneNumber;
         }
@@ -190,7 +214,8 @@ const OrderDialog = ({ isOpen, onClose }) => {
     if (!formData.fullName.trim()) newErrors.fullName = 'Full name is required';
     else if (formData.fullName.length < 2)
       newErrors.fullName = 'Full name must be at least 2 characters';
-    if (!formData.phoneNumber) newErrors.phoneNumber = 'Phone number is required';
+    if (!formData.phoneNumber)
+      newErrors.phoneNumber = 'Phone number is required';
     else if (!/^\+880\d{10}$/.test(formData.phoneNumber))
       newErrors.phoneNumber = 'Please enter a valid Bangladesh phone number';
     if (!formData.district.trim()) newErrors.district = 'District is required';
@@ -237,7 +262,7 @@ const OrderDialog = ({ isOpen, onClose }) => {
           price: item.price || 0,
           quantity: item.quantity || 1,
           selectedColor: item.selectedColor || item.selectedVariantValue,
-        }))
+        })),
       ),
       totalPrice: totalPrice || 0,
       shippingCharge: shippingCharge || 0,
@@ -284,6 +309,7 @@ const OrderDialog = ({ isOpen, onClose }) => {
 
         // Push purchase event to data layer
         window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({ ecommerce: null });
         window.dataLayer.push({
           event: 'purchase',
           ecommerce: {
@@ -302,19 +328,6 @@ const OrderDialog = ({ isOpen, onClose }) => {
           },
         });
 
-        // Fire Meta Pixel Purchase event directly
-        if (typeof window.fbq === 'function') {
-          window.fbq('track', 'Purchase', {
-            content_ids: order.order.items.map((item) => item.id || 'unknown'),
-            content_type: 'product',
-            contents: order.order.items.map((item) => ({
-              id: item.id || 'unknown',
-              quantity: item.quantity || 1,
-            })),
-            currency: 'BDT',
-            value: order.order.grandTotal || 0,
-          });
-        }
       }
     } catch (error) {
       console.error('Fetch error:', error.name, error.message);
@@ -356,18 +369,23 @@ const OrderDialog = ({ isOpen, onClose }) => {
 
   // Handle remove item from cart
   const handleRemoveItem = (item) => {
-    dispatch(removeFromCart({ id: item.id, selectedColor: item.selectedColor }));
+    dispatch(
+      removeFromCart({ id: item.id, selectedColor: item.selectedColor }),
+    );
   };
 
   // Handle quantity change for cart items
   const handleItemQuantityChange = (item, type) => {
-    const newQuantity = type === 'increment' ? item.quantity + 1 : item.quantity - 1;
+    const newQuantity =
+      type === 'increment' ? item.quantity + 1 : item.quantity - 1;
     if (newQuantity >= 1) {
-      dispatch(updateQuantity({
-        id: item.id,
-        selectedColor: item.selectedColor,
-        quantity: newQuantity,
-      }));
+      dispatch(
+        updateQuantity({
+          id: item.id,
+          selectedColor: item.selectedColor,
+          quantity: newQuantity,
+        }),
+      );
     }
   };
 
@@ -402,9 +420,10 @@ const OrderDialog = ({ isOpen, onClose }) => {
             shadow-2xl
             flex flex-col
             transform transition-all ease-[cubic-bezier(0.32,0.72,0,1)]
-            ${isAnimating
-              ? 'translate-y-0 md:translate-y-0 md:translate-x-0'
-              : 'translate-y-full md:translate-y-0 md:translate-x-full'
+            ${
+              isAnimating
+                ? 'translate-y-0 md:translate-y-0 md:translate-x-0'
+                : 'translate-y-full md:translate-y-0 md:translate-x-full'
             }
           `}
           style={{ transitionDuration: '400ms' }}
@@ -412,7 +431,9 @@ const OrderDialog = ({ isOpen, onClose }) => {
           {/* Header */}
           <div className='flex-shrink-0 flex items-center justify-between p-4 md:p-6 border-b border-gray-200 bg-white rounded-t-xl md:rounded-none'>
             <h2 className='text-lg md:text-xl font-semibold text-gray-900'>
-              {currentView === 'cart' ? 'Complete Your Order' : 'Order Confirmed!'}
+              {currentView === 'cart'
+                ? 'Complete Your Order'
+                : 'Order Confirmed!'}
             </h2>
             <button
               onClick={handleClose}
@@ -436,11 +457,23 @@ const OrderDialog = ({ isOpen, onClose }) => {
                   {cartItems.length === 0 ? (
                     <div className='flex flex-col items-center justify-center py-8'>
                       <div className='w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mb-4'>
-                        <svg className='w-8 h-8 text-gray-400' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                          <path strokeLinecap='round' strokeLinejoin='round' strokeWidth='2' d='M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z' />
+                        <svg
+                          className='w-8 h-8 text-gray-400'
+                          fill='none'
+                          stroke='currentColor'
+                          viewBox='0 0 24 24'
+                        >
+                          <path
+                            strokeLinecap='round'
+                            strokeLinejoin='round'
+                            strokeWidth='2'
+                            d='M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z'
+                          />
                         </svg>
                       </div>
-                      <p className='text-gray-500 text-sm'>Your cart is empty</p>
+                      <p className='text-gray-500 text-sm'>
+                        Your cart is empty
+                      </p>
                     </div>
                   ) : (
                     <div className='space-y-3'>
@@ -465,36 +498,65 @@ const OrderDialog = ({ isOpen, onClose }) => {
                               {item.title}
                             </p>
                             <p className='text-xs text-gray-500'>
-                              {item.selectedColor || item.selectedVariantValue || 'Standard'}
+                              {item.selectedColor ||
+                                item.selectedVariantValue ||
+                                'Standard'}
                             </p>
                             <div className='flex items-center justify-between mt-2'>
                               {/* Quantity Controls */}
                               <div className='flex items-center border border-gray-300 rounded-lg'>
                                 <button
-                                  onClick={() => handleItemQuantityChange(item, 'decrement')}
+                                  onClick={() =>
+                                    handleItemQuantityChange(item, 'decrement')
+                                  }
                                   disabled={item.quantity <= 1}
                                   className='px-2 py-1 text-gray-600 hover:bg-gray-100 rounded-l-lg disabled:opacity-40 disabled:cursor-not-allowed'
                                   aria-label='Decrease quantity'
                                 >
-                                  <svg className='w-3 h-3' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                                    <path strokeLinecap='round' strokeLinejoin='round' strokeWidth='2' d='M20 12H4' />
+                                  <svg
+                                    className='w-3 h-3'
+                                    fill='none'
+                                    stroke='currentColor'
+                                    viewBox='0 0 24 24'
+                                  >
+                                    <path
+                                      strokeLinecap='round'
+                                      strokeLinejoin='round'
+                                      strokeWidth='2'
+                                      d='M20 12H4'
+                                    />
                                   </svg>
                                 </button>
                                 <span className='px-3 py-1 text-sm font-medium text-gray-900 min-w-[32px] text-center'>
                                   {item.quantity}
                                 </span>
                                 <button
-                                  onClick={() => handleItemQuantityChange(item, 'increment')}
+                                  onClick={() =>
+                                    handleItemQuantityChange(item, 'increment')
+                                  }
                                   className='px-2 py-1 text-gray-600 hover:bg-gray-100 rounded-r-lg'
                                   aria-label='Increase quantity'
                                 >
-                                  <svg className='w-3 h-3' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                                    <path strokeLinecap='round' strokeLinejoin='round' strokeWidth='2' d='M12 4v16m8-8H4' />
+                                  <svg
+                                    className='w-3 h-3'
+                                    fill='none'
+                                    stroke='currentColor'
+                                    viewBox='0 0 24 24'
+                                  >
+                                    <path
+                                      strokeLinecap='round'
+                                      strokeLinejoin='round'
+                                      strokeWidth='2'
+                                      d='M12 4v16m8-8H4'
+                                    />
                                   </svg>
                                 </button>
                               </div>
                               <p className='font-semibold text-gray-900 text-sm'>
-                                ৳{((item.price || 0) * (item.quantity || 1)).toFixed(2)}
+                                ৳
+                                {(
+                                  (item.price || 0) * (item.quantity || 1)
+                                ).toFixed(2)}
                               </p>
                             </div>
                           </div>
@@ -552,7 +614,9 @@ const OrderDialog = ({ isOpen, onClose }) => {
                         className='py-2.5 px-3 border w-full rounded-lg text-base bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all'
                       />
                       {errors.fullName && (
-                        <p className='text-red-500 text-xs mt-1'>{errors.fullName}</p>
+                        <p className='text-red-500 text-xs mt-1'>
+                          {errors.fullName}
+                        </p>
                       )}
                     </div>
 
@@ -573,7 +637,9 @@ const OrderDialog = ({ isOpen, onClose }) => {
                         className='py-2.5 px-3 border w-full rounded-lg text-base bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
                       />
                       {errors.phoneNumber && (
-                        <p className='text-red-500 text-xs mt-1'>{errors.phoneNumber}</p>
+                        <p className='text-red-500 text-xs mt-1'>
+                          {errors.phoneNumber}
+                        </p>
                       )}
                     </div>
 
@@ -601,7 +667,9 @@ const OrderDialog = ({ isOpen, onClose }) => {
                             filteredDistricts.map((district) => (
                               <li
                                 key={district.id}
-                                onClick={() => handleDistrictSelect(district.name)}
+                                onClick={() =>
+                                  handleDistrictSelect(district.name)
+                                }
                                 className='px-3 py-2 text-sm hover:bg-blue-100 cursor-pointer transition-colors'
                               >
                                 {district.name}
@@ -615,7 +683,9 @@ const OrderDialog = ({ isOpen, onClose }) => {
                         </ul>
                       )}
                       {errors.district && (
-                        <p className='text-red-500 text-xs mt-1'>{errors.district}</p>
+                        <p className='text-red-500 text-xs mt-1'>
+                          {errors.district}
+                        </p>
                       )}
                     </div>
 
@@ -637,7 +707,9 @@ const OrderDialog = ({ isOpen, onClose }) => {
                         className='py-2.5 px-3 border w-full rounded-lg text-base bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
                       />
                       {errors.address && (
-                        <p className='text-red-500 text-xs mt-1'>{errors.address}</p>
+                        <p className='text-red-500 text-xs mt-1'>
+                          {errors.address}
+                        </p>
                       )}
                     </div>
 
@@ -678,9 +750,25 @@ const OrderDialog = ({ isOpen, onClose }) => {
                     >
                       {isLoading ? (
                         <span className='flex items-center justify-center gap-2'>
-                          <svg className='animate-spin h-4 w-4 text-white' xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24'>
-                            <circle className='opacity-25' cx='12' cy='12' r='10' stroke='currentColor' strokeWidth='4'></circle>
-                            <path className='opacity-75' fill='currentColor' d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'></path>
+                          <svg
+                            className='animate-spin h-4 w-4 text-white'
+                            xmlns='http://www.w3.org/2000/svg'
+                            fill='none'
+                            viewBox='0 0 24 24'
+                          >
+                            <circle
+                              className='opacity-25'
+                              cx='12'
+                              cy='12'
+                              r='10'
+                              stroke='currentColor'
+                              strokeWidth='4'
+                            ></circle>
+                            <path
+                              className='opacity-75'
+                              fill='currentColor'
+                              d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
+                            ></path>
                           </svg>
                           Confirming...
                         </span>
@@ -710,7 +798,9 @@ const OrderDialog = ({ isOpen, onClose }) => {
                   >
                     <svg
                       className={`w-10 h-10 text-green-600 transition-all duration-300 ${
-                        confirmationAnimating ? 'opacity-100 scale-100' : 'opacity-0 scale-50'
+                        confirmationAnimating
+                          ? 'opacity-100 scale-100'
+                          : 'opacity-0 scale-50'
                       }`}
                       style={{ transitionDelay: '200ms' }}
                       fill='none'
@@ -727,7 +817,9 @@ const OrderDialog = ({ isOpen, onClose }) => {
                   </div>
                   <h3
                     className={`text-2xl font-bold text-gray-900 mb-2 transition-all duration-400 ${
-                      confirmationAnimating ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
+                      confirmationAnimating
+                        ? 'opacity-100 translate-y-0'
+                        : 'opacity-0 translate-y-2'
                     }`}
                     style={{ transitionDelay: '150ms' }}
                   >
@@ -735,7 +827,9 @@ const OrderDialog = ({ isOpen, onClose }) => {
                   </h3>
                   <p
                     className={`text-gray-600 text-sm mb-3 transition-all duration-400 ${
-                      confirmationAnimating ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
+                      confirmationAnimating
+                        ? 'opacity-100 translate-y-0'
+                        : 'opacity-0 translate-y-2'
                     }`}
                     style={{ transitionDelay: '200ms' }}
                   >
@@ -743,12 +837,16 @@ const OrderDialog = ({ isOpen, onClose }) => {
                   </p>
                   <div
                     className={`bg-green-100 px-4 py-2 rounded-full inline-flex items-center gap-2 text-sm font-medium text-green-800 transition-all duration-400 ${
-                      confirmationAnimating ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
+                      confirmationAnimating
+                        ? 'opacity-100 scale-100'
+                        : 'opacity-0 scale-95'
                     }`}
                     style={{ transitionDelay: '250ms' }}
                   >
                     <span>Order ID:</span>
-                    <span className='font-bold'>#{orderDetails?.order?.orderId}</span>
+                    <span className='font-bold'>
+                      #{orderDetails?.order?.orderId}
+                    </span>
                   </div>
                   <p
                     className={`text-xs text-gray-500 mt-3 transition-all duration-300 ${
@@ -758,20 +856,25 @@ const OrderDialog = ({ isOpen, onClose }) => {
                   >
                     Placed on{' '}
                     {orderDetails?.order?.orderDate &&
-                      new Date(orderDetails.order.orderDate).toLocaleDateString('en-GB', {
-                        day: 'numeric',
-                        month: 'short',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
+                      new Date(orderDetails.order.orderDate).toLocaleDateString(
+                        'en-GB',
+                        {
+                          day: 'numeric',
+                          month: 'short',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        },
+                      )}
                   </p>
                 </div>
 
                 {/* Order Items */}
                 <div
                   className={`mb-6 transition-all duration-400 ${
-                    confirmationAnimating ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+                    confirmationAnimating
+                      ? 'opacity-100 translate-y-0'
+                      : 'opacity-0 translate-y-4'
                   }`}
                   style={{ transitionDelay: '350ms' }}
                 >
@@ -801,12 +904,18 @@ const OrderDialog = ({ isOpen, onClose }) => {
                             {item.title}
                           </p>
                           <p className='text-xs text-gray-500'>
-                            {item.selectedColor || item.selectedVariantValue || 'Standard'} | Qty: {item.quantity}
+                            {item.selectedColor ||
+                              item.selectedVariantValue ||
+                              'Standard'}{' '}
+                            | Qty: {item.quantity}
                           </p>
                         </div>
                         <div className='text-right flex-shrink-0'>
                           <p className='font-semibold text-gray-900 text-sm'>
-                            ৳{((item.price || 0) * (item.quantity || 1)).toFixed(2)}
+                            ৳
+                            {((item.price || 0) * (item.quantity || 1)).toFixed(
+                              2,
+                            )}
                           </p>
                         </div>
                       </div>
@@ -817,7 +926,9 @@ const OrderDialog = ({ isOpen, onClose }) => {
                 {/* Delivery Info */}
                 <div
                   className={`mb-6 p-4 bg-gray-50 rounded-xl transition-all duration-400 ${
-                    confirmationAnimating ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+                    confirmationAnimating
+                      ? 'opacity-100 translate-y-0'
+                      : 'opacity-0 translate-y-4'
                   }`}
                   style={{ transitionDelay: '400ms' }}
                 >
@@ -826,16 +937,20 @@ const OrderDialog = ({ isOpen, onClose }) => {
                   </h4>
                   <div className='space-y-2 text-sm'>
                     <p className='text-gray-700'>
-                      <span className='text-gray-500'>Name:</span> {orderDetails?.user?.fullName}
+                      <span className='text-gray-500'>Name:</span>{' '}
+                      {orderDetails?.user?.fullName}
                     </p>
                     <p className='text-gray-700'>
-                      <span className='text-gray-500'>Phone:</span> {orderDetails?.user?.phoneNumber}
+                      <span className='text-gray-500'>Phone:</span>{' '}
+                      {orderDetails?.user?.phoneNumber}
                     </p>
                     <p className='text-gray-700'>
-                      <span className='text-gray-500'>District:</span> {orderDetails?.user?.district}
+                      <span className='text-gray-500'>District:</span>{' '}
+                      {orderDetails?.user?.district}
                     </p>
                     <p className='text-gray-700'>
-                      <span className='text-gray-500'>Address:</span> {orderDetails?.user?.address}
+                      <span className='text-gray-500'>Address:</span>{' '}
+                      {orderDetails?.user?.address}
                     </p>
                   </div>
                 </div>
@@ -843,7 +958,9 @@ const OrderDialog = ({ isOpen, onClose }) => {
                 {/* Payment Summary */}
                 <div
                   className={`mb-6 p-4 bg-blue-50 rounded-xl transition-all duration-400 ${
-                    confirmationAnimating ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+                    confirmationAnimating
+                      ? 'opacity-100 translate-y-0'
+                      : 'opacity-0 translate-y-4'
                   }`}
                   style={{ transitionDelay: '450ms' }}
                 >
@@ -853,7 +970,9 @@ const OrderDialog = ({ isOpen, onClose }) => {
                   </div>
                   <div className='flex justify-between text-sm text-gray-700 mb-2'>
                     <span>Shipping</span>
-                    <span>৳{orderDetails?.order?.shippingCharge?.toFixed(2)}</span>
+                    <span>
+                      ৳{orderDetails?.order?.shippingCharge?.toFixed(2)}
+                    </span>
                   </div>
                   <div className='flex justify-between font-bold text-lg text-gray-900 pt-2 border-t border-blue-200'>
                     <span>Total</span>
@@ -865,15 +984,23 @@ const OrderDialog = ({ isOpen, onClose }) => {
                 <button
                   onClick={handleContinueShopping}
                   className={`w-full bg-orange-600 text-white py-3 px-6 rounded-xl font-semibold text-sm hover:bg-orange-700 transition-all shadow-md ${
-                    confirmationAnimating ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+                    confirmationAnimating
+                      ? 'opacity-100 translate-y-0'
+                      : 'opacity-0 translate-y-4'
                   }`}
-                  style={{ transitionDelay: '500ms', transitionDuration: '400ms' }}
+                  style={{
+                    transitionDelay: '500ms',
+                    transitionDuration: '400ms',
+                  }}
                 >
                   Continue Shopping
                 </button>
                 <p className='text-center text-xs text-gray-500 mt-4'>
                   Need help? Contact us at{' '}
-                  <a href='tel:+8801814575428' className='text-orange-600 hover:underline'>
+                  <a
+                    href='tel:+8801814575428'
+                    className='text-orange-600 hover:underline'
+                  >
                     +8801814575428
                   </a>
                 </p>

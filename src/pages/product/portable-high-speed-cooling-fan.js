@@ -33,26 +33,29 @@ const ProductDetails = ({ initialProduct }) => {
       setActiveImage(initialProduct.images[0] || ''); // Set first image as default
 
       // Push product view event to data layer
-      window.dataLayer = window.dataLayer || [];
-      window.dataLayer.push({
-        event: 'view_item',
-        ecommerce: {
-          items: [
-            {
-              item_id: initialProduct.id || 'unknown',
-              item_name: initialProduct.title || 'unknown',
-              price: initialProduct.price || 0,
-              original_price: initialProduct.originalPrice || 0,
-              item_category: 'Electronics', // Adjust based on your product taxonomy
-              item_variant: initialProduct.variants
-                ? initialProduct.variants.map((v) => v.color).join(', ')
-                : 'unknown',
-            },
-          ],
-          currency: 'BDT', // Bangladeshi Taka
-          value: initialProduct.price || 0,
-        },
-      });
+      if (typeof window !== 'undefined') {
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({ ecommerce: null });
+        window.dataLayer.push({
+          event: 'view_item',
+          ecommerce: {
+            items: [
+              {
+                item_id: initialProduct.id || 'unknown',
+                item_name: initialProduct.title || 'unknown',
+                price: initialProduct.price || 0,
+                original_price: initialProduct.originalPrice || 0,
+                item_category: 'Electronics',
+                item_variant: initialProduct.variants
+                  ? initialProduct.variants.map((v) => v.color).join(', ')
+                  : 'unknown',
+              },
+            ],
+            currency: 'BDT',
+            value: initialProduct.price || 0,
+          },
+        });
+      }
     }
   }, [initialProduct]);
 
@@ -78,25 +81,28 @@ const ProductDetails = ({ initialProduct }) => {
     setIsAddingToCart(true);
 
     // Push add_to_cart event to data layer
-    window.dataLayer = window.dataLayer || [];
-    window.dataLayer.push({
-      event: 'add_to_cart',
-      ecommerce: {
-        currency: 'BDT',
-        value: product.price * quantity || 0,
-        items: [
-          {
-            item_id: product.id || 'unknown',
-            item_name: product.title || 'unknown',
-            price: product.price || 0,
-            original_price: product.originalPrice || 0,
-            item_category: 'Wearables',
-            item_variant: selectedColor || 'unknown',
-            quantity: quantity || 1,
-          },
-        ],
-      },
-    });
+    if (typeof window !== 'undefined') {
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({ ecommerce: null });
+      window.dataLayer.push({
+        event: 'add_to_cart',
+        ecommerce: {
+          currency: 'BDT',
+          value: product.price * quantity || 0,
+          items: [
+            {
+              item_id: product.id || 'unknown',
+              item_name: product.title || 'unknown',
+              price: product.price || 0,
+              original_price: product.originalPrice || 0,
+              item_category: 'Wearables',
+              item_variant: selectedColor || 'unknown',
+              quantity: quantity || 1,
+            },
+          ],
+        },
+      });
+    }
     // Always add 1 item, quantity can be changed in dialog
     dispatch(
       addToCart({

@@ -41,6 +41,32 @@ function Cart() {
   const [shippingCharge, setShippingCharge] = useState(60);
   const [grandTotal, setGrandTotal] = useState(0);
 
+  // Push begin_checkout event when order page loads with cart items
+  useEffect(() => {
+    if (typeof window !== 'undefined' && cartItems.length > 0) {
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({ ecommerce: null });
+      window.dataLayer.push({
+        event: 'begin_checkout',
+        ecommerce: {
+          currency: 'BDT',
+          value: cartItems.reduce(
+            (sum, item) => sum + (item.price || 0) * (item.quantity || 1),
+            0,
+          ),
+          items: cartItems.map((item) => ({
+            item_id: item.id || 'unknown',
+            item_name: item.title || 'unknown',
+            price: item.price || 0,
+            quantity: item.quantity || 1,
+            item_variant: item.selectedColor || item.selectedVariantValue,
+            item_category: item.category || 'Accessories',
+          })),
+        },
+      });
+    }
+  }, []);
+
   // Calculate totals based on cart items
   useEffect(() => {
     const total = cartItems.reduce(
@@ -241,6 +267,7 @@ function Cart() {
 
         // Push purchase event to data layer
         window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({ ecommerce: null });
         window.dataLayer.push({
           event: 'purchase',
           ecommerce: {
@@ -254,7 +281,7 @@ function Cart() {
               price: item.price || 0,
               quantity: item.quantity || 1,
               item_variant: item.selectedColor || item.selectedVariantValue,
-              item_category: item.category || 'Accessories', // Adjust based on product data
+              item_category: item.category || 'Accessories',
             })),
           },
         });

@@ -80,24 +80,27 @@ const ProductDetails = ({ initialProduct }) => {
       setActiveImage(initialProduct.images?.[0] || '');
 
       // Push product view event to data layer
-      window.dataLayer = window.dataLayer || [];
-      window.dataLayer.push({
-        event: 'view_item',
-        ecommerce: {
-          currency: 'BDT',
-          value: initialProduct.price || 0,
-          items: [
-            {
-              item_id: initialProduct.id || 'unknown',
-              item_name: initialProduct.title || 'unknown',
-              price: initialProduct.price || 0,
-              original_price: initialProduct.originalPrice || 0,
-              item_category: 'Baby Bottle Warmer',
-              item_variant: initialProduct.variants?.[0]?.color || 'unknown',
-            },
-          ],
-        },
-      });
+      if (typeof window !== 'undefined') {
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({ ecommerce: null });
+        window.dataLayer.push({
+          event: 'view_item',
+          ecommerce: {
+            currency: 'BDT',
+            value: initialProduct.price || 0,
+            items: [
+              {
+                item_id: initialProduct.id || 'unknown',
+                item_name: initialProduct.title || 'unknown',
+                price: initialProduct.price || 0,
+                original_price: initialProduct.originalPrice || 0,
+                item_category: 'Baby Bottle Warmer',
+                item_variant: initialProduct.variants?.[0]?.color || 'unknown',
+              },
+            ],
+          },
+        });
+      }
     }
   }, [initialProduct]);
 
@@ -126,25 +129,28 @@ const ProductDetails = ({ initialProduct }) => {
     setIsAddingToCart(true);
 
     // Push add_to_cart event to data layer
-    window.dataLayer = window.dataLayer || [];
-    window.dataLayer.push({
-      event: 'add_to_cart',
-      ecommerce: {
-        currency: 'BDT',
-        value: product.price * quantity || 0,
-        items: [
-          {
-            item_id: product.id || 'unknown',
-            item_name: product.title || 'unknown',
-            price: product.price || 0,
-            original_price: product.originalPrice || 0,
-            item_category: 'Baby Bottle Warmer',
-            item_variant: selectedColor || 'unknown',
-            quantity: quantity || 1,
-          },
-        ],
-      },
-    });
+    if (typeof window !== 'undefined') {
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({ ecommerce: null });
+      window.dataLayer.push({
+        event: 'add_to_cart',
+        ecommerce: {
+          currency: 'BDT',
+          value: product.price * quantity || 0,
+          items: [
+            {
+              item_id: product.id || 'unknown',
+              item_name: product.title || 'unknown',
+              price: product.price || 0,
+              original_price: product.originalPrice || 0,
+              item_category: 'Baby Bottle Warmer',
+              item_variant: selectedColor || 'unknown',
+              quantity: quantity || 1,
+            },
+          ],
+        },
+      });
+    }
 
     // Dispatch to Redux store - always add 1 item, quantity can be changed in dialog
     dispatch(
