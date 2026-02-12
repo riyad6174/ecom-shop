@@ -32,7 +32,7 @@ export default function Document() {
               j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
               'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
               })(window,document,'script','dataLayer','${
-                process.env.NEXT_PUBLIC_GTM_ID || 'GTM-MCHV6ZPK'
+                process.env.NEXT_PUBLIC_GTM_ID || 'GTM-MJXWJ24V'
               }');
             `,
           }}
@@ -65,7 +65,7 @@ export default function Document() {
           dangerouslySetInnerHTML={{
             __html: `
               <iframe https://www.googletagmanager.com/ns.html?id=${
-                process.env.NEXT_PUBLIC_GTM_ID || 'GTM-MCHV6ZPK'
+                process.env.NEXT_PUBLIC_GTM_ID || 'GTM-MJXWJ24V'
               }
               height="0" width="0" style="display:none;visibility:hidden"></iframe>
             `,
