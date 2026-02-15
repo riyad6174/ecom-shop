@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { sendGTMEvent } from '@next/third-parties/google';
 import { useSelector, useDispatch } from 'react-redux';
 import Navbar from '@/components/common/Navbar';
 import CustomSection from '@/components/layout/CustomSection';
@@ -44,9 +45,7 @@ function Cart() {
   // Push begin_checkout event when order page loads with cart items
   useEffect(() => {
     if (typeof window !== 'undefined' && cartItems.length > 0) {
-      window.dataLayer = window.dataLayer || [];
-      window.dataLayer.push({ ecommerce: null });
-      window.dataLayer.push({
+      sendGTMEvent({
         event: 'begin_checkout',
         ecommerce: {
           currency: 'BDT',
@@ -266,9 +265,7 @@ function Cart() {
         setShowPopup(true);
 
         // Push purchase event to data layer
-        window.dataLayer = window.dataLayer || [];
-        window.dataLayer.push({ ecommerce: null });
-        window.dataLayer.push({
+        sendGTMEvent({
           event: 'purchase',
           ecommerce: {
             transaction_id: order.order.orderId || 'ORD-UNKNOWN',

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { sendGTMEvent } from '@next/third-parties/google';
 import { useSelector, useDispatch } from 'react-redux';
 import { IoClose } from 'react-icons/io5';
 import { HiOutlineTrash } from 'react-icons/hi';
@@ -54,9 +55,7 @@ const OrderDialog = ({ isOpen, onClose }) => {
       });
       // Push begin_checkout event to data layer
       if (cartItems.length > 0) {
-        window.dataLayer = window.dataLayer || [];
-        window.dataLayer.push({ ecommerce: null });
-        window.dataLayer.push({
+        sendGTMEvent({
           event: 'begin_checkout',
           ecommerce: {
             currency: 'BDT',
@@ -308,9 +307,7 @@ const OrderDialog = ({ isOpen, onClose }) => {
         setTimeout(() => setConfirmationAnimating(true), 50);
 
         // Push purchase event to data layer
-        window.dataLayer = window.dataLayer || [];
-        window.dataLayer.push({ ecommerce: null });
-        window.dataLayer.push({
+        sendGTMEvent({
           event: 'purchase',
           ecommerce: {
             transaction_id: order.order.orderId || 'ORD-UNKNOWN',

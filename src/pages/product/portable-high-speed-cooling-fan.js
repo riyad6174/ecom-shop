@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { sendGTMEvent } from '@next/third-parties/google';
 import { useDispatch } from 'react-redux';
 import { GoShareAndroid } from 'react-icons/go';
 import Navbar from '@/components/common/Navbar';
@@ -34,9 +35,7 @@ const ProductDetails = ({ initialProduct }) => {
 
       // Push product view event to data layer
       if (typeof window !== 'undefined') {
-        window.dataLayer = window.dataLayer || [];
-        window.dataLayer.push({ ecommerce: null });
-        window.dataLayer.push({
+        sendGTMEvent({
           event: 'view_item',
           ecommerce: {
             items: [
@@ -82,9 +81,7 @@ const ProductDetails = ({ initialProduct }) => {
 
     // Push add_to_cart event to data layer
     if (typeof window !== 'undefined') {
-      window.dataLayer = window.dataLayer || [];
-      window.dataLayer.push({ ecommerce: null });
-      window.dataLayer.push({
+      sendGTMEvent({
         event: 'add_to_cart',
         ecommerce: {
           currency: 'BDT',
