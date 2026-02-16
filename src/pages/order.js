@@ -484,7 +484,7 @@ function Cart() {
                       cartItems.length === 0 ||
                       isLoading
                     }
-                    className='bg-orange-600 text-white py-3 px-4 rounded-lg w-full text-sm font-semibold disabled:bg-gray-400 disabled:cursor-not-allowed hover:bg-orange-700 transition-colors'
+                    className='bg-gradient-to-r from-blue-700 to-blue-900 text-white py-3 px-4 rounded-lg w-full text-sm font-semibold disabled:from-gray-400 disabled:to-gray-400 disabled:cursor-not-allowed hover:from-blue-800 hover:to-blue-950 transition-all'
                   >
                     {isLoading ? 'Confirming...' : 'Confirm Order'}
                   </button>
@@ -503,10 +503,10 @@ function Cart() {
         <div className='fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4'>
           <div className='bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[95vh] overflow-y-auto transform transition-all duration-300 scale-100'>
             {/* Header Section */}
-            <div className='text-center p-6 pb-4 bg-gradient-to-b from-orange-50 to-white rounded-t-2xl border-b border-orange-100'>
-              <div className='w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4'>
+            <div className='text-center p-6 pb-4 bg-gradient-to-b from-blue-50 to-white rounded-t-2xl border-b border-blue-100'>
+              <div className='w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4'>
                 <svg
-                  className='w-8 h-8 text-orange-600'
+                  className='w-8 h-8 text-blue-700'
                   fill='none'
                   stroke='currentColor'
                   viewBox='0 0 24 24'
@@ -525,7 +525,7 @@ function Cart() {
               <p className='text-gray-600 text-sm mb-1'>
                 Your order has been placed successfully.
               </p>
-              <div className='bg-orange-100 px-3 py-1 rounded-full inline-flex items-center gap-2 text-xs font-medium text-orange-800'>
+              <div className='bg-blue-100 px-3 py-1 rounded-full inline-flex items-center gap-2 text-xs font-medium text-blue-800'>
                 <span>Order ID:</span>
                 <span className='font-semibold'>
                   #{orderDetails.order.orderId}
@@ -626,7 +626,7 @@ function Cart() {
             <div className='p-6 pt-0 border-t border-gray-100 bg-gray-50 rounded-b-2xl'>
               <button
                 onClick={handleClosePopup}
-                className='w-full bg-orange-600 text-white py-3 px-6 rounded-xl font-semibold text-sm hover:bg-orange-700 transition-colors shadow-md'
+                className='w-full bg-gradient-to-r from-blue-700 to-blue-900 text-white py-3 px-6 rounded-xl font-semibold text-sm hover:from-blue-800 hover:to-blue-950 transition-all shadow-md'
               >
                 Continue Shopping
               </button>
@@ -634,7 +634,7 @@ function Cart() {
                 Need help? Contact us at{' '}
                 <a
                   href='tel:+8801814575428'
-                  className='text-orange-600 hover:underline'
+                  className='text-blue-700 hover:underline'
                 >
                   +8801814575428
                 </a>

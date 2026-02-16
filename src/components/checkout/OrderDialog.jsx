@@ -727,7 +727,7 @@ const OrderDialog = ({ isOpen, onClose }) => {
                         cartItems.length === 0 ||
                         isLoading
                       }
-                      className='bg-orange-600 text-white py-3 px-4 rounded-lg w-full text-sm font-semibold disabled:bg-gray-400 disabled:cursor-not-allowed hover:bg-orange-700 transition-colors shadow-md'
+                      className='bg-gradient-to-r from-blue-700 to-blue-900 text-white py-3 px-4 rounded-lg w-full text-sm font-semibold disabled:from-gray-400 disabled:to-gray-400 disabled:cursor-not-allowed hover:from-blue-800 hover:to-blue-950 transition-all shadow-md'
                     >
                       {isLoading ? (
                         <span className='flex items-center justify-center gap-2'>
@@ -964,7 +964,7 @@ const OrderDialog = ({ isOpen, onClose }) => {
                 {/* Continue Shopping Button */}
                 <button
                   onClick={handleContinueShopping}
-                  className={`w-full bg-orange-600 text-white py-3 px-6 rounded-xl font-semibold text-sm hover:bg-orange-700 transition-all shadow-md ${
+                  className={`w-full bg-gradient-to-r from-blue-700 to-blue-900 text-white py-3 px-6 rounded-xl font-semibold text-sm hover:from-blue-800 hover:to-blue-950 transition-all shadow-md ${
                     confirmationAnimating
                       ? 'opacity-100 translate-y-0'
                       : 'opacity-0 translate-y-4'
@@ -980,7 +980,7 @@ const OrderDialog = ({ isOpen, onClose }) => {
                   Need help? Contact us at{' '}
                   <a
                     href='tel:+8801814575428'
-                    className='text-orange-600 hover:underline'
+                    className='text-blue-700 hover:underline'
                   >
                     +8801814575428
                   </a>

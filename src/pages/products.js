@@ -216,11 +216,11 @@ function Products() {
                 href={`/product/${product.slug}`}
                 // onClick={handleAddToCart}
                 disabled={!product.inStock}
-                className={`mt-3 bg-accent text-center text-white py-2 px-4 rounded-lg text-sm font-semibold w-full ${
+                className={`mt-3 text-center text-white py-2 px-4 rounded-lg text-sm font-semibold w-full ${
                   product.inStock
-                    ? 'hover:bg-blue-700'
+                    ? 'bg-gradient-to-r from-blue-700 to-blue-900 hover:from-blue-800 hover:to-blue-950'
                     : 'bg-gray-400 cursor-not-allowed'
-                } transition-colors`}
+                } transition-all`}
               >
                 Buy Now
               </Link>

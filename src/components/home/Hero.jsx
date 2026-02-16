@@ -73,7 +73,7 @@ const Hero = () => {
               <div className='absolute bottom-0 p-4'>
                 <Link
                   href={'/products'}
-                  className='mt-2 bg-white text-orange-600 font-semibold py-2 px-4 rounded-md hover:bg-orange-100'
+                  className='mt-2 bg-white text-blue-700 font-semibold py-2 px-4 rounded-md hover:bg-blue-50'
                 >
                   Shop Now
                 </Link>

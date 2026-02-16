@@ -12,7 +12,7 @@ import Trending from '@/components/home/Trending';
 
 import React from 'react';
 
-function index() {
+function Index() {
   return (
     <>
       <Head>
@@ -25,12 +25,16 @@ function index() {
         />
         <meta
           name='keywords'
-          content="Sheii Shop, trendy fashion, affordable clothing, women's fashion, online boutique, fashion accessories, beauty deals, fashion store"
+          content="Sheii Shop, trendy fashion, affordable clothing, women's fashion, online boutique, fashion accessories, beauty deals, fashion store, smart watches, gadgets, Bangladesh"
         />
         <meta name='author' content='Sheii Shop' />
-        <meta name='robots' content='index, follow' />
+        <meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1' />
+        <link rel='canonical' href='https://www.sheiishop.com/' />
+        <meta name='viewport' content='width=device-width, initial-scale=1' />
 
         {/* Open Graph Tags */}
+        <meta property='og:locale' content='en_US' />
+        <meta property='og:type' content='website' />
         <meta
           property='og:title'
           content='Sheii Shop | Trendy Fashion & Exclusive Deals'
@@ -41,13 +45,14 @@ function index() {
         />
         <meta
           property='og:image'
-          content='https://www.sheiishop.com/assets/footer-logo.png'
+          content='https://www.sheiishop.com/assets/logo.png'
         />
+        <meta property='og:image:width' content='1200' />
+        <meta property='og:image:height' content='630' />
         <meta property='og:url' content='https://www.sheiishop.com' />
-        <meta property='og:type' content='website' />
         <meta property='og:site_name' content='Sheii Shop' />
 
-        {/* Optional: Twitter Cards */}
+        {/* Twitter Cards */}
         <meta name='twitter:card' content='summary_large_image' />
         <meta
           name='twitter:title'
@@ -59,8 +64,10 @@ function index() {
         />
         <meta
           name='twitter:image'
-          content='https://www.sheiishop.com/assets/footer-logo.png'
+          content='https://www.sheiishop.com/assets/logo.png'
         />
+
+        {/* JSON-LD: WebSite + SearchAction */}
         <script
           type='application/ld+json'
           dangerouslySetInnerHTML={{
@@ -69,11 +76,41 @@ function index() {
               '@type': 'WebSite',
               url: 'https://www.sheiishop.com/',
               name: 'Sheii Shop',
+              description:
+                'Discover stylish and affordable fashion at Sheii Shop. Shop the latest trends in clothing, accessories, and beauty.',
               potentialAction: {
                 '@type': 'SearchAction',
                 target:
-                  'https://www.sheiishop.com/search?q={search_term_string}',
+                  'https://www.sheiishop.com/products?q={search_term_string}',
                 'query-input': 'required name=search_term_string',
+              },
+            }),
+          }}
+        />
+
+        {/* JSON-LD: Organization */}
+        <script
+          type='application/ld+json'
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'Organization',
+              name: 'Sheii Shop',
+              url: 'https://www.sheiishop.com',
+              logo: 'https://www.sheiishop.com/assets/logo.png',
+              sameAs: [],
+              contactPoint: {
+                '@type': 'ContactPoint',
+                telephone: '+8801814575428',
+                contactType: 'customer service',
+                areaServed: 'BD',
+                availableLanguage: ['English', 'Bengali'],
+              },
+              address: {
+                '@type': 'PostalAddress',
+                streetAddress: 'Road 12A, Uttora Sector 10',
+                addressLocality: 'Dhaka',
+                addressCountry: 'BD',
               },
             }),
           }}
@@ -94,4 +131,4 @@ function index() {
   );
 }
 
-export default index;
+export default Index;

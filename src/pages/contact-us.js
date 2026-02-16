@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Head from 'next/head';
 import Navbar from '@/components/common/Navbar';
 import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
@@ -137,6 +138,73 @@ function ContactUs() {
 
   return (
     <>
+      <Head>
+        <title>Contact Us | Sheii Shop - Get in Touch</title>
+        <meta
+          name='description'
+          content='Contact Sheii Shop for any questions, feedback, or support. Reach us at Road 12A, Uttora Sector 10, Dhaka, Bangladesh. Call +8801814575428 or email helloseiishop@gmail.com.'
+        />
+        <meta
+          name='keywords'
+          content='Sheii Shop contact, contact us, customer support, Sheii Shop Dhaka, feedback'
+        />
+        <meta name='robots' content='index, follow' />
+        <link rel='canonical' href='https://www.sheiishop.com/contact-us' />
+
+        <meta property='og:type' content='website' />
+        <meta property='og:title' content='Contact Us | Sheii Shop' />
+        <meta
+          property='og:description'
+          content='Contact Sheii Shop for any questions, feedback, or support. We are located in Uttora, Dhaka, Bangladesh.'
+        />
+        <meta
+          property='og:image'
+          content='https://www.sheiishop.com/assets/logo.png'
+        />
+        <meta
+          property='og:url'
+          content='https://www.sheiishop.com/contact-us'
+        />
+        <meta property='og:site_name' content='Sheii Shop' />
+
+        <meta name='twitter:card' content='summary_large_image' />
+        <meta name='twitter:title' content='Contact Us | Sheii Shop' />
+        <meta
+          name='twitter:description'
+          content='Contact Sheii Shop for questions, feedback, or support. Located in Dhaka, Bangladesh.'
+        />
+        <meta
+          name='twitter:image'
+          content='https://www.sheiishop.com/assets/logo.png'
+        />
+
+        <script
+          type='application/ld+json'
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'ContactPage',
+              name: 'Contact Sheii Shop',
+              url: 'https://www.sheiishop.com/contact-us',
+              mainEntity: {
+                '@type': 'LocalBusiness',
+                name: 'Sheii Shop',
+                url: 'https://www.sheiishop.com',
+                logo: 'https://www.sheiishop.com/assets/logo.png',
+                telephone: '+8801814575428',
+                email: 'helloseiishop@gmail.com',
+                address: {
+                  '@type': 'PostalAddress',
+                  streetAddress: 'Road 12A, Uttora Sector 10',
+                  addressLocality: 'Dhaka',
+                  addressCountry: 'BD',
+                },
+              },
+            }),
+          }}
+        />
+      </Head>
+
       <Navbar />
       <section className='text-gray-600 body-font relative'>
         <div className='container px-5 py-24 mx-auto flex sm:flex-nowrap flex-wrap'>
@@ -146,7 +214,7 @@ function ContactUs() {
               width='100%'
               height='100%'
               className='absolute inset-0'
-              title='map'
+              title='Sheii Shop location map'
               src='https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d3648.0880396672933!2d90.38499306467548!3d23.8864966!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2s!5e0!3m2!1sen!2sbd!4v1753963064745!5m2!1sen!2sbd'
               style={{ filter: 'grayscale(1) contrast(1.2) opacity(0.4)' }}
             ></iframe>
@@ -179,9 +247,9 @@ function ContactUs() {
 
           {/* Contact Form */}
           <div className='lg:w-1/3 md:w-1/2 p-5 bg-white flex flex-col md:ml-auto w-full md:py-8 mt-8 md:mt-0'>
-            <h2 className='text-gray-900 text-lg mb-1 font-medium title-font'>
+            <h1 className='text-gray-900 text-lg mb-1 font-medium title-font'>
               Feedback
-            </h2>
+            </h1>
             <p className='leading-relaxed mb-5 text-gray-600'>
               Please fill out the form below to get in touch with us.
             </p>
@@ -256,15 +324,11 @@ function ContactUs() {
               <button
                 type='submit'
                 disabled={isLoading || Object.keys(errors).length > 0}
-                className='text-white bg-red-500 border-0 py-2 px-6 focus:outline-none hover:bg-red-600 rounded text-lg disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors'
+                className='text-white bg-gradient-to-r from-blue-700 to-blue-900 border-0 py-2 px-6 focus:outline-none hover:from-blue-800 hover:to-blue-950 rounded text-lg disabled:from-gray-400 disabled:to-gray-400 disabled:cursor-not-allowed transition-all'
               >
                 {isLoading ? 'Submitting...' : 'Submit'}
               </button>
             </form>
-            <p className='text-xs text-gray-500 mt-3'>
-              Chicharrones blog helvetica normcore iceland tousled brook viral
-              artisan.
-            </p>
           </div>
         </div>
       </section>

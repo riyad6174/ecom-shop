@@ -66,16 +66,14 @@ const ProductCard = ({ product }) => {
         <div className='mt-auto flex items-center justify-center'>
           <Link
             href={`/product/${product?.slug}`}
-            className='text-xs bg-gray-100 text-center w-full py-2 rounded-md font-semibold text-gray-700 hover:bg-accent hover:text-white transition duration-300'
+            className='text-xs bg-gradient-to-r from-blue-600 via-blue-700 to-blue-600 text-center w-full py-2 rounded-md font-semibold text-white hover:from-blue-800 hover:to-blue-950 transition-all'
           >
             Order Now
           </Link>
         </div>
       ) : (
         <div className='mt-auto flex items-center justify-center'>
-          <span
-            className='text-xs bg-gray-100 w-full py-2 rounded-md font-semibold text-red-700 text-center cursor-not-allowed'
-          >
+          <span className='text-xs bg-gray-100 w-full py-2 rounded-md font-semibold text-red-700 text-center cursor-not-allowed'>
             Out of Stock
           </span>
         </div>

@@ -16,7 +16,7 @@ const FloatingCartMenu = () => {
     <div className='fixed bottom-4 left-0 right-0 z-50 md:hidden'>
       {totalItems > 0 && (
         <Link href='/order'>
-          <div className='mx-4 bg-orange-600 text-white rounded-full shadow-lg p-3 flex items-center justify-between hover:bg-orange-700 transition-colors'>
+          <div className='mx-4 bg-gradient-to-r from-blue-700 to-blue-900 text-white rounded-full shadow-lg p-3 flex items-center justify-between hover:from-blue-800 hover:to-blue-950 transition-all'>
             <div className='flex items-center'>
               <FiShoppingCart className='text-xl mr-2' />
               <span className='text-sm font-semibold'>
@@ -24,7 +24,7 @@ const FloatingCartMenu = () => {
                 {totalPrice.toFixed(2)}
               </span>
             </div>
-            <span className='text-xs font-medium bg-white text-orange-500 px-2 py-1 rounded-full'>
+            <span className='text-xs font-medium bg-white text-blue-700 px-2 py-1 rounded-full'>
               View Cart
             </span>
           </div>

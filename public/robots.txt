@@ -1,7 +1,9 @@
 User-agent: *
+Allow: /
 Disallow: /admin/
 Disallow: /checkout/
 Disallow: /cart/
-Allow: /
+Disallow: /api/
+Disallow: /order
 
 Sitemap: https://www.sheiishop.com/sitemap.xml

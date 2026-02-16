@@ -205,7 +205,7 @@ function ProductDetailsCard() {
                   </span>
                   <span>Add to Cart</span>
                 </div> */}
-                <div className='flex items-center bg-blue-600 text-white justify-center gap-2 border border-blue-600 px-6 py-[12px] rounded-md font-mont font-semibold text-sm'>
+                <div className='flex items-center bg-gradient-to-r from-blue-700 to-blue-900 text-white justify-center gap-2 px-6 py-[12px] rounded-md font-mont font-semibold text-sm hover:from-blue-800 hover:to-blue-950 transition-all shadow-md cursor-pointer'>
                   <span>Buy Now</span>
                 </div>
               </div>

@@ -7,7 +7,7 @@ module.exports = {
         secondary: '#9333EA', // Purple
         dark: '#1E1E1E',
         'dark-2': '#212121', // Top header color
-        accent: '#FF4423', // Orange
+        accent: '#1e40af', // Deep blue
         background: '#F5F6F7', // Light gray
         text: '#111827', // Dark gray
         sectionText: '#637381',

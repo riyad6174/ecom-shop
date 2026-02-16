@@ -482,7 +482,7 @@ const ProductDetails = ({ initialProduct }) => {
                 </div>
                 <button
                   onClick={handleBuyNow}
-                  className='flex items-center bg-[#2563eb] text-white justify-center gap-2 border border-primary px-4 sm:px-6 py-2 sm:py-3 rounded-md font-mont font-semibold text-sm disabled:opacity-70'
+                  className='flex items-center bg-gradient-to-r from-blue-700 to-blue-900 text-white justify-center gap-2 px-4 sm:px-6 py-2 sm:py-3 rounded-md font-mont font-semibold text-sm hover:from-blue-800 hover:to-blue-950 transition-all shadow-md disabled:opacity-70'
                   disabled={!product.inStock || isAddingToCart}
                 >
                   {isAddingToCart ? (
