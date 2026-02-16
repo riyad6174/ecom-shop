@@ -9,7 +9,6 @@ import HeaderSm from '@/components/common/HeaderSm';
 import Footer from '@/components/common/Footer';
 import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
-import districtsData from '@/utils/districts.json';
 import DeliveryAndReturnPolicy from '@/components/CartPolicy';
 import Link from 'next/link';
 import { clearCart } from '@/store/cartSlice';
@@ -23,15 +22,10 @@ function Cart() {
   const [formData, setFormData] = useState({
     fullName: '',
     phoneNumber: '',
-    district: '',
+    deliveryZone: '',
     address: '',
   });
   const [errors, setErrors] = useState({});
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filteredDistricts, setFilteredDistricts] = useState(
-    districtsData.districts.slice(0, 5)
-  );
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [orderDetails, setOrderDetails] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -89,27 +83,14 @@ function Cart() {
     validateField('phoneNumber', value || '');
   };
 
-  // Handle district selection
-  const handleDistrictSelect = (district) => {
-    setFormData({ ...formData, district });
-    setSearchTerm(district);
-    setIsDropdownOpen(false);
-    validateField('district', district);
-    const newShippingCharge = district === 'Dhaka' ? 60 : 120;
+  // Handle delivery zone selection
+  const handleDeliveryZoneChange = (e) => {
+    const value = e.target.value;
+    setFormData({ ...formData, deliveryZone: value });
+    validateField('deliveryZone', value);
+    const newShippingCharge = value === 'ঢাকার ভেতরে' ? 60 : 120;
     setShippingCharge(newShippingCharge);
     setGrandTotal(totalPrice + newShippingCharge);
-  };
-
-  // Handle district search
-  const handleSearchChange = (e) => {
-    const value = e.target.value;
-    setSearchTerm(value);
-    setFormData({ ...formData, district: value });
-    setIsDropdownOpen(true);
-    const filtered = districtsData.districts.filter((district) =>
-      district.name.toLowerCase().includes(value.toLowerCase())
-    );
-    setFilteredDistricts(filtered.slice(0, 5));
   };
 
   // Validate individual field
@@ -135,13 +116,11 @@ function Cart() {
           delete newErrors.phoneNumber;
         }
         break;
-      case 'district':
-        if (!value.trim()) {
-          newErrors.district = 'District is required';
-        } else if (!districtsData.districts.some((d) => d.name === value)) {
-          newErrors.district = 'Please select a valid district';
+      case 'deliveryZone':
+        if (!value) {
+          newErrors.deliveryZone = 'Please select a delivery zone';
         } else {
-          delete newErrors.district;
+          delete newErrors.deliveryZone;
         }
         break;
       case 'address':
@@ -169,9 +148,7 @@ function Cart() {
       newErrors.phoneNumber = 'Phone number is required';
     else if (!/^\+880\d{10}$/.test(formData.phoneNumber))
       newErrors.phoneNumber = 'Please enter a valid Bangladesh phone number';
-    if (!formData.district.trim()) newErrors.district = 'District is required';
-    else if (!districtsData.districts.some((d) => d.name === formData.district))
-      newErrors.district = 'Please select a valid district';
+    if (!formData.deliveryZone) newErrors.deliveryZone = 'Please select a delivery zone';
     if (!formData.address.trim()) newErrors.address = 'Address is required';
     else if (formData.address.length < 5)
       newErrors.address = 'Address must be at least 5 characters';
@@ -202,10 +179,20 @@ function Cart() {
       },
     };
 
+    const bdtTime = new Date().toLocaleString('en-US', {
+      timeZone: 'Asia/Dhaka',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+      month: 'short',
+      day: '2-digit',
+      year: 'numeric',
+    });
+
     const sheetData = {
       name: formData.fullName || '',
       phone: formData.phoneNumber || '',
-      district: formData.district || '',
+      deliveryZone: formData.deliveryZone || '',
       address: formData.address || '',
       items: JSON.stringify(
         cartItems.map((item) => ({
@@ -220,15 +207,14 @@ function Cart() {
       grandTotal: grandTotal || 0,
       orderId: `ORD-${phoneLastFive}` || 'ORD-UNKNOWN',
       orderDate: new Date().toISOString(),
-      submissionTime: new Date().toISOString(),
+      submissionTime: bdtTime,
       sheetName: 'Orders',
     };
 
-    console.log('sheetData:', JSON.stringify(sheetData, null, 2));
     if (
       !sheetData.name ||
       !sheetData.phone ||
-      !sheetData.district ||
+      !sheetData.deliveryZone ||
       !sheetData.address
     ) {
       setSubmissionError('Please fill all required fields.');
@@ -299,10 +285,6 @@ function Cart() {
     router.push('/');
   };
 
-  // Update filtered districts on mount
-  useEffect(() => {
-    setFilteredDistricts(districtsData.districts.slice(0, 5));
-  }, []);
 
   return (
     <div>
@@ -404,48 +386,40 @@ function Cart() {
                         </p>
                       )}
                     </div>
-                    {/* District */}
-                    <div className='relative'>
-                      <label
-                        htmlFor='district'
-                        className='block text-sm font-medium text-gray-700 mb-1'
-                      >
-                        District
+                    {/* Delivery Zone */}
+                    <div>
+                      <label className='block text-sm font-medium text-gray-700 mb-1'>
+                        Delivery Zone
                       </label>
-                      <input
-                        type='text'
-                        id='district'
-                        name='district'
-                        value={searchTerm}
-                        onChange={handleSearchChange}
-                        onFocus={() => setIsDropdownOpen(true)}
-                        placeholder='Select District'
-                        className='py-2 px-3 border w-full rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
-                      />
-                      {isDropdownOpen && (
-                        <ul className='absolute z-10 w-full bg-white border border-gray-300 rounded-lg mt-1 max-h-60 overflow-y-auto shadow-lg'>
-                          {filteredDistricts.length > 0 ? (
-                            filteredDistricts.map((district) => (
-                              <li
-                                key={district.id}
-                                onClick={() =>
-                                  handleDistrictSelect(district.name)
-                                }
-                                className='px-3 py-2 text-sm hover:bg-blue-100 cursor-pointer'
-                              >
-                                {district.name}
-                              </li>
-                            ))
-                          ) : (
-                            <li className='px-3 py-2 text-sm text-gray-500'>
-                              No districts found
-                            </li>
-                          )}
-                        </ul>
-                      )}
-                      {errors.district && (
+                      <div className='flex gap-3'>
+                        <button
+                          type='button'
+                          onClick={() => handleDeliveryZoneChange({ target: { value: 'ঢাকার ভেতরে' } })}
+                          className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium border-2 transition-all ${
+                            formData.deliveryZone === 'ঢাকার ভেতরে'
+                              ? 'border-blue-500 bg-blue-50 text-blue-700'
+                              : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
+                          }`}
+                        >
+                          ঢাকার ভেতরে
+                          <span className='block text-xs mt-0.5 opacity-70'>৳60</span>
+                        </button>
+                        <button
+                          type='button'
+                          onClick={() => handleDeliveryZoneChange({ target: { value: 'ঢাকার বাহিরে' } })}
+                          className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium border-2 transition-all ${
+                            formData.deliveryZone === 'ঢাকার বাহিরে'
+                              ? 'border-blue-500 bg-blue-50 text-blue-700'
+                              : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
+                          }`}
+                        >
+                          ঢাকার বাহিরে
+                          <span className='block text-xs mt-0.5 opacity-70'>৳120</span>
+                        </button>
+                      </div>
+                      {errors.deliveryZone && (
                         <p className='text-red-500 text-xs mt-1'>
-                          {errors.district}
+                          {errors.deliveryZone}
                         </p>
                       )}
                     </div>
@@ -463,7 +437,7 @@ function Cart() {
                         name='address'
                         value={formData.address}
                         onChange={handleInputChange}
-                        placeholder='Thana, Road No, House No'
+                        placeholder='এলাকার নাম, থানা, জেলা'
                         className='py-2 px-3 border w-full rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
                       />
                       {errors.address && (
@@ -505,7 +479,7 @@ function Cart() {
                       Object.keys(errors).length > 0 ||
                       !formData.fullName ||
                       !formData.phoneNumber ||
-                      !formData.district ||
+                      !formData.deliveryZone ||
                       !formData.address ||
                       cartItems.length === 0 ||
                       isLoading

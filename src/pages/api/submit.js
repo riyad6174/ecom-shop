@@ -17,7 +17,7 @@ export default async (req, res) => {
     const {
       name,
       phone,
-      district,
+      deliveryZone,
       address,
       items,
       totalPrice,
@@ -33,7 +33,7 @@ export default async (req, res) => {
     if (
       !name ||
       !phone ||
-      !district ||
+      !deliveryZone ||
       !address ||
       !items ||
       !totalPrice ||
@@ -46,7 +46,7 @@ export default async (req, res) => {
     ) {
       return res.status(400).json({
         message:
-          'Missing required fields: name, phone, district, address, items, totalPrice, shippingCharge, grandTotal, orderId, orderDate, submissionTime, and sheetName are required',
+          'Missing required fields: name, phone, deliveryZone, address, items, totalPrice, shippingCharge, grandTotal, orderId, orderDate, submissionTime, and sheetName are required',
       });
     }
 
@@ -74,23 +74,23 @@ export default async (req, res) => {
     // Check if sheet has headers
     const checkSheet = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: `${sheetName}!A1:J1`,
+      range: `${sheetName}!A1:K1`,
     });
 
     if (!checkSheet.data.values) {
       await sheets.spreadsheets.values.update({
         spreadsheetId,
-        range: `${sheetName}!A1:J1`,
+        range: `${sheetName}!A1:K1`,
         valueInputOption: 'RAW',
         resource: {
           values: [
             [
               'Name',
               'Phone',
-              'District',
+              'DeliveryZone',
               'Address',
               'OrderID',
-              'OrderDate',
+              'SubmissionTime',
               'Items',
               'TotalPrice',
               'ShippingCharge',
@@ -118,10 +118,10 @@ export default async (req, res) => {
           [
             name,
             phone,
-            district || '',
+            deliveryZone || '',
             address || '',
             orderId || '',
-            orderDate,
+            submissionTime,
             itemsString,
             totalPrice || 0,
             shippingCharge || 0,
@@ -138,14 +138,14 @@ export default async (req, res) => {
       data: {
         name,
         phone,
-        district,
+        deliveryZone,
         address,
         items: parsedItems,
         totalPrice,
         shippingCharge,
         grandTotal,
         orderId,
-        orderDate,
+        submissionTime,
       },
     });
   } catch (error) {
