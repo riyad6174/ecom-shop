@@ -323,10 +323,9 @@ const OrderDialog = ({ isOpen, onClose }) => {
       setFormData({
         fullName: '',
         phoneNumber: '',
-        district: '',
+        deliveryZone: '',
         address: '',
       });
-      setSearchTerm('');
       setOrderDetails(null);
     }
     onClose();
