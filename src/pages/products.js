@@ -56,7 +56,7 @@ function Products() {
     result = result.filter(
       (product) =>
         product.price >= filters.priceRange[0] &&
-        product.price <= filters.priceRange[1]
+        product.price <= filters.priceRange[1],
     );
 
     // Apply stock status filter
@@ -136,7 +136,7 @@ function Products() {
           selectedColor: product.variants[0].color, // Default to first variant
           quantity: 1,
           image: product.thumbnail,
-        })
+        }),
       );
       router.push('/order');
     };
@@ -259,7 +259,7 @@ function Products() {
         />
         <meta
           property='og:image'
-          content='https://www.sheiishop.com/assets/footer-logo.png'
+          content='https://www.sheiishop.com/assets/footer-new-logo.png'
         />
         <meta property='og:url' content='https://www.sheiishop.com/products' />
         <meta property='og:type' content='website' />
@@ -274,7 +274,7 @@ function Products() {
         />
         <meta
           name='twitter:image'
-          content='https://www.sheiishop.com/assets/footer-logo.png'
+          content='https://www.sheiishop.com/assets/footer-new-logo.png'
         />
 
         {/* Schema.org Structured Data for Product Collection Page */}

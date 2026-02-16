@@ -5,12 +5,12 @@ export default function Document() {
     <Html lang='en'>
       <Head>
         <meta charSet='utf-8' />
-        <meta name='theme-color' content='#ea580c' />
+        <meta name='theme-color' content='#3553b7' />
 
         {/* Favicon & App Icons */}
         <link rel='icon' href='/favicon.ico' sizes='any' />
         <link rel='icon' type='image/png' sizes='32x32' href='/favicon.ico' />
-        <link rel='apple-touch-icon' href='/assets/logo.png' />
+        <link rel='apple-touch-icon' href='/assets/new-logo.png' />
 
         {/* Preconnect for performance */}
         <link rel='preconnect' href='https://fonts.googleapis.com' />

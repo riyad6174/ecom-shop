@@ -28,7 +28,10 @@ function Index() {
           content="Sheii Shop, trendy fashion, affordable clothing, women's fashion, online boutique, fashion accessories, beauty deals, fashion store, smart watches, gadgets, Bangladesh"
         />
         <meta name='author' content='Sheii Shop' />
-        <meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1' />
+        <meta
+          name='robots'
+          content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'
+        />
         <link rel='canonical' href='https://www.sheiishop.com/' />
         <meta name='viewport' content='width=device-width, initial-scale=1' />
 
@@ -45,7 +48,7 @@ function Index() {
         />
         <meta
           property='og:image'
-          content='https://www.sheiishop.com/assets/logo.png'
+          content='https://www.sheiishop.com/assets/new-logo.png'
         />
         <meta property='og:image:width' content='1200' />
         <meta property='og:image:height' content='630' />
@@ -64,7 +67,7 @@ function Index() {
         />
         <meta
           name='twitter:image'
-          content='https://www.sheiishop.com/assets/logo.png'
+          content='https://www.sheiishop.com/assets/new-logo.png'
         />
 
         {/* JSON-LD: WebSite + SearchAction */}
@@ -97,7 +100,7 @@ function Index() {
               '@type': 'Organization',
               name: 'Sheii Shop',
               url: 'https://www.sheiishop.com',
-              logo: 'https://www.sheiishop.com/assets/logo.png',
+              logo: 'https://www.sheiishop.com/assets/new-logo.png',
               sameAs: [],
               contactPoint: {
                 '@type': 'ContactPoint',

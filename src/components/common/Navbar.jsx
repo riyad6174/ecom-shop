@@ -32,7 +32,7 @@ function Navbar() {
               <Link href='/'>
                 <img
                   className='h-20 drop-shadow-lg'
-                  src='/assets/logo.png'
+                  src='/assets/new-logo.png'
                   alt='Logo'
                 />
               </Link>
@@ -74,7 +74,7 @@ function Navbar() {
             <Link href='/'>
               <img
                 className='h-12 drop-shadow-md'
-                src='/assets/logo.png'
+                src='/assets/new-logo.png'
                 alt='Logo'
               />
             </Link>

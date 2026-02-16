@@ -15,7 +15,7 @@ import Image from 'next/image';
 
 // Find the specific product for this page
 const productData = products.find(
-  (p) => p.slug === 'portable-high-speed-cooling-fan'
+  (p) => p.slug === 'portable-high-speed-cooling-fan',
 );
 
 const ProductDetails = ({ initialProduct }) => {
@@ -110,7 +110,7 @@ const ProductDetails = ({ initialProduct }) => {
         selectedColor,
         quantity: 1,
         image: activeImage,
-      })
+      }),
     );
 
     // Open order dialog instead of navigating
@@ -156,7 +156,7 @@ const ProductDetails = ({ initialProduct }) => {
           property='og:image'
           content={
             product.images[0] ||
-            'https://www.sheiishop.com/assets/footer-logo.png'
+            'https://www.sheiishop.com/assets/footer-new-logo.png'
           }
         />
         <meta
@@ -173,7 +173,7 @@ const ProductDetails = ({ initialProduct }) => {
           name='twitter:image'
           content={
             product.images[0] ||
-            'https://www.sheiishop.com/assets/footer-logo.png'
+            'https://www.sheiishop.com/assets/footer-new-logo.png'
           }
         />
 
@@ -211,13 +211,17 @@ const ProductDetails = ({ initialProduct }) => {
       <div>
         <style jsx>{`
           .image-transition {
-            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+            transition:
+              opacity 0.3s ease-in-out,
+              transform 0.3s ease-in-out;
           }
           .image-transition:hover {
             transform: scale(1.02);
           }
           .small-image {
-            transition: opacity 0.2s ease-in-out, border-color 0.2s ease-in-out;
+            transition:
+              opacity 0.2s ease-in-out,
+              border-color 0.2s ease-in-out;
             border-width: 2px;
           }
           .small-image-active {
@@ -388,14 +392,32 @@ const ProductDetails = ({ initialProduct }) => {
                   >
                     {isAddingToCart ? (
                       <>
-                        <svg className='animate-spin h-4 w-4 text-white' xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24'>
-                          <circle className='opacity-25' cx='12' cy='12' r='10' stroke='currentColor' strokeWidth='4'></circle>
-                          <path className='opacity-75' fill='currentColor' d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'></path>
+                        <svg
+                          className='animate-spin h-4 w-4 text-white'
+                          xmlns='http://www.w3.org/2000/svg'
+                          fill='none'
+                          viewBox='0 0 24 24'
+                        >
+                          <circle
+                            className='opacity-25'
+                            cx='12'
+                            cy='12'
+                            r='10'
+                            stroke='currentColor'
+                            strokeWidth='4'
+                          ></circle>
+                          <path
+                            className='opacity-75'
+                            fill='currentColor'
+                            d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
+                          ></path>
                         </svg>
                         <span>Processing...</span>
                       </>
                     ) : (
-                      <span>{product.inStock ? 'Buy Now' : 'Out of Stock'}</span>
+                      <span>
+                        {product.inStock ? 'Buy Now' : 'Out of Stock'}
+                      </span>
                     )}
                   </button>
                 </div>

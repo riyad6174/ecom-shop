@@ -19,17 +19,14 @@ function AboutUs() {
         <link rel='canonical' href='https://www.sheiishop.com/about-us' />
 
         <meta property='og:type' content='website' />
-        <meta
-          property='og:title'
-          content='About Us | Sheii Shop'
-        />
+        <meta property='og:title' content='About Us | Sheii Shop' />
         <meta
           property='og:description'
           content='Learn about Sheii Shop — founded in 2025, we bring stylish, high-quality, and innovative products to elevate everyday living.'
         />
         <meta
           property='og:image'
-          content='https://www.sheiishop.com/assets/logo.png'
+          content='https://www.sheiishop.com/assets/new-logo.png'
         />
         <meta property='og:url' content='https://www.sheiishop.com/about-us' />
         <meta property='og:site_name' content='Sheii Shop' />
@@ -42,7 +39,7 @@ function AboutUs() {
         />
         <meta
           name='twitter:image'
-          content='https://www.sheiishop.com/assets/logo.png'
+          content='https://www.sheiishop.com/assets/new-logo.png'
         />
 
         <script
@@ -60,7 +57,7 @@ function AboutUs() {
                 name: 'Sheii Shop',
                 foundingDate: '2025',
                 url: 'https://www.sheiishop.com',
-                logo: 'https://www.sheiishop.com/assets/logo.png',
+                logo: 'https://www.sheiishop.com/assets/new-logo.png',
               },
             }),
           }}
@@ -72,7 +69,10 @@ function AboutUs() {
         <div className='sm:flex items-center max-w-screen-xl'>
           <div className='sm:w-1/2 p-10'>
             <div className='image object-center text-center'>
-              <img src='https://i.imgur.com/WbQnbas.png' alt='About Sheii Shop' />
+              <img
+                src='https://i.imgur.com/WbQnbas.png'
+                alt='About Sheii Shop'
+              />
             </div>
           </div>
           <div className='sm:w-1/2 p-5'>
@@ -84,17 +84,18 @@ function AboutUs() {
                 About <span className='text-primary'>Sheii Shop</span>
               </h1>
               <p className='text-gray-700'>
-                Founded in 2025, Sheii Shop is your go-to destination for stylish,
-                high-quality, and innovative products that elevate everyday
-                living. Specializing in imported accessories, cutting-edge
-                devices, home essentials, and trendy must-haves, we curate a
-                collection that blends functionality with flair. <br /> <br /> Our
-                mission is simple: to delight our customers with reliable,
-                fashionable, and forward-thinking goods that inspire and enhance
-                their lifestyle. At Sheii Shop, we&apos;re committed to exceptional
-                quality, seamless shopping experiences, and bringing global trends
-                right to your doorstep. <br /> Join us on this journey to redefine
-                everyday elegance—shop with Sheii, where style meets innovation.
+                Founded in 2025, Sheii Shop is your go-to destination for
+                stylish, high-quality, and innovative products that elevate
+                everyday living. Specializing in imported accessories,
+                cutting-edge devices, home essentials, and trendy must-haves, we
+                curate a collection that blends functionality with flair. <br />{' '}
+                <br /> Our mission is simple: to delight our customers with
+                reliable, fashionable, and forward-thinking goods that inspire
+                and enhance their lifestyle. At Sheii Shop, we&apos;re committed
+                to exceptional quality, seamless shopping experiences, and
+                bringing global trends right to your doorstep. <br /> Join us on
+                this journey to redefine everyday elegance—shop with Sheii,
+                where style meets innovation.
               </p>
             </div>
           </div>

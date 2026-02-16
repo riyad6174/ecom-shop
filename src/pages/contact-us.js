@@ -159,7 +159,7 @@ function ContactUs() {
         />
         <meta
           property='og:image'
-          content='https://www.sheiishop.com/assets/logo.png'
+          content='https://www.sheiishop.com/assets/new-logo.png'
         />
         <meta
           property='og:url'
@@ -175,7 +175,7 @@ function ContactUs() {
         />
         <meta
           name='twitter:image'
-          content='https://www.sheiishop.com/assets/logo.png'
+          content='https://www.sheiishop.com/assets/new-logo.png'
         />
 
         <script
@@ -190,7 +190,7 @@ function ContactUs() {
                 '@type': 'LocalBusiness',
                 name: 'Sheii Shop',
                 url: 'https://www.sheiishop.com',
-                logo: 'https://www.sheiishop.com/assets/logo.png',
+                logo: 'https://www.sheiishop.com/assets/new-logo.png',
                 telephone: '+8801814575428',
                 email: 'helloseiishop@gmail.com',
                 address: {
