@@ -297,6 +297,12 @@ const OrderDialog = ({ isOpen, onClose }) => {
             value: order.order.grandTotal || 0,
             currency: 'BDT',
             shipping: order.order.shippingCharge || 0,
+            customer: {
+              customer_first_name: formData.fullName || '',
+              customer_phone: formData.phoneNumber || '',
+              customer_billing_city: formData.address || '',
+              billing_country: 'BD',
+            },
             items: order.order.items.map((item) => ({
               item_id: item.id || 'unknown',
               item_name: item.title || 'unknown',
