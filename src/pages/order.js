@@ -39,6 +39,7 @@ function Cart() {
   // Push begin_checkout event when order page loads with cart items
   useEffect(() => {
     if (typeof window !== 'undefined' && cartItems.length > 0) {
+      sendGTMEvent({ ecommerce: null });
       sendGTMEvent({
         event: 'begin_checkout',
         ecommerce: {
@@ -251,6 +252,7 @@ function Cart() {
         setShowPopup(true);
 
         // Push purchase event to data layer
+        sendGTMEvent({ ecommerce: null });
         sendGTMEvent({
           event: 'purchase',
           ecommerce: {

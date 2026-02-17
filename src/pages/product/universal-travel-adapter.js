@@ -88,6 +88,7 @@ const ProductDetails = ({ initialProduct }) => {
           price: initialProduct.price || 0,
           originalPrice: initialProduct.originalPrice || 0,
         };
+        sendGTMEvent({ ecommerce: null });
         sendGTMEvent({
           event: 'view_item',
           ecommerce: {
@@ -135,6 +136,7 @@ const ProductDetails = ({ initialProduct }) => {
     setIsAddingToCart(true);
 
     if (typeof window !== 'undefined') {
+      sendGTMEvent({ ecommerce: null });
       sendGTMEvent({
         event: 'add_to_cart',
         ecommerce: {

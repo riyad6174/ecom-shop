@@ -49,6 +49,7 @@ const OrderDialog = ({ isOpen, onClose }) => {
       });
       // Push begin_checkout event to data layer
       if (cartItems.length > 0) {
+        sendGTMEvent({ ecommerce: null });
         sendGTMEvent({
           event: 'begin_checkout',
           ecommerce: {
@@ -290,6 +291,7 @@ const OrderDialog = ({ isOpen, onClose }) => {
         setTimeout(() => setConfirmationAnimating(true), 50);
 
         // Push purchase event to data layer
+        sendGTMEvent({ ecommerce: null });
         sendGTMEvent({
           event: 'purchase',
           ecommerce: {

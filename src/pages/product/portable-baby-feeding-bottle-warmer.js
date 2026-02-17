@@ -82,6 +82,7 @@ const ProductDetails = ({ initialProduct }) => {
 
       // Push product view event to data layer
       if (typeof window !== 'undefined') {
+        sendGTMEvent({ ecommerce: null });
         sendGTMEvent({
           event: 'view_item',
           ecommerce: {
@@ -129,6 +130,7 @@ const ProductDetails = ({ initialProduct }) => {
 
     // Push add_to_cart event to data layer
     if (typeof window !== 'undefined') {
+      sendGTMEvent({ ecommerce: null });
       sendGTMEvent({
         event: 'add_to_cart',
         ecommerce: {

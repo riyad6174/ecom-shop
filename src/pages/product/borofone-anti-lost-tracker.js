@@ -59,6 +59,7 @@ const ProductDetails = ({ initialProduct }) => {
 
       // GTM Data Layer Push (only on client-side)
       if (typeof window !== 'undefined') {
+        sendGTMEvent({ ecommerce: null });
         sendGTMEvent({
           event: 'view_item',
           ecommerce: {
@@ -110,6 +111,7 @@ const ProductDetails = ({ initialProduct }) => {
     setIsAddingToCart(true);
 
     if (typeof window !== 'undefined') {
+      sendGTMEvent({ ecommerce: null });
       sendGTMEvent({
         event: 'add_to_cart',
         ecommerce: {
