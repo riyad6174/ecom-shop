@@ -12,6 +12,13 @@ export default function Document() {
         <link rel='icon' type='image/png' sizes='32x32' href='/favicon.ico' />
         <link rel='apple-touch-icon' href='/assets/new-logo.png' />
 
+        {/* Stape Custom GTM Loader */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s);j.async=true;j.src="https://data.sheiishop.com/7rkxzywpkozt.js?"+i;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','58xvcd=HR5SLCQ6VDc%2BIjghQkMvXAJHXUVBUR0USQkHDhkeChIbCkEIHxo%3D');`,
+          }}
+        />
+
         {/* Preconnect for performance */}
         <link rel='preconnect' href='https://fonts.googleapis.com' />
         <link
@@ -35,6 +42,15 @@ export default function Document() {
         />
       </Head>
       <body className='antialiased'>
+        {/* Stape GTM noscript fallback */}
+        <noscript>
+          <iframe
+            src='https://data.sheiishop.com/ns.html?id=GTM-MJXWJ24V'
+            height='0'
+            width='0'
+            style={{ display: 'none', visibility: 'hidden' }}
+          />
+        </noscript>
         <Main />
         <NextScript />
       </body>
