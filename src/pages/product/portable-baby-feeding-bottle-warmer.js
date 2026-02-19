@@ -292,6 +292,8 @@ const ProductDetails = ({ initialProduct }) => {
                       className='w-full h-[320px] md:h-[533px] object-cover rounded-lg image-transition'
                       src={activeImage}
                       alt={product.title}
+                      loading='eager'
+                      decoding='sync'
                     />
                     <div className='flex justify-center gap-2 mt-4 md:hidden'>
                       {product.images.slice(1).map((image, index) => (
@@ -305,6 +307,8 @@ const ProductDetails = ({ initialProduct }) => {
                           src={image}
                           alt={`${product.title} Thumbnail ${index + 1}`}
                           onClick={() => handleImageClick(image)}
+                          loading='lazy'
+                          decoding='async'
                         />
                       ))}
                     </div>
@@ -321,6 +325,8 @@ const ProductDetails = ({ initialProduct }) => {
                         src={image}
                         alt={`${product.title} Thumbnail ${index + 1}`}
                         onClick={() => handleImageClick(image)}
+                        loading='lazy'
+                        decoding='async'
                       />
                     ))}
                   </div>
@@ -589,6 +595,8 @@ const ProductDetails = ({ initialProduct }) => {
                 '/assets/product/warmer/comp.jpeg' || '/images/placeholder.jpg'
               }
               alt='Product Usage'
+              loading='lazy'
+              decoding='async'
             />
           </div>
         </div>
@@ -645,6 +653,8 @@ const ProductDetails = ({ initialProduct }) => {
                       className='w-full h-[350px] md:h-[300px] object-cover'
                       src={review.image}
                       alt='Review Image'
+                      loading='lazy'
+                      decoding='async'
                     />
                   </div>
                 </SwiperSlide>

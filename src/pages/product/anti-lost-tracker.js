@@ -328,6 +328,8 @@ const ProductDetails = ({ initialProduct }) => {
                     className='w-full h-64 sm:h-80 lg:h-[400px] object-cover rounded-lg image-transition'
                     src={activeImage}
                     alt={product.title}
+                    loading='eager'
+                    decoding='sync'
                   />
                   <div className='flex justify-center gap-2 mt-4 sm:hidden'>
                     {product.images.map((image, index) => (
@@ -341,6 +343,8 @@ const ProductDetails = ({ initialProduct }) => {
                         src={image}
                         alt={`${product.title} থাম্বনেইল ${index + 1}`}
                         onClick={() => handleImageClick(image)}
+                        loading='lazy'
+                        decoding='async'
                       />
                     ))}
                   </div>
@@ -357,6 +361,8 @@ const ProductDetails = ({ initialProduct }) => {
                       src={image}
                       alt={`${product.title} থাম্বনেইল ${index + 1}`}
                       onClick={() => handleImageClick(image)}
+                      loading='lazy'
+                      decoding='async'
                     />
                   ))}
                 </div>
@@ -550,6 +556,8 @@ const ProductDetails = ({ initialProduct }) => {
                 src='/assets/product/tracker/dual.webp'
                 alt='Hoco E101 vs Borofone Tracker Comparison'
                 className='w-full h-auto rounded-lg'
+                loading='lazy'
+                decoding='async'
               />
             </div>
 

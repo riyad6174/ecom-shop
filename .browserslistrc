@@ -1,0 +1,17 @@
+# Target modern evergreen browsers only
+# Eliminates legacy polyfills (arrow functions, async/await transforms, etc.)
+# Covers ~95%+ of global users as of 2025
+
+[production]
+Chrome >= 90
+Firefox >= 90
+Safari >= 14
+Edge >= 90
+iOS >= 14
+Samsung >= 14
+Opera >= 76
+
+[development]
+last 1 chrome version
+last 1 firefox version
+last 1 safari version

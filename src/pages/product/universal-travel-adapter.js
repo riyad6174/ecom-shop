@@ -353,6 +353,8 @@ const ProductDetails = ({ initialProduct }) => {
                     className='w-full h-72  lg:h-[400px] object-contain rounded-lg image-transition'
                     src={activeImage}
                     alt={product.title}
+                    loading='eager'
+                    decoding='sync'
                   />
                   <div className='flex justify-center gap-2 mt-4 sm:hidden'>
                     {product.images.map((image, index) => (
@@ -366,6 +368,8 @@ const ProductDetails = ({ initialProduct }) => {
                         src={image}
                         alt={`${product.title} থাম্বনেইল ${index + 1}`}
                         onClick={() => handleImageClick(image)}
+                        loading='lazy'
+                        decoding='async'
                       />
                     ))}
                   </div>
@@ -382,6 +386,8 @@ const ProductDetails = ({ initialProduct }) => {
                       src={image}
                       alt={`${product.title} থাম্বনেইল ${index + 1}`}
                       onClick={() => handleImageClick(image)}
+                      loading='lazy'
+                      decoding='async'
                     />
                   ))}
                 </div>
@@ -512,10 +518,10 @@ const ProductDetails = ({ initialProduct }) => {
         <div className='px-3 sm:px-4'>
           <div className='bg-white p-4 sm:p-5 rounded-lg'>
             <div>
-              <img src='/assets/product/adapter/all.png' />
-              <img src='/assets/product/adapter/gan.jpg' />
-              <img src='/assets/product/adapter/gan2.jpg' />
-              <img src='/assets/product/adapter/high-power.jpg' />
+              <img src='/assets/product/adapter/all.png' loading='lazy' decoding='async' />
+              <img src='/assets/product/adapter/gan.jpg' loading='lazy' decoding='async' />
+              <img src='/assets/product/adapter/gan2.jpg' loading='lazy' decoding='async' />
+              <img src='/assets/product/adapter/high-power.jpg' loading='lazy' decoding='async' />
             </div>
             <h2 className='text-lg mt-4 sm:text-xl font-semibold mb-3'>
               পণ্যের বিবরণ
@@ -580,6 +586,8 @@ const ProductDetails = ({ initialProduct }) => {
                       src={image}
                       alt={`Universal Adapter ${index + 1}`}
                       className='w-full h-36 object-cover hover:scale-105 transition-transform duration-300'
+                      loading='lazy'
+                      decoding='async'
                     />
                     <p className='absolute bottom-1 left-1 bg-black bg-opacity-50 text-white text-xs px-1 rounded'>
                       {index === 0 && '20W'} {index === 1 && '35W'}{' '}

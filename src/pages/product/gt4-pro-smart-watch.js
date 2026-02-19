@@ -245,6 +245,8 @@ const ProductDetails = ({ initialProduct }) => {
                       className='w-full h-[267px] md:h-[533px] object-cover rounded-lg image-transition'
                       src={activeImage}
                       alt={product.title}
+                      loading='eager'
+                      decoding='sync'
                     />
                     <div className='flex justify-center gap-2 mt-4 md:hidden'>
                       {product.images.slice(1).map((image, index) => (
@@ -258,6 +260,8 @@ const ProductDetails = ({ initialProduct }) => {
                           src={image}
                           alt={`${product.title} Thumbnail ${index + 1}`}
                           onClick={() => handleImageClick(image)}
+                          loading='lazy'
+                          decoding='async'
                         />
                       ))}
                     </div>
@@ -274,6 +278,8 @@ const ProductDetails = ({ initialProduct }) => {
                         src={image}
                         alt={`${product.title} Thumbnail ${index + 1}`}
                         onClick={() => handleImageClick(image)}
+                        loading='lazy'
+                        decoding='async'
                       />
                     ))}
                   </div>

@@ -15,43 +15,52 @@ const Hero = () => {
           <div className='relative col-span-2'>
             <Swiper
               modules={[Pagination, Autoplay]}
-              // pagination={{ clickable: true }}
               autoplay={{ delay: 5000, disableOnInteraction: false }}
               speed={1000}
               className='h-[500px] w-full rounded-xl overflow-hidden'
             >
+              {/* First slide: LCP image — load eagerly, high priority */}
               <SwiperSlide>
                 <img
                   src='/assets/banner/banner-tag.png'
                   alt='Winter Collection'
                   className='h-full w-full object-fit rounded-xl'
+                  fetchpriority='high'
+                  loading='eager'
+                  decoding='sync'
                 />
               </SwiperSlide>
+              {/* Remaining slides: defer loading */}
               <SwiperSlide>
                 <img
                   src='/assets/banner/fan-banner.png'
-                  alt='Winter Collection Slide 2'
+                  alt='Fan Collection'
                   className='h-full w-full object-fit rounded-xl'
+                  loading='lazy'
+                  decoding='async'
                 />
               </SwiperSlide>
               <SwiperSlide>
                 <img
                   src='/assets/banner/watch2.webp'
-                  alt='Winter Collection Slide 3'
+                  alt='Watch Collection'
                   className='h-full w-full object-fit rounded-xl'
+                  loading='lazy'
+                  decoding='async'
                 />
               </SwiperSlide>
             </Swiper>
           </div>
 
-          {/* Right Side - Two Small Images */}
+          {/* Right Side — these are above-fold so load eagerly but without highest priority */}
           <div className='flex flex-col gap-4'>
-            {/* Top Right Image */}
             <div className='relative rounded-xl overflow-hidden'>
               <img
                 src='/assets/banner/watch2.webp'
                 alt='Online Shopping'
                 className='h-[262px] w-full object-cover'
+                loading='eager'
+                decoding='async'
               />
               <div className='absolute bottom-0 p-4'>
                 <Link
@@ -63,12 +72,13 @@ const Hero = () => {
               </div>
             </div>
 
-            {/* Bottom Right Image */}
             <div className='relative rounded-xl overflow-hidden'>
               <img
                 src='/assets/banner/ring.webp'
                 alt='Trade-In Offer'
                 className='h-[222px] w-full object-cover'
+                loading='eager'
+                decoding='async'
               />
               <div className='absolute bottom-0 p-4'>
                 <Link
@@ -84,7 +94,7 @@ const Hero = () => {
       </div>
 
       {/* Mobile View - Image Slider */}
-      <div className='px-6 pt-6  md:hidden'>
+      <div className='px-6 pt-6 md:hidden'>
         <Swiper
           modules={[Pagination, Autoplay]}
           pagination={{ clickable: true, el: '.hero-pagination' }}
@@ -92,25 +102,33 @@ const Hero = () => {
           speed={1000}
           className='h-[183px] w-full rounded-xl overflow-hidden'
         >
+          {/* First slide: LCP on mobile */}
           <SwiperSlide>
             <img
               src='/assets/banner/banner-tag.png'
               alt='Winter Collection'
               className='h-full w-full object-cover rounded-xl'
+              fetchpriority='high'
+              loading='eager'
+              decoding='sync'
             />
           </SwiperSlide>
           <SwiperSlide>
             <img
               src='/assets/banner/fan-banner.png'
-              alt='Winter Collection Slide 2'
+              alt='Fan Collection'
               className='h-full w-full object-cover rounded-xl'
+              loading='lazy'
+              decoding='async'
             />
           </SwiperSlide>
           <SwiperSlide>
             <img
               src='/assets/banner/watch2.webp'
-              alt='Winter Collection Slide 3'
+              alt='Watch Collection'
               className='h-full w-full object-cover rounded-xl'
+              loading='lazy'
+              decoding='async'
             />
           </SwiperSlide>
         </Swiper>

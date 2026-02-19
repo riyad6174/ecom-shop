@@ -254,6 +254,8 @@ const ProductDetails = ({ initialProduct }) => {
                       className='w-full h-[300px] md:h-[533px] object-cover rounded-lg image-transition'
                       src={activeImage}
                       alt={product.title}
+                      loading='eager'
+                      decoding='sync'
                     />
                     {/* Small Images for Mobile */}
                     <div className='flex justify-center gap-2 mt-4 md:hidden'>
@@ -268,6 +270,8 @@ const ProductDetails = ({ initialProduct }) => {
                           src={image}
                           alt={`${product.title} Thumbnail ${index + 1}`}
                           onClick={() => handleImageClick(image)}
+                          loading='lazy'
+                          decoding='async'
                         />
                       ))}
                     </div>
@@ -285,6 +289,8 @@ const ProductDetails = ({ initialProduct }) => {
                         src={image}
                         alt={`${product.title} Thumbnail ${index + 1}`}
                         onClick={() => handleImageClick(image)}
+                        loading='lazy'
+                        decoding='async'
                       />
                     ))}
                   </div>
@@ -451,6 +457,8 @@ const ProductDetails = ({ initialProduct }) => {
                 className='w-full h-[300px] md:h-[400px] object-cover rounded-lg mb-4'
                 src='/assets/product/fan/ice.png'
                 alt='portable cooling fan description image'
+                loading='lazy'
+                decoding='async'
               />
               <p className='text-gray-600 font-mont text-sm'>
                 Beat the heat with the **JF132 Mini Portable Cooling Fan**, your
@@ -471,6 +479,8 @@ const ProductDetails = ({ initialProduct }) => {
                 className='w-full h-[350px] md:h-[400px] object-cover rounded-lg my-4'
                 src='/assets/product/fan/fan-description.avif'
                 alt='portable cooling fan description image'
+                loading='lazy'
+                decoding='async'
               />
               <p className='text-gray-600 font-mont text-sm mt-4'>
                 Express your style with **six vibrant color options**: Black,

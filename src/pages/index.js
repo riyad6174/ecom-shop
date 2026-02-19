@@ -35,6 +35,14 @@ function Index() {
         <link rel='canonical' href='https://www.sheiishop.com/' />
         <meta name='viewport' content='width=device-width, initial-scale=1' />
 
+        {/* Preload LCP hero image — critical for paint score */}
+        <link
+          rel='preload'
+          as='image'
+          href='/assets/banner/banner-tag.png'
+          fetchPriority='high'
+        />
+
         {/* Open Graph Tags */}
         <meta property='og:locale' content='en_US' />
         <meta property='og:type' content='website' />

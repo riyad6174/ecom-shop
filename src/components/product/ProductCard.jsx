@@ -17,6 +17,8 @@ const ProductCard = ({ product }) => {
               src={product?.thumbnail}
               alt={product?.title}
               className='w-full h-36 md:h-44 object-cover rounded-lg'
+              loading='lazy'
+              decoding='async'
             />
           </Link>
         ) : (
@@ -24,6 +26,8 @@ const ProductCard = ({ product }) => {
             src={product?.thumbnail}
             alt={product?.title}
             className='w-full h-36 md:h-44 object-cover rounded-lg opacity-70'
+            loading='lazy'
+            decoding='async'
           />
         )}
         {product?.sectionType === 'hot' && (
