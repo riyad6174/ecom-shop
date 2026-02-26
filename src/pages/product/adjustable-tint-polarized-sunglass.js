@@ -8,6 +8,7 @@ import CustomSection from '@/components/layout/CustomSection';
 import { products } from '@/utils/products';
 import { addToCart } from '@/store/cartSlice';
 import Footer from '@/components/common/Footer';
+import Image from 'next/image';
 import Head from 'next/head';
 import OrderDialog from '@/components/checkout/OrderDialog';
 
@@ -239,46 +240,38 @@ const ProductDetails = ({ initialProduct }) => {
               <div className='w-full md:w-3/4 px-4'>
                 <div className='p-2 md:p-0 md:grid md:grid-cols-4 gap-4'>
                   <div className='col-span-3 md:pl-6'>
-                    <img
-                      className='w-full h-[267px] md:h-[533px] object-cover rounded-lg image-transition'
-                      src={activeImage}
-                      alt={product.title}
-                      loading='eager'
-                      decoding='sync'
-                    />
+                    <div className='relative w-full h-[267px] md:h-[533px] rounded-lg overflow-hidden image-transition'>
+                      <Image fill src={activeImage} alt={product.title} className='object-cover' priority sizes='(max-width: 768px) 100vw, 60vw' />
+                    </div>
                     <div className='flex justify-center gap-2 mt-4 md:hidden'>
                       {product.images.slice(1).map((image, index) => (
-                        <img
+                        <div
                           key={index}
-                          className={`w-[80px] h-[80px] object-cover rounded-lg cursor-pointer small-image ${
+                          className={`relative w-[80px] h-[80px] rounded-lg overflow-hidden cursor-pointer small-image ${
                             activeImage === image
                               ? 'small-image-active'
                               : 'small-image-inactive'
                           }`}
-                          src={image}
-                          alt={`${product.title} Thumbnail ${index + 1}`}
                           onClick={() => handleImageClick(image)}
-                          loading='lazy'
-                          decoding='async'
-                        />
+                        >
+                          <Image fill src={image} alt={`${product.title} Thumbnail ${index + 1}`} className='object-cover' />
+                        </div>
                       ))}
                     </div>
                   </div>
                   <div className='col-span-1 hidden md:flex flex-col items-center gap-4'>
                     {product.images.slice(1).map((image, index) => (
-                      <img
+                      <div
                         key={index}
-                        className={`w-full h-[167px] object-cover rounded-lg cursor-pointer small-image ${
+                        className={`relative w-full h-[167px] rounded-lg overflow-hidden cursor-pointer small-image ${
                           activeImage === image
                             ? 'small-image-active'
                             : 'small-image-inactive'
                         }`}
-                        src={image}
-                        alt={`${product.title} Thumbnail ${index + 1}`}
                         onClick={() => handleImageClick(image)}
-                        loading='lazy'
-                        decoding='async'
-                      />
+                      >
+                        <Image fill src={image} alt={`${product.title} Thumbnail ${index + 1}`} className='object-cover' />
+                      </div>
                     ))}
                   </div>
                 </div>

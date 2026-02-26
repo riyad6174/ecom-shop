@@ -14,6 +14,7 @@ import CustomSection from '@/components/layout/CustomSection';
 import { products } from '@/utils/products';
 import { addToCart } from '@/store/cartSlice';
 import Footer from '@/components/common/Footer';
+import Image from 'next/image';
 import Head from 'next/head';
 import { BsThunderbolt } from 'react-icons/bs';
 import OrderDialog from '@/components/checkout/OrderDialog';
@@ -349,46 +350,38 @@ const ProductDetails = ({ initialProduct }) => {
             <div className='w-full lg:w-3/5 px-4'>
               <div className='grid grid-cols-1 sm:grid-cols-4 gap-4'>
                 <div className='col-span-1 sm:col-span-3'>
-                  <img
-                    className='w-full h-72  lg:h-[400px] object-contain rounded-lg image-transition'
-                    src={activeImage}
-                    alt={product.title}
-                    loading='eager'
-                    decoding='sync'
-                  />
+                  <div className='relative w-full h-72 lg:h-[400px] rounded-lg overflow-hidden image-transition'>
+                    <Image fill src={activeImage} alt={product.title} className='object-contain' priority sizes='(max-width: 768px) 100vw, 60vw' />
+                  </div>
                   <div className='flex justify-center gap-2 mt-4 sm:hidden'>
                     {product.images.map((image, index) => (
-                      <img
+                      <div
                         key={index}
-                        className={`w-16 h-16  sm:h-20 object-cover rounded-lg cursor-pointer small-image ${
+                        className={`relative w-16 h-16 sm:h-20 rounded-lg overflow-hidden cursor-pointer small-image ${
                           activeImage === image
                             ? 'small-image-active'
                             : 'small-image-inactive'
                         }`}
-                        src={image}
-                        alt={`${product.title} থাম্বনেইল ${index + 1}`}
                         onClick={() => handleImageClick(image)}
-                        loading='lazy'
-                        decoding='async'
-                      />
+                      >
+                        <Image fill src={image} alt={`${product.title} থাম্বনেইল ${index + 1}`} className='object-cover' />
+                      </div>
                     ))}
                   </div>
                 </div>
                 <div className='hidden sm:flex flex-col items-center gap-4'>
                   {product.images.map((image, index) => (
-                    <img
+                    <div
                       key={index}
-                      className={`w-full h-20 sm:h-28 lg:h-36 object-cover rounded-lg cursor-pointer small-image ${
+                      className={`relative w-full h-20 sm:h-28 lg:h-36 rounded-lg overflow-hidden cursor-pointer small-image ${
                         activeImage === image
                           ? 'small-image-active'
                           : 'small-image-inactive'
                       }`}
-                      src={image}
-                      alt={`${product.title} থাম্বনেইল ${index + 1}`}
                       onClick={() => handleImageClick(image)}
-                      loading='lazy'
-                      decoding='async'
-                    />
+                    >
+                      <Image fill src={image} alt={`${product.title} থাম্বনেইল ${index + 1}`} className='object-cover' />
+                    </div>
                   ))}
                 </div>
               </div>
@@ -518,10 +511,10 @@ const ProductDetails = ({ initialProduct }) => {
         <div className='px-3 sm:px-4'>
           <div className='bg-white p-4 sm:p-5 rounded-lg'>
             <div>
-              <img src='/assets/product/adapter/all.png' loading='lazy' decoding='async' />
-              <img src='/assets/product/adapter/gan.jpg' loading='lazy' decoding='async' />
-              <img src='/assets/product/adapter/gan2.jpg' loading='lazy' decoding='async' />
-              <img src='/assets/product/adapter/high-power.jpg' loading='lazy' decoding='async' />
+              <Image src='/assets/product/adapter/all.png' alt='Product image' width={800} height={500} style={{ width: '100%', height: 'auto' }} />
+              <Image src='/assets/product/adapter/gan.jpg' alt='Product image' width={800} height={500} style={{ width: '100%', height: 'auto' }} />
+              <Image src='/assets/product/adapter/gan2.jpg' alt='Product image' width={800} height={500} style={{ width: '100%', height: 'auto' }} />
+              <Image src='/assets/product/adapter/high-power.jpg' alt='Product image' width={800} height={500} style={{ width: '100%', height: 'auto' }} />
             </div>
             <h2 className='text-lg mt-4 sm:text-xl font-semibold mb-3'>
               পণ্যের বিবরণ
@@ -582,13 +575,9 @@ const ProductDetails = ({ initialProduct }) => {
                     key={index}
                     className='relative overflow-hidden rounded-lg shadow-md'
                   >
-                    <img
-                      src={image}
-                      alt={`Universal Adapter ${index + 1}`}
-                      className='w-full h-36 object-cover hover:scale-105 transition-transform duration-300'
-                      loading='lazy'
-                      decoding='async'
-                    />
+                    <div className='relative w-full h-36'>
+                      <Image fill src={image} alt={`Universal Adapter ${index + 1}`} className='object-cover hover:scale-105 transition-transform duration-300' />
+                    </div>
                     <p className='absolute bottom-1 left-1 bg-black bg-opacity-50 text-white text-xs px-1 rounded'>
                       {index === 0 && '20W'} {index === 1 && '35W'}{' '}
                       {index === 2 && '45W'} {index === 3 && '65W'}

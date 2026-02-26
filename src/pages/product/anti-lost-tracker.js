@@ -18,6 +18,7 @@ import CustomSection from '@/components/layout/CustomSection';
 import { products } from '@/utils/products';
 import { addToCart } from '@/store/cartSlice';
 import Footer from '@/components/common/Footer';
+import Image from 'next/image';
 import Head from 'next/head';
 import OrderDialog from '@/components/checkout/OrderDialog';
 
@@ -131,7 +132,7 @@ const ProductDetails = ({ initialProduct }) => {
         selectedColor: selectedVariant, // Send as selectedColor to match cartSlice structure
         quantity: 1,
         image: activeImage,
-      })
+      }),
     );
 
     // Open order dialog instead of navigating
@@ -291,13 +292,17 @@ const ProductDetails = ({ initialProduct }) => {
       <div className='py-6 sm:py-8 container mx-auto px-4 sm:px-6 lg:px-8'>
         <style jsx>{`
           .image-transition {
-            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+            transition:
+              opacity 0.3s ease-in-out,
+              transform 0.3s ease-in-out;
           }
           .image-transition:hover {
             transform: scale(1.02);
           }
           .small-image {
-            transition: opacity 0.2s ease-in-out, border-color 0.2s ease-in-out;
+            transition:
+              opacity 0.2s ease-in-out,
+              border-color 0.2s ease-in-out;
             border-width: 2px;
           }
           .small-image-active {
@@ -324,46 +329,38 @@ const ProductDetails = ({ initialProduct }) => {
             <div className='w-full lg:w-3/5 px-4'>
               <div className='grid grid-cols-1 sm:grid-cols-4 gap-4'>
                 <div className='col-span-1 sm:col-span-3'>
-                  <img
-                    className='w-full h-64 sm:h-80 lg:h-[400px] object-cover rounded-lg image-transition'
-                    src={activeImage}
-                    alt={product.title}
-                    loading='eager'
-                    decoding='sync'
-                  />
+                  <div className='relative w-full h-64 sm:h-80 lg:h-[400px] rounded-lg overflow-hidden image-transition'>
+                    <Image fill src={activeImage} alt={product.title} className='object-cover' priority sizes='(max-width: 768px) 100vw, 60vw' />
+                  </div>
                   <div className='flex justify-center gap-2 mt-4 sm:hidden'>
                     {product.images.map((image, index) => (
-                      <img
+                      <div
                         key={index}
-                        className={`w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-lg cursor-pointer small-image ${
+                        className={`relative w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden cursor-pointer small-image ${
                           activeImage === image
                             ? 'small-image-active'
                             : 'small-image-inactive'
                         }`}
-                        src={image}
-                        alt={`${product.title} থাম্বনেইল ${index + 1}`}
                         onClick={() => handleImageClick(image)}
-                        loading='lazy'
-                        decoding='async'
-                      />
+                      >
+                        <Image fill src={image} alt={`${product.title} থাম্বনেইল ${index + 1}`} className='object-cover' />
+                      </div>
                     ))}
                   </div>
                 </div>
                 <div className='hidden sm:flex flex-col items-center gap-4'>
                   {product.images.map((image, index) => (
-                    <img
+                    <div
                       key={index}
-                      className={`w-full h-20 sm:h-28 lg:h-36 object-cover rounded-lg cursor-pointer small-image ${
+                      className={`relative w-full h-20 sm:h-28 lg:h-36 rounded-lg overflow-hidden cursor-pointer small-image ${
                         activeImage === image
                           ? 'small-image-active'
                           : 'small-image-inactive'
                       }`}
-                      src={image}
-                      alt={`${product.title} থাম্বনেইল ${index + 1}`}
                       onClick={() => handleImageClick(image)}
-                      loading='lazy'
-                      decoding='async'
-                    />
+                    >
+                      <Image fill src={image} alt={`${product.title} থাম্বনেইল ${index + 1}`} className='object-cover' />
+                    </div>
                   ))}
                 </div>
               </div>
@@ -492,9 +489,25 @@ const ProductDetails = ({ initialProduct }) => {
                 >
                   {isAddingToCart ? (
                     <>
-                      <svg className='animate-spin h-4 w-4 text-white' xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24'>
-                        <circle className='opacity-25' cx='12' cy='12' r='10' stroke='currentColor' strokeWidth='4'></circle>
-                        <path className='opacity-75' fill='currentColor' d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'></path>
+                      <svg
+                        className='animate-spin h-4 w-4 text-white'
+                        xmlns='http://www.w3.org/2000/svg'
+                        fill='none'
+                        viewBox='0 0 24 24'
+                      >
+                        <circle
+                          className='opacity-25'
+                          cx='12'
+                          cy='12'
+                          r='10'
+                          stroke='currentColor'
+                          strokeWidth='4'
+                        ></circle>
+                        <path
+                          className='opacity-75'
+                          fill='currentColor'
+                          d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
+                        ></path>
                       </svg>
                       <span>Processing...</span>
                     </>
@@ -552,12 +565,13 @@ const ProductDetails = ({ initialProduct }) => {
 
             {/* Added Image in Description */}
             <div className='my-6 rounded-lg overflow-hidden border border-gray-200'>
-              <img
+              <Image
                 src='/assets/product/tracker/dual.webp'
                 alt='Hoco E101 vs Borofone Tracker Comparison'
-                className='w-full h-auto rounded-lg'
-                loading='lazy'
-                decoding='async'
+                width={1200}
+                height={600}
+                className='w-full rounded-lg'
+                style={{ width: '100%', height: 'auto' }}
               />
             </div>
 
@@ -733,7 +747,7 @@ const ProductDetails = ({ initialProduct }) => {
                 <div className='w-full aspect-video rounded-xl overflow-hidden shadow-md'>
                   <iframe
                     className='w-full h-full'
-                    src='https://www.youtube.com/embed/DXhqtG9eHuc'
+                    src='https://www.youtube.com/embed/H6m1ESYHupc?si=V5t-RODIeZCHI9m0'
                     title='YouTube video player'
                     frameBorder='0'
                     allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share'

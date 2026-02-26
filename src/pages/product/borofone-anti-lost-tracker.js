@@ -18,6 +18,7 @@ import CustomSection from '@/components/layout/CustomSection';
 import { products } from '@/utils/products';
 import { addToCart } from '@/store/cartSlice';
 import Footer from '@/components/common/Footer';
+import Image from 'next/image';
 import Head from 'next/head';
 import OrderDialog from '@/components/checkout/OrderDialog';
 
@@ -323,46 +324,38 @@ const ProductDetails = ({ initialProduct }) => {
             <div className='w-full lg:w-3/5 px-4'>
               <div className='grid grid-cols-1 sm:grid-cols-4 gap-4'>
                 <div className='col-span-1 sm:col-span-3'>
-                  <img
-                    className='w-full h-64 sm:h-80 lg:h-[400px] object-cover rounded-lg image-transition'
-                    src={activeImage}
-                    alt={product.title}
-                    loading='eager'
-                    decoding='sync'
-                  />
+                  <div className='relative w-full h-64 sm:h-80 lg:h-[400px] rounded-lg overflow-hidden image-transition'>
+                    <Image fill src={activeImage} alt={product.title} className='object-cover' priority sizes='(max-width: 768px) 100vw, 60vw' />
+                  </div>
                   <div className='flex justify-center gap-2 mt-4 sm:hidden'>
                     {product.images.map((image, index) => (
-                      <img
+                      <div
                         key={index}
-                        className={`w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-lg cursor-pointer small-image ${
+                        className={`relative w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden cursor-pointer small-image ${
                           activeImage === image
                             ? 'small-image-active'
                             : 'small-image-inactive'
                         }`}
-                        src={image}
-                        alt={`${product.title} থাম্বনেইল ${index + 1}`}
                         onClick={() => handleImageClick(image)}
-                        loading='lazy'
-                        decoding='async'
-                      />
+                      >
+                        <Image fill src={image} alt={`${product.title} থাম্বনেইল ${index + 1}`} className='object-cover' />
+                      </div>
                     ))}
                   </div>
                 </div>
                 <div className='hidden sm:flex flex-col items-center gap-4'>
                   {product.images.map((image, index) => (
-                    <img
+                    <div
                       key={index}
-                      className={`w-full h-20 sm:h-28 lg:h-36 object-cover rounded-lg cursor-pointer small-image ${
+                      className={`relative w-full h-20 sm:h-28 lg:h-36 rounded-lg overflow-hidden cursor-pointer small-image ${
                         activeImage === image
                           ? 'small-image-active'
                           : 'small-image-inactive'
                       }`}
-                      src={image}
-                      alt={`${product.title} থাম্বনেইল ${index + 1}`}
                       onClick={() => handleImageClick(image)}
-                      loading='lazy'
-                      decoding='async'
-                    />
+                    >
+                      <Image fill src={image} alt={`${product.title} থাম্বনেইল ${index + 1}`} className='object-cover' />
+                    </div>
                   ))}
                 </div>
               </div>

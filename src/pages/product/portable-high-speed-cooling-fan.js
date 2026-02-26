@@ -250,48 +250,40 @@ const ProductDetails = ({ initialProduct }) => {
                 <div className='p-2 md:p-0 md:grid md:grid-cols-4 gap-4'>
                   {/* Main Image */}
                   <div className='col-span-3 md:pl-6'>
-                    <img
-                      className='w-full h-[300px] md:h-[533px] object-cover rounded-lg image-transition'
-                      src={activeImage}
-                      alt={product.title}
-                      loading='eager'
-                      decoding='sync'
-                    />
+                    <div className='relative w-full h-[300px] md:h-[533px] rounded-lg overflow-hidden image-transition'>
+                      <Image fill src={activeImage} alt={product.title} className='object-cover' priority sizes='(max-width: 768px) 100vw, 60vw' />
+                    </div>
                     {/* Small Images for Mobile */}
                     <div className='flex justify-center gap-2 mt-4 md:hidden'>
                       {product.images.slice(1).map((image, index) => (
-                        <img
+                        <div
                           key={index}
-                          className={`w-[80px] h-[80px] object-cover rounded-lg cursor-pointer small-image ${
+                          className={`relative w-[80px] h-[80px] rounded-lg overflow-hidden cursor-pointer small-image ${
                             activeImage === image
                               ? 'small-image-active'
                               : 'small-image-inactive'
                           }`}
-                          src={image}
-                          alt={`${product.title} Thumbnail ${index + 1}`}
                           onClick={() => handleImageClick(image)}
-                          loading='lazy'
-                          decoding='async'
-                        />
+                        >
+                          <Image fill src={image} alt={`${product.title} Thumbnail ${index + 1}`} className='object-cover' />
+                        </div>
                       ))}
                     </div>
                   </div>
                   {/* Small Images for Desktop */}
                   <div className='col-span-1 hidden md:flex flex-col items-center gap-4'>
                     {product.images.slice(1).map((image, index) => (
-                      <img
+                      <div
                         key={index}
-                        className={`w-full h-[167px] object-cover rounded-lg cursor-pointer small-image ${
+                        className={`relative w-full h-[167px] rounded-lg overflow-hidden cursor-pointer small-image ${
                           activeImage === image
                             ? 'small-image-active'
                             : 'small-image-inactive'
                         }`}
-                        src={image}
-                        alt={`${product.title} Thumbnail ${index + 1}`}
                         onClick={() => handleImageClick(image)}
-                        loading='lazy'
-                        decoding='async'
-                      />
+                      >
+                        <Image fill src={image} alt={`${product.title} Thumbnail ${index + 1}`} className='object-cover' />
+                      </div>
                     ))}
                   </div>
                 </div>
@@ -453,13 +445,9 @@ const ProductDetails = ({ initialProduct }) => {
               <h2 className='text-lg font-semibold'>Description</h2>
             </div>
             <div className='mt-5'>
-              <img
-                className='w-full h-[300px] md:h-[400px] object-cover rounded-lg mb-4'
-                src='/assets/product/fan/ice.png'
-                alt='portable cooling fan description image'
-                loading='lazy'
-                decoding='async'
-              />
+              <div className='relative w-full h-[300px] md:h-[400px] rounded-lg mb-4'>
+                <Image fill src='/assets/product/fan/ice.png' alt='portable cooling fan description image' className='object-cover rounded-lg' />
+              </div>
               <p className='text-gray-600 font-mont text-sm'>
                 Beat the heat with the **JF132 Mini Portable Cooling Fan**, your
                 ultimate companion for instant refreshment! Featuring
@@ -475,13 +463,9 @@ const ProductDetails = ({ initialProduct }) => {
                 JF132 Mini combines durability with a sleek, modern vibe that
                 feels as good as it looks. 💪
               </p>
-              <img
-                className='w-full h-[350px] md:h-[400px] object-cover rounded-lg my-4'
-                src='/assets/product/fan/fan-description.avif'
-                alt='portable cooling fan description image'
-                loading='lazy'
-                decoding='async'
-              />
+              <div className='relative w-full h-[350px] md:h-[400px] rounded-lg my-4'>
+                <Image fill src='/assets/product/fan/fan-description.avif' alt='portable cooling fan description image' className='object-cover rounded-lg' />
+              </div>
               <p className='text-gray-600 font-mont text-sm mt-4'>
                 Express your style with **six vibrant color options**: Black,
                 White, Gray, Pink, Blue, Beige—pick the one that matches your

@@ -8,6 +8,7 @@ import CustomSection from '@/components/layout/CustomSection';
 import { products } from '@/utils/products';
 import { addToCart } from '@/store/cartSlice';
 import Footer from '@/components/common/Footer';
+import Image from 'next/image';
 import Head from 'next/head';
 import OrderDialog from '@/components/checkout/OrderDialog';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -288,46 +289,38 @@ const ProductDetails = ({ initialProduct }) => {
               <div className='w-full md:w-3/4 px-4'>
                 <div className='p-2 md:p-0 md:grid md:grid-cols-4 gap-4'>
                   <div className='col-span-3 md:pl-6'>
-                    <img
-                      className='w-full h-[320px] md:h-[533px] object-cover rounded-lg image-transition'
-                      src={activeImage}
-                      alt={product.title}
-                      loading='eager'
-                      decoding='sync'
-                    />
+                    <div className='relative w-full h-[320px] md:h-[533px] rounded-lg overflow-hidden image-transition'>
+                      <Image fill src={activeImage} alt={product.title} className='object-cover' priority sizes='(max-width: 768px) 100vw, 60vw' />
+                    </div>
                     <div className='flex justify-center gap-2 mt-4 md:hidden'>
                       {product.images.slice(1).map((image, index) => (
-                        <img
+                        <div
                           key={index}
-                          className={`w-[80px] h-[80px] object-cover rounded-lg cursor-pointer small-image ${
+                          className={`relative w-[80px] h-[80px] rounded-lg overflow-hidden cursor-pointer small-image ${
                             activeImage === image
                               ? 'small-image-active'
                               : 'small-image-inactive'
                           }`}
-                          src={image}
-                          alt={`${product.title} Thumbnail ${index + 1}`}
                           onClick={() => handleImageClick(image)}
-                          loading='lazy'
-                          decoding='async'
-                        />
+                        >
+                          <Image fill src={image} alt={`${product.title} Thumbnail ${index + 1}`} className='object-cover' />
+                        </div>
                       ))}
                     </div>
                   </div>
                   <div className='col-span-1 hidden md:flex flex-col items-center gap-4'>
                     {product.images.slice(1).map((image, index) => (
-                      <img
+                      <div
                         key={index}
-                        className={`w-full h-[167px] object-cover rounded-lg cursor-pointer small-image ${
+                        className={`relative w-full h-[167px] rounded-lg overflow-hidden cursor-pointer small-image ${
                           activeImage === image
                             ? 'small-image-active'
                             : 'small-image-inactive'
                         }`}
-                        src={image}
-                        alt={`${product.title} Thumbnail ${index + 1}`}
                         onClick={() => handleImageClick(image)}
-                        loading='lazy'
-                        decoding='async'
-                      />
+                      >
+                        <Image fill src={image} alt={`${product.title} Thumbnail ${index + 1}`} className='object-cover' />
+                      </div>
                     ))}
                   </div>
                 </div>
@@ -589,15 +582,9 @@ const ProductDetails = ({ initialProduct }) => {
       <CustomSection>
         <div className='px-3 mb-2'>
           <div className='bg-white rounded-lg overflow-hidden shadow-md'>
-            <img
-              className='w-full h-[420px] md:h-full object-cover'
-              src={
-                '/assets/product/warmer/comp.jpeg' || '/images/placeholder.jpg'
-              }
-              alt='Product Usage'
-              loading='lazy'
-              decoding='async'
-            />
+            <div className='relative w-full h-[420px] md:h-[600px]'>
+              <Image fill src='/assets/product/warmer/comp.jpeg' alt='Product Usage' className='object-cover' />
+            </div>
           </div>
         </div>
       </CustomSection>
@@ -649,13 +636,9 @@ const ProductDetails = ({ initialProduct }) => {
               {reviews.map((review) => (
                 <SwiperSlide key={review.id} className='!px-2'>
                   <div className='bg-gray-50 rounded-lg overflow-hidden shadow-sm border'>
-                    <img
-                      className='w-full h-[350px] md:h-[300px] object-cover'
-                      src={review.image}
-                      alt='Review Image'
-                      loading='lazy'
-                      decoding='async'
-                    />
+                    <div className='relative w-full h-[350px] md:h-[300px]'>
+                      <Image fill src={review.image} alt='Review Image' className='object-cover' />
+                    </div>
                   </div>
                 </SwiperSlide>
               ))}
