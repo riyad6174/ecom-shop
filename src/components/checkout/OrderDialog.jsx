@@ -209,9 +209,7 @@ const OrderDialog = ({ isOpen, onClose }) => {
     setIsLoading(true);
     setSubmissionError(null);
 
-    const phoneLastFive = formData.phoneNumber
-      ? formData.phoneNumber.slice(-5)
-      : 'UNKNOWN';
+    const uniqueId = `ORD-${Date.now().toString().slice(-6)}-${Math.floor(1000 + Math.random() * 9000)}`;
     const order = {
       user: { ...formData },
       order: {
@@ -220,7 +218,7 @@ const OrderDialog = ({ isOpen, onClose }) => {
         shippingCharge,
         grandTotal,
         orderDate: new Date().toISOString(),
-        orderId: `ORD-${phoneLastFive}`,
+        orderId: uniqueId,
       },
     };
 
@@ -244,13 +242,13 @@ const OrderDialog = ({ isOpen, onClose }) => {
           title: item.title || 'Unknown',
           price: item.price || 0,
           quantity: item.quantity || 1,
-          selectedColor: item.selectedColor || item.selectedVariantValue,
+          variant: (item.selectedColor ? `Color: ${item.selectedColor}` : '') || (item.selectedVariantValue ? `Type: ${item.selectedVariantValue}` : '') || 'Standard',
         })),
       ),
       totalPrice: totalPrice || 0,
       shippingCharge: shippingCharge || 0,
       grandTotal: grandTotal || 0,
-      orderId: `ORD-${phoneLastFive}` || 'ORD-UNKNOWN',
+      orderId: uniqueId,
       orderDate: new Date().toISOString(),
       submissionTime: bdtTime,
       sheetName: 'Orders',

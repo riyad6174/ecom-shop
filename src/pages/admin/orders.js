@@ -1,0 +1,749 @@
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { useRouter } from 'next/router';
+import Link from 'next/link';
+import Head from 'next/head';
+import { 
+  FiSearch, FiRefreshCw, FiFilter, FiTrash2, FiEdit3, 
+  FiCheckCircle, FiXCircle, FiClock, FiPhone, FiPhoneMissed,
+  FiCopy, FiExternalLink, FiCalendar, FiArrowLeft, FiArrowRight
+} from 'react-icons/fi';
+import { Dialog, Transition } from '@headlessui/react';
+import { Fragment } from 'react';
+
+// ─── Status configuration ──────────────────────────────────────────────────
+const ORDER_STATUS_CONFIG = {
+  pending: { label: 'Pending', color: 'bg-yellow-50', badge: 'bg-yellow-100 text-yellow-800 border-yellow-200', icon: FiClock, btn: 'bg-yellow-600' },
+  confirmed: { label: 'Confirmed', color: 'bg-green-100', badge: 'bg-green-100 text-green-800 border-green-200', icon: FiCheckCircle, btn: 'bg-green-600' },
+  cancel: { label: 'Cancelled', color: 'bg-red-100', badge: 'bg-red-100 text-red-800 border-red-200', icon: FiXCircle, btn: 'bg-red-600' },
+};
+
+const RESPONSE_STATUS_CONFIG = {
+  called: { label: 'Called', color: 'text-green-600', icon: FiPhone, badge: 'bg-green-100 text-green-700' },
+  did_not_pick: { label: 'Did Not Pick', color: 'text-red-600', icon: FiPhoneMissed, badge: 'bg-red-100 text-red-700' },
+  null: { label: 'Not Called', color: 'text-yellow-600', icon: FiPhone, badge: 'bg-yellow-100 text-yellow-700' },
+};
+
+// ─── Helpers ────────────────────────────────────────────────────────────────
+function parseItems(itemsStr) {
+  try {
+    const arr = JSON.parse(itemsStr || '[]');
+    return arr.map((it) => (
+      <div key={Math.random()} className="mb-1 last:mb-0">
+        <span className="font-medium">{it.title || it.name || 'Item'}</span>
+        <span className="text-gray-400 mx-1">×</span>
+        <span className="text-blue-600 font-semibold">{it.quantity || 1}</span>
+        {it.variant && (
+          <span className="block text-[10px] text-gray-500 uppercase tracking-tight">{it.variant}</span>
+        )}
+      </div>
+    ));
+  } catch {
+    return <span className="text-gray-400 italic">No items</span>;
+  }
+}
+
+function parseItemQty(itemsStr) {
+  try {
+    const arr = JSON.parse(itemsStr || '[]');
+    return arr.reduce((sum, it) => sum + (Number(it.quantity) || 1), 0);
+  } catch {
+    return 0;
+  }
+}
+
+// ─── Main page ───────────────────────────────────────────────────────────────
+export default function AdminOrders() {
+  const router = useRouter();
+  const [admin, setAdmin] = useState(null);
+  const [orders, setOrders] = useState([]);
+  const [total, setTotal] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(true);
+  const [authChecked, setAuthChecked] = useState(false);
+
+  // Filters
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
+  const [responseFilter, setResponseFilter] = useState('');
+  const [fromDate, setFromDate] = useState('');
+  const [toDate, setToDate] = useState('');
+
+  // Modal State
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [copyFeedback, setCopyFeedback] = useState({});
+  const [toast, setToast] = useState(null);
+  const [stats, setStats] = useState({ total: 0, today: 0, confirmedToday: 0, cancelledToday: 0 });
+
+  const debounceRef = useRef(null);
+
+  const showToast = (message, type = 'success') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  // ── Auth guard ──────────────────────────────────────────────────────────
+  useEffect(() => {
+    fetch('/api/admin/me')
+      .then(async (r) => {
+        if (!r.ok) {
+          router.replace('/admin/login');
+        } else {
+          const data = await r.json();
+          setAdmin(data);
+          setAuthChecked(true);
+        }
+      })
+      .catch(() => router.replace('/admin/login'));
+  }, []);
+
+  // ── Fetch orders ────────────────────────────────────────────────────────
+  const fetchOrders = useCallback(async () => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams({
+        page,
+        limit: 30,
+        search,
+        status: statusFilter,
+        responseStatus: responseFilter,
+        from: fromDate,
+        to: toDate,
+      });
+
+      const res = await fetch(`/api/admin/orders?${params}`);
+      if (!res.ok) throw new Error('Failed');
+      const data = await res.json();
+      setOrders(data.orders);
+      setTotal(data.total);
+      setTotalPages(data.totalPages);
+      if (data.stats) {
+        setStats({
+          today: data.stats.today,
+          confirmedToday: data.stats.confirmedToday,
+          cancelledToday: data.stats.cancelledToday,
+          total: data.stats.globalTotal,
+        });
+      }
+    } catch {
+      // keep previous state
+    } finally {
+      setLoading(false);
+    }
+  }, [page, search, statusFilter, responseFilter, fromDate, toDate]);
+
+  useEffect(() => {
+    if (authChecked) fetchOrders();
+  }, [authChecked, fetchOrders]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [search, statusFilter, responseFilter, fromDate, toDate]);
+
+  const handleSearchChange = (e) => {
+    const val = e.target.value;
+    clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => setSearch(val), 400);
+  };
+
+  const handleResetFilters = () => {
+    setSearch('');
+    setStatusFilter('');
+    setResponseFilter('');
+    setFromDate('');
+    setToDate('');
+    setPage(1);
+  };
+
+  const handleLogout = async () => {
+    await fetch('/api/admin/logout', { method: 'POST' });
+    router.replace('/admin/login');
+  };
+
+  const openUpdateModal = (order) => {
+    setSelectedOrder({ ...order });
+    setIsUpdateModalOpen(true);
+  };
+
+  const handleStatusUpdate = async (field, newVal) => {
+    if (!selectedOrder) return;
+    try {
+      const res = await fetch(`/api/admin/orders/${selectedOrder._id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ [field]: newVal }),
+      });
+      if (res.ok) {
+        setOrders((prev) =>
+          prev.map((o) => (o._id === selectedOrder._id ? { ...o, [field]: newVal } : o))
+        );
+        setSelectedOrder((prev) => ({ ...prev, [field]: newVal }));
+        showToast(`${field === 'orderStatus' ? 'Order' : 'Response'} status updated to ${newVal || 'None'}`);
+        // Refetch to sync global statistics cards
+        fetchOrders();
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const copyToClipboard = (text, key) => {
+    navigator.clipboard.writeText(text);
+    setCopyFeedback((prev) => ({ ...prev, [key]: true }));
+    setTimeout(() => {
+      setCopyFeedback((prev) => ({ ...prev, [key]: false }));
+    }, 2000);
+  };
+
+  const copyFullOrder = () => {
+    if (!selectedOrder) return;
+    const text = `Name: ${selectedOrder.name}\nPhone: ${selectedOrder.phone}\nAddress: ${selectedOrder.address}\nTotal Price: ৳${selectedOrder.grandTotal}`;
+    copyToClipboard(text, 'fullOrder');
+  };
+
+  const statsDisplay = {
+    total: stats.total,
+    today: stats.today,
+    confirmedToday: stats.confirmedToday,
+    cancelledToday: stats.cancelledToday,
+  };
+
+  if (!authChecked) {
+    return (
+      <div className='min-h-screen flex items-center justify-center bg-slate-50'>
+        <div className="flex flex-col items-center gap-3">
+          <div className='animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full' />
+          <p className='text-slate-500 font-medium'>Authenticating Admin...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <Head>
+        <title>Order Management | Sheii Shop Admin</title>
+        <meta name='robots' content='noindex,nofollow' />
+      </Head>
+
+      <div className='min-h-screen bg-slate-50 flex flex-col'>
+        {/* ── Top Bar ── */}
+        <header className='bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between sticky top-0 z-20 shadow-sm'>
+          <div className='flex items-center gap-6'>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold italic">S</div>
+              <span className='font-bold text-slate-900 tracking-tight hidden sm:block'>Dashboard</span>
+            </div>
+            <nav className='flex items-center gap-1 bg-slate-100 p-1 rounded-lg'>
+              <Link href='/admin/orders' className='text-sm px-4 py-1.5 rounded-md bg-white shadow-sm font-semibold text-blue-700'>
+                Orders
+              </Link>
+              <Link href='/admin/admins' className='text-sm px-4 py-1.5 rounded-md text-slate-600 hover:bg-slate-200 transition-colors font-medium'>
+                Admins
+              </Link>
+            </nav>
+          </div>
+          <div className='flex items-center gap-4'>
+            <button 
+              onClick={fetchOrders}
+              className="hidden lg:flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-slate-600 text-[11px] font-black uppercase tracking-widest hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm group active:scale-95"
+            >
+              <FiRefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-700'}`} />
+              Reload
+            </button>
+            <div className="flex flex-col items-end leading-none">
+              <span className='text-xs font-semibold text-slate-900 uppercase tracking-wider mb-1'>Administrator</span>
+              <span className='text-[10px] text-slate-500 font-mono'>{admin?.email}</span>
+            </div>
+            <button
+              onClick={handleLogout}
+              className='hidden md:flex items-center gap-2 text-xs font-semibold text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 px-4 py-2 rounded-lg transition-all border border-red-100'
+            >
+              Logout
+            </button>
+          </div>
+        </header>
+
+        <main className='p-4 sm:p-6 max-w-[1800px] mx-auto w-full flex-grow'>
+          {/* ── Page Title & Stats ── */}
+          <div className='flex flex-wrap items-end justify-between gap-4 mb-8'>
+            <div>
+              <h1 className='text-3xl font-black text-slate-900 flex items-center gap-3'>
+                Order Management
+              </h1>
+              <p className="text-slate-500 text-sm mt-1 font-medium tracking-tight">Real-time control center for your shop's operations.</p>
+            </div>
+          </div>
+
+          {/* ── Stats Row ── */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            {[
+              { label: 'Total Orders', value: statsDisplay.total, color: 'text-blue-600', bg: 'bg-blue-50', icon: FiSearch },
+              { label: "Today's Orders", value: statsDisplay.today, color: 'text-purple-600', bg: 'bg-purple-50', icon: FiCalendar },
+              { label: 'Confirmed Today', value: statsDisplay.confirmedToday, color: 'text-green-600', bg: 'bg-green-50', icon: FiCheckCircle },
+              { label: 'Cancelled Today', value: statsDisplay.cancelledToday, color: 'text-red-600', bg: 'bg-red-50', icon: FiTrash2 },
+            ].map((stat, idx) => (
+              <div key={idx} className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm flex items-center justify-between group hover:border-blue-200 transition-colors">
+                <div>
+                  <p className="text-xs font-black text-slate-400 uppercase tracking-[0.15em] mb-1">{stat.label}</p>
+                  <p className={`text-2xl font-black ${stat.color}`}>{stat.value}</p>
+                </div>
+                <div className={`${stat.bg} ${stat.color} w-12 h-12 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform`}>
+                  <stat.icon className="w-6 h-6" />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* ── Advanced Filters ── */}
+          <div className='bg-white rounded-2xl shadow-sm border border-slate-200 p-5 mb-6'>
+            <div className="flex items-center gap-2 mb-4 text-slate-900 font-bold text-sm border-b border-slate-100 pb-3">
+              <FiFilter className="w-4 h-4 text-blue-600" />
+              Advanced Filters
+            </div>
+            <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-6'>
+              {/* Search */}
+              <div className='xl:col-span-2 relative'>
+                <label className='text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 block'>Quick Search</label>
+                <div className="relative">
+                  <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
+                  <input
+                    type='text'
+                    defaultValue={search}
+                    onChange={handleSearchChange}
+                    placeholder='Customer name, phone, or order number...'
+                    className='w-full text-sm border border-slate-200 bg-slate-50/50 rounded-xl pl-10 pr-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all'
+                  />
+                </div>
+              </div>
+
+              {/* Status Filters Group */}
+              <div className="grid grid-cols-2 gap-3 xl:col-span-2">
+                <div>
+                  <label className='text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 block'>Order Status</label>
+                  <select
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    className='w-full text-sm border border-slate-200 bg-slate-50/50 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all cursor-pointer font-medium text-slate-700 italic placeholder:text-slate-200'
+                  >
+                    <option value=''>All Orders</option>
+                    <option value='pending'>⏳ Pending</option>
+                    <option value='confirmed'>✅ Confirmed</option>
+                    <option value='cancel'>❌ Cancelled</option>
+                  </select>
+                </div>
+                <div>
+                  <label className='text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 block'>Response</label>
+                  <select
+                    value={responseFilter}
+                    onChange={(e) => setResponseFilter(e.target.value)}
+                    className='w-full text-sm border border-slate-200 bg-slate-50/50 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all cursor-pointer font-medium text-slate-700'
+                  >
+                    <option value=''>All Attempts</option>
+                    <option value='none'>⚪ No Response</option>
+                    <option value='called'>📞 Called</option>
+                    <option value='number_off'>📵 Number Off</option>
+                    <option value='did_not_pick'>📵 Did Not Pick</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Date Filter */}
+              <div>
+                <label className='text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 block'>Date Selection</label>
+                <div className="flex gap-2 items-center">
+                  <div className="relative flex-1">
+                    <FiCalendar className="absolute left-2 top-1/2 -translate-y-1/2 text-slate-400 w-3 h-3 pointer-events-none" />
+                    <input
+                      type='date'
+                      value={fromDate}
+                      onChange={(e) => setFromDate(e.target.value)}
+                      className='w-full text-[10px] border border-slate-200 bg-slate-50/50 rounded-lg pl-7 pr-2 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all uppercase'
+                    />
+                  </div>
+                  <div className="text-slate-300">—</div>
+                  <div className="relative flex-1">
+                    <FiCalendar className="absolute left-2 top-1/2 -translate-y-1/2 text-slate-400 w-3 h-3 pointer-events-none" />
+                    <input
+                      type='date'
+                      value={toDate}
+                      onChange={(e) => setToDate(e.target.value)}
+                      className='w-full text-[10px] border border-slate-200 bg-slate-50/50 rounded-lg pl-7 pr-2 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all uppercase'
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            {/* Filter Actions */}
+            <div className="mt-4 pt-4 border-t border-slate-100 flex justify-end gap-3">
+              <button 
+                onClick={handleResetFilters}
+                className="text-xs font-bold text-slate-500 hover:text-slate-800 transition-colors uppercase tracking-widest flex items-center gap-1.5"
+              >
+                <FiTrash2 className="w-3 h-3" />
+                Reset All Filters
+              </button>
+            </div>
+          </div>
+
+          {/* ── Modern Table Container ── */}
+          <div className='bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col min-h-[500px]'>
+            <div className='overflow-x-auto flex-grow'>
+              <table className='w-full text-sm text-left border-collapse'>
+                <thead>
+                  <tr className='bg-slate-50/80 border-b border-slate-200 text-[11px] font-black text-slate-500 uppercase tracking-widest'>
+                    <th className='px-6 py-4'>Action</th>
+                    <th className='px-6 py-4'>Order ID</th>
+                    <th className='px-6 py-4'>Customer Profile</th>
+                    <th className='px-6 py-4'>Shipping Details</th>
+                    <th className='px-6 py-4'>Product Summary</th>
+                    <th className='px-6 py-4 text-right'>Revenue</th>
+                    <th className='px-6 py-4'>Response Status</th>
+                    <th className='px-6 py-4'>Timestamp</th>
+                  </tr>
+                </thead>
+                <tbody className='divide-y divide-slate-100'>
+                  {loading ? (
+                    <tr>
+                      <td colSpan="8" className="py-32 text-center">
+                        <div className="flex flex-col items-center gap-4">
+                          <div className='animate-spin w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full shadow-lg' />
+                          <p className="text-slate-400 font-bold animate-pulse text-xs uppercase tracking-[0.2em]">Synchronizing data...</p>
+                        </div>
+                      </td>
+                    </tr>
+                  ) : orders.length === 0 ? (
+                    <tr>
+                      <td colSpan="8" className="py-32 text-center">
+                         <div className="flex flex-col items-center gap-3">
+                           <div className="w-16 h-16 bg-slate-50 rounded-3xl flex items-center justify-center mb-2">
+                             <FiSearch className="w-8 h-8 text-slate-200" />
+                           </div>
+                           <p className='text-slate-500 font-bold text-lg'>No matching orders found</p>
+                           <p className='text-slate-400 text-sm max-w-xs'>Try adjusting your search terms or clearing your filters to see more results.</p>
+                           <button onClick={handleResetFilters} className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-xl text-sm font-bold shadow-blue-200 shadow-lg transition-transform hover:scale-105">View All Orders</button>
+                         </div>
+                      </td>
+                    </tr>
+                  ) : (
+                    orders.map((order) => {
+                      const status = ORDER_STATUS_CONFIG[order.orderStatus || 'pending'];
+                      const response = RESPONSE_STATUS_CONFIG[order.responseStatus || 'null'];
+                      const RespIcon = response.icon;
+
+                      return (
+                        <tr
+                          key={order._id}
+                          className={`group transition-all hover:z-10 relative border-l-4 ${status.color} hover:shadow-md border-transparent hover:border-blue-500`}
+                        >
+                          <td className='px-6 py-4'>
+                            <button 
+                              onClick={() => openUpdateModal(order)}
+                              className="flex items-center justify-center w-10 h-10 bg-white border border-slate-200 rounded-xl text-blue-600 shadow-sm hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all"
+                              title="Update Order Details"
+                            >
+                              <FiEdit3 className="w-5 h-5" />
+                            </button>
+                          </td>
+                          <td className='px-6 py-4'>
+                            <span className="font-mono text-[11px] px-2.5 py-1 bg-slate-100 text-slate-600 rounded-md border border-slate-200 font-bold tracking-tight">
+                              {order.orderId}
+                            </span>
+                          </td>
+                          <td className='px-6 py-4'>
+                            <div className="flex flex-col">
+                              <span className='font-bold text-slate-800 text-sm mb-0.5'>{order.name}</span>
+                              <span className='text-xs text-slate-500 font-medium selection:bg-blue-100'>{order.phone}</span>
+                            </div>
+                          </td>
+                          <td className='px-6 py-4 max-w-[250px]'>
+                            <div className="flex flex-col gap-1">
+                              <span className="text-[10px] font-black uppercase text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded w-fit inline-block leading-none border border-blue-100">
+                                {order.deliveryZone || 'Standard'}
+                              </span>
+                              <p className="text-xs text-slate-600 leading-relaxed font-medium" title={order.address}>
+                                {order.address}
+                              </p>
+                            </div>
+                          </td>
+                          <td className='px-6 py-4'>
+                            <div className="text-[11px] leading-tight text-slate-700">
+                              {parseItems(order.items)}
+                            </div>
+                          </td>
+                          <td className='px-6 py-4 text-right'>
+                            <div className="flex flex-col items-end">
+                              <span className='font-black text-slate-900 text-sm'>
+                                ৳{Number(order.grandTotal || 0).toLocaleString('en-BD')}
+                              </span>
+                              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tight">
+                                {parseItemQty(order.items)} Items
+                              </span>
+                            </div>
+                          </td>
+                          <td className='px-6 py-4'>
+                            <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border ${response.badge} border-white shadow-sm`}>
+                              <RespIcon className="w-3.5 h-3.5" />
+                              <span className="text-[10px] font-bold uppercase tracking-wider whitespace-nowrap">{response.label}</span>
+                            </div>
+                          </td>
+                          <td className='px-6 py-4'>
+                            <div className="flex flex-col">
+                              <span className="text-xs font-bold text-slate-700 whitespace-nowrap mb-0.5">
+                                {order.submissionTime?.split(',')[0] || '—'}
+                              </span>
+                              <span className="text-[10px] text-slate-400 font-medium whitespace-nowrap">
+                                {order.submissionTime?.split(',')[1]?.trim() || '—'}
+                              </span>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {/* ── Modern Pagination ── */}
+            {totalPages > 1 && (
+              <div className='px-6 py-5 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4'>
+                <div className="flex items-center gap-3">
+                   <div className="text-xs font-bold text-slate-500 uppercase tracking-widest bg-white border border-slate-200 px-3 py-2 rounded-xl shadow-sm">
+                     Page <span className="text-blue-600">{page}</span> of {totalPages}
+                   </div>
+                   <div className="hidden lg:block text-[10px] text-slate-400 font-medium uppercase tracking-wider">
+                     Displaying order range {(page-1)*30 + 1} - {Math.min(page*30, total)}
+                   </div>
+                </div>
+                <div className='flex items-center gap-1.5'>
+                  <button
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    disabled={page === 1}
+                    className='h-10 w-10 flex items-center justify-center rounded-xl bg-white border border-slate-200 text-slate-400 hover:text-blue-600 hover:border-blue-600 disabled:opacity-30 disabled:pointer-events-none transition-all shadow-sm'
+                  >
+                    <FiArrowLeft className="w-5 h-5" />
+                  </button>
+                  
+                  {/* Page Numbers - Limited view */}
+                  <div className="flex items-center gap-1 mx-2">
+                    {[...Array(Math.min(5, totalPages))].map((_, i) => {
+                      const pNum = i + 1; // Simplistic view
+                      return (
+                        <button
+                          key={pNum}
+                          onClick={() => setPage(pNum)}
+                          className={`h-10 w-10 text-xs font-bold rounded-xl transition-all ${
+                            page === pNum 
+                              ? 'bg-blue-600 text-white shadow-lg shadow-blue-100 translate-y-[-2px]' 
+                              : 'bg-white border border-slate-200 text-slate-500 hover:bg-slate-50'
+                          }`}
+                        >
+                          {pNum}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <button
+                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={page === totalPages}
+                    className='h-10 w-10 flex items-center justify-center rounded-xl bg-white border border-slate-200 text-slate-400 hover:text-blue-600 hover:border-blue-600 disabled:opacity-30 disabled:pointer-events-none transition-all shadow-sm'
+                  >
+                    <FiArrowRight className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </main>
+
+        {/* ── Update Order Modal ── */}
+        <Transition show={isUpdateModalOpen} as={Fragment}>
+          <Dialog as="div" className="relative z-50" onClose={() => setIsUpdateModalOpen(false)}>
+            <Transition.Child
+              as={Fragment}
+              enter="ease-out duration-300"
+              enterFrom="opacity-0"
+              enterTo="opacity-100"
+              leave="ease-in duration-200"
+              leaveFrom="opacity-100"
+              leaveTo="opacity-0"
+            >
+              <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm" />
+            </Transition.Child>
+
+            <div className="fixed inset-0 overflow-y-auto">
+              <div className="flex min-h-full items-center justify-center p-4 text-center">
+                <Transition.Child
+                  as={Fragment}
+                  enter="ease-out duration-300"
+                  enterFrom="opacity-0 scale-95"
+                  enterTo="opacity-100 scale-100"
+                  leave="ease-in duration-200"
+                  leaveFrom="opacity-100 scale-100"
+                  leaveTo="opacity-0 scale-95"
+                >
+                  <Dialog.Panel className="w-full max-w-2xl transform overflow-hidden rounded-3xl bg-white text-left align-middle shadow-2xl transition-all border border-slate-100">
+                    <div className="relative p-8">
+                       {/* Modal Header */}
+                       <div className="flex items-center justify-between mb-8">
+                         <div>
+                            <Dialog.Title as="h3" className="text-xl font-black text-slate-900">
+                              Order Details & Management
+                            </Dialog.Title>
+                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Ref No: {selectedOrder?.orderId}</p>
+                         </div>
+                         <button 
+                          onClick={() => setIsUpdateModalOpen(false)}
+                          className="w-10 h-10 bg-slate-50 text-slate-400 rounded-2xl flex items-center justify-center hover:bg-red-50 hover:text-red-500 transition-all"
+                         >
+                           <FiXCircle className="w-6 h-6" />
+                         </button>
+                       </div>
+
+                       {/* Summary Table */}
+                       <div className="bg-slate-50 rounded-2xl border border-slate-100 overflow-hidden mb-8">
+                          <table className="w-full text-sm">
+                             <tbody className="divide-y divide-slate-100">
+                               {[
+                                 { label: 'Customer Name', value: selectedOrder?.name, key: 'name' },
+                                 { label: 'Primary Contact', value: selectedOrder?.phone, key: 'phone' },
+                                 { label: 'Delivery Address', value: selectedOrder?.address, key: 'address' },
+                                 { label: 'Total Payable', value: `৳${selectedOrder?.grandTotal}`, key: 'price' }
+                               ].map((field) => (
+                                 <tr key={field.key} className="group hover:bg-white transition-colors">
+                                   <td className="px-5 py-4 font-bold text-[11px] text-slate-400 uppercase tracking-wider w-1/3 border-r border-slate-100">{field.label}</td>
+                                   <td className="px-5 py-4 font-semibold text-slate-700 flex items-center justify-between">
+                                      <span className="truncate pr-4">{field.value}</span>
+                                      <button 
+                                        onClick={() => copyToClipboard(field.value, field.key)}
+                                        className={`p-2 rounded-lg transition-all flex items-center gap-1.5 text-[10px] font-black uppercase ${copyFeedback[field.key] ? 'bg-green-600 text-white' : 'bg-white text-slate-500 hover:text-blue-600 border border-slate-200'}`}
+                                      >
+                                        {copyFeedback[field.key] ? <FiCheckCircle /> : <FiCopy />}
+                                        {copyFeedback[field.key] ? 'Copied' : 'Copy'}
+                                      </button>
+                                   </td>
+                                 </tr>
+                               ))}
+                             </tbody>
+                          </table>
+                       </div>
+
+                       {/* Status Update Sections */}
+                       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                          {/* Order Status */}
+                          <div>
+                            <h4 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                               <div className="w-1.5 h-4 bg-blue-600 rounded-full" />
+                               Process Lifecycle
+                            </h4>
+                            <div className="flex flex-col gap-2">
+                              {['pending', 'confirmed', 'cancel'].map((st) => {
+                                const config = ORDER_STATUS_CONFIG[st];
+                                const isActive = selectedOrder?.orderStatus === st;
+                                return (
+                                  <button
+                                    key={st}
+                                    onClick={() => handleStatusUpdate('orderStatus', st)}
+                                    className={`flex items-center justify-between px-4 py-3 rounded-2xl border-2 transition-all font-bold text-sm ${
+                                      isActive
+                                        ? `${config.btn} border-transparent text-white shadow-lg`
+                                        : 'bg-white border-slate-100 text-slate-500 hover:border-slate-200 hover:text-slate-600'
+                                    }`}
+                                  >
+                                    {config.label}
+                                    {isActive && <FiCheckCircle />}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+
+                          {/* Response Status */}
+                          <div>
+                            <h4 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                               <div className="w-1.5 h-4 bg-green-600 rounded-full" />
+                               Call Management
+                            </h4>
+                            <div className="flex flex-col gap-2">
+                              {[
+                                { val: 'null', label: 'Not Called Yet', icon: FiClock, color: 'bg-slate-600' },
+                                { val: 'called', label: 'Call Successful', icon: FiPhone, color: 'bg-green-600' },
+                                { val: 'did_not_pick', label: 'Did Not Pick', icon: FiPhoneMissed, color: 'bg-red-600' }
+                              ].map((resp) => {
+                                const isActive = (selectedOrder?.responseStatus === null && resp.val === 'null') || (selectedOrder?.responseStatus === resp.val);
+                                return (
+                                  <button
+                                    key={resp.val}
+                                    onClick={() => handleStatusUpdate('responseStatus', resp.val === 'null' ? null : resp.val)}
+                                    className={`flex items-center justify-between px-4 py-3 rounded-2xl border-2 transition-all font-bold text-sm ${
+                                      isActive
+                                        ? `${resp.color} border-transparent text-white shadow-lg`
+                                        : 'bg-white border-slate-100 text-slate-500 hover:border-green-200 hover:text-green-600'
+                                    }`}
+                                  >
+                                    <div className="flex items-center gap-2">
+                                      <resp.icon className="w-4 h-4" />
+                                      {resp.label}
+                                    </div>
+                                    {isActive && <FiCheckCircle />}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                       </div>
+
+                       {/* Action Footer */}
+                       <div className="flex flex-col gap-3">
+                          <button 
+                            onClick={copyFullOrder}
+                            className={`w-full py-4 rounded-2xl border-2 font-black text-xs uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 ${
+                              copyFeedback.fullOrder 
+                                ? 'bg-slate-900 border-slate-900 text-white' 
+                                : 'bg-slate-50 border-slate-200 text-slate-900 hover:bg-slate-900 hover:text-white hover:border-slate-900'
+                            }`}
+                          >
+                            {copyFeedback.fullOrder ? <FiCheckCircle className="text-green-400 w-5 h-5" /> : <FiCopy className="w-5 h-5" />}
+                            {copyFeedback.fullOrder ? 'Full Data Copied to Clipboard' : 'Generate & Copy Full Order Data'}
+                          </button>
+                          
+                          <div className="flex justify-center mt-2">
+                             <button
+                               onClick={() => setIsUpdateModalOpen(false)}
+                               className="px-8 py-3 text-center bg-blue-50 rounded-xl text-blue-600 text-[10px] font-black uppercase tracking-widest hover:bg-blue-100 transition-all border border-blue-100"
+                             >
+                               Close Manager
+                             </button>
+                          </div>
+                       </div>
+                    </div>
+                  </Dialog.Panel>
+                </Transition.Child>
+              </div>
+            </div>
+          </Dialog>
+        </Transition>
+
+        {/* ── Toast Notification ── */}
+        <Transition
+          show={!!toast}
+          as={Fragment}
+          enter="transform ease-out duration-300 transition"
+          enterFrom="translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2"
+          enterTo="translate-y-0 opacity-100 sm:translate-x-0"
+          leave="transition ease-in duration-100"
+          leaveFrom="opacity-100"
+          leaveTo="opacity-0"
+        >
+          <div className="fixed bottom-5 right-5 z-[60] flex items-center gap-3 bg-slate-900 text-white px-6 py-4 rounded-2xl shadow-2xl border border-slate-800">
+            <FiCheckCircle className="text-green-400 w-5 h-5" />
+            <span className="text-sm font-bold tracking-tight">{toast?.message}</span>
+          </div>
+        </Transition>
+      </div>
+    </>
+  );
+}

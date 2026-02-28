@@ -12,7 +12,7 @@ const loadCartFromLocalStorage = () => {
 const cartSlice = createSlice({
   name: 'cart',
   initialState: {
-    items: loadCartFromLocalStorage(),
+    items: [],
   },
   reducers: {
     addToCart: (state, action) => {
@@ -26,7 +26,6 @@ const cartSlice = createSlice({
       } else {
         state.items.push(action.payload);
       }
-      localStorage.setItem('cart', JSON.stringify(state.items));
     },
     removeFromCart: (state, action) => {
       state.items = state.items.filter(
@@ -36,7 +35,6 @@ const cartSlice = createSlice({
             item.selectedColor === action.payload.selectedColor
           )
       );
-      localStorage.setItem('cart', JSON.stringify(state.items));
     },
     updateQuantity: (state, action) => {
       const { id, selectedColor, quantity } = action.payload;
@@ -45,12 +43,10 @@ const cartSlice = createSlice({
       );
       if (item && quantity >= 1) {
         item.quantity = quantity;
-        localStorage.setItem('cart', JSON.stringify(state.items));
       }
     },
     clearCart: (state) => {
       state.items = [];
-      localStorage.removeItem('cart');
     },
   },
 });
