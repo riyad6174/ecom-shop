@@ -42,7 +42,8 @@ export const products = [
   },
   {
     id: 8,
-    title: '20W, 35w, 45w, 65w Univarsal Travel Adapter ',
+    title:
+      'Universal Travel Adapter with Fast Charging | USB-C PD & USB-A Multi-Port World Plug for for iPhone, Xiaomi, Nothing & OnePlus',
     slug: 'universal-travel-adapter',
     model: 'Black',
     price: 1290.0,
@@ -51,7 +52,7 @@ export const products = [
     inStock: true,
     thumbnail: '/assets/product/adapter/all.png',
     description:
-      '২০W, ৩৫W, ৪৫W, ৬৫W ওয়াট ইউনিভার্সাল ট্রাভেল অ্যাডাপ্টর যেটি আপনার যেকোনো ডিভাইস চার্জিং এর জন্য পারফেক্ট সলিউশন।',
+      '২০W, ৩৫W, ৪৫W, ৬৫W ওয়াট ইউনিভার্সাল ট্রাভেল অ্যাডাপ্টর যেটি আপনার যেকোনো ডিভাইস- ফোন, ট্যাব ও ল্যাপটপ চার্জ করুন নির্ভরযোগ্য ফাস্ট চার্জিং এর জন্য পারফেক্ট সলিউশন।',
     images: [
       '/assets/product/adapter/20w-main.png',
       '/assets/product/adapter/35w-main.png',
