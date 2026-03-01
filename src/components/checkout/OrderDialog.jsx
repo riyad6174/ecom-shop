@@ -253,7 +253,12 @@ const OrderDialog = ({ isOpen, onClose }) => {
           title: item.title || 'Unknown',
           price: item.price || 0,
           quantity: item.quantity || 1,
-          variant: (item.selectedColor ? `Color: ${item.selectedColor}` : '') || (item.selectedVariantValue ? `Type: ${item.selectedVariantValue}` : '') || 'Standard',
+          variant:
+            (item.selectedColor ? `Color: ${item.selectedColor}` : '') ||
+            (item.selectedVariantValue
+              ? `Type: ${item.selectedVariantValue}`
+              : '') ||
+            'Standard',
         })),
       ),
       totalPrice: totalPrice || 0,
@@ -664,7 +669,7 @@ const OrderDialog = ({ isOpen, onClose }) => {
                     {/* Delivery Zone */}
                     <div>
                       <label className='block text-sm font-medium text-gray-700 mb-1'>
-                        Delivery Zone
+                        Delivery Zone সিলেক্ট করুন
                       </label>
                       <div className='flex gap-3'>
                         <button

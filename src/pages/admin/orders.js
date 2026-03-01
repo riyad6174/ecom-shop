@@ -619,6 +619,22 @@ export default function AdminOrders() {
                               Order Details & Management
                             </Dialog.Title>
                             <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Ref No: {selectedOrder?.orderId}</p>
+                            {selectedOrder?.items && (() => {
+                              try {
+                                const items = JSON.parse(selectedOrder.items);
+                                return (
+                                  <p className="text-xs text-slate-600 font-medium mt-1.5 leading-snug">
+                                    {items.map((it, i) => (
+                                      <span key={i}>
+                                        {i > 0 && <span className="text-slate-300 mx-1">·</span>}
+                                        {it.title || 'Item'}
+                                        {it.quantity > 1 && <span className="text-blue-500 font-bold ml-0.5">×{it.quantity}</span>}
+                                      </span>
+                                    ))}
+                                  </p>
+                                );
+                              } catch { return null; }
+                            })()}
                          </div>
                          <button 
                           onClick={() => setIsUpdateModalOpen(false)}
