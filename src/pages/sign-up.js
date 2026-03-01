@@ -8,7 +8,7 @@ import { FiSmartphone } from 'react-icons/fi';
 import { IoMdArrowBack } from 'react-icons/io';
 import { IoMailOutline } from 'react-icons/io5';
 import { SlLock } from 'react-icons/sl';
-function sign_up() {
+function SignUp() {
   return (
     <>
       <HeaderSm>
@@ -239,4 +239,4 @@ function sign_up() {
   );
 }
 
-export default sign_up;
+export default SignUp;

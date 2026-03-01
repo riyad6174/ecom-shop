@@ -2,6 +2,12 @@ import { connectDB } from '@/lib/mongodb';
 import Order from '@/models/Order';
 
 export default async function handler(req, res) {
+  // HEAD: pre-warm the DB connection when the order dialog opens
+  if (req.method === 'HEAD') {
+    await connectDB().catch(() => {});
+    return res.status(200).end();
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method not allowed' });
   }

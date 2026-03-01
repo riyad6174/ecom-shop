@@ -24,6 +24,45 @@ const RESPONSE_STATUS_CONFIG = {
 };
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
+function formatPhone(phone) {
+  if (!phone) return '';
+  if (phone.startsWith('+88')) return phone.slice(3);
+  if (phone.startsWith('88') && phone.length > 11) return phone.slice(2);
+  return phone;
+}
+
+function formatOrderTime(order) {
+  if (order.submissionTime) {
+    // submissionTime format: "Mar 02, 2026, 10:30 AM" — split on last comma
+    const lastComma = order.submissionTime.lastIndexOf(',');
+    if (lastComma !== -1) {
+      return {
+        date: order.submissionTime.slice(0, lastComma).trim(),
+        time: order.submissionTime.slice(lastComma + 1).trim(),
+      };
+    }
+    return { date: order.submissionTime, time: '—' };
+  }
+  if (order.createdAt) {
+    const d = new Date(order.createdAt);
+    return {
+      date: d.toLocaleDateString('en-US', { timeZone: 'Asia/Dhaka' }),
+      time: d.toLocaleTimeString('en-US', { timeZone: 'Asia/Dhaka', hour: '2-digit', minute: '2-digit' }),
+    };
+  }
+  return { date: '—', time: '—' };
+}
+
+function OrderTime({ order }) {
+  const t = formatOrderTime(order);
+  return (
+    <div className="flex flex-col">
+      <span className="text-xs font-bold text-slate-700 whitespace-nowrap mb-0.5">{t.date}</span>
+      <span className="text-[10px] text-slate-400 font-medium whitespace-nowrap">{t.time}</span>
+    </div>
+  );
+}
+
 function parseItems(itemsStr) {
   try {
     const arr = JSON.parse(itemsStr || '[]');
@@ -74,7 +113,7 @@ export default function AdminOrders() {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [copyFeedback, setCopyFeedback] = useState({});
   const [toast, setToast] = useState(null);
-  const [stats, setStats] = useState({ total: 0, today: 0, confirmedToday: 0, cancelledToday: 0 });
+  const [stats, setStats] = useState({ total: 0, today: 0, pendingToday: 0, confirmedToday: 0, cancelledToday: 0, totalPending: 0, totalConfirmed: 0, totalCancelled: 0 });
 
   const debounceRef = useRef(null);
 
@@ -121,9 +160,13 @@ export default function AdminOrders() {
       if (data.stats) {
         setStats({
           today: data.stats.today,
+          pendingToday: data.stats.pendingToday,
           confirmedToday: data.stats.confirmedToday,
           cancelledToday: data.stats.cancelledToday,
           total: data.stats.globalTotal,
+          totalPending: data.stats.totalPending,
+          totalConfirmed: data.stats.totalConfirmed,
+          totalCancelled: data.stats.totalCancelled,
         });
       }
     } catch {
@@ -198,16 +241,10 @@ export default function AdminOrders() {
 
   const copyFullOrder = () => {
     if (!selectedOrder) return;
-    const text = `Name: ${selectedOrder.name}\nPhone: ${selectedOrder.phone}\nAddress: ${selectedOrder.address}\nTotal Price: ৳${selectedOrder.grandTotal}`;
+    const text = `${selectedOrder.name}\n${formatPhone(selectedOrder.phone)}\n${selectedOrder.address}\n৳${selectedOrder.grandTotal}`;
     copyToClipboard(text, 'fullOrder');
   };
 
-  const statsDisplay = {
-    total: stats.total,
-    today: stats.today,
-    confirmedToday: stats.confirmedToday,
-    cancelledToday: stats.cancelledToday,
-  };
 
   if (!authChecked) {
     return (
@@ -279,17 +316,18 @@ export default function AdminOrders() {
           {/* ── Stats Row ── */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             {[
-              { label: 'Total Orders', value: statsDisplay.total, color: 'text-blue-600', bg: 'bg-blue-50', icon: FiSearch },
-              { label: "Today's Orders", value: statsDisplay.today, color: 'text-purple-600', bg: 'bg-purple-50', icon: FiCalendar },
-              { label: 'Confirmed Today', value: statsDisplay.confirmedToday, color: 'text-green-600', bg: 'bg-green-50', icon: FiCheckCircle },
-              { label: 'Cancelled Today', value: statsDisplay.cancelledToday, color: 'text-red-600', bg: 'bg-red-50', icon: FiTrash2 },
+              { todayLabel: "Today's Orders", todayValue: stats.today, totalLabel: 'Total Orders', totalValue: stats.total, color: 'text-blue-600', bg: 'bg-blue-50', border: 'hover:border-blue-200', icon: FiCalendar },
+              { todayLabel: "Today's Pending", todayValue: stats.pendingToday, totalLabel: 'Total Pending', totalValue: stats.totalPending, color: 'text-yellow-600', bg: 'bg-yellow-50', border: 'hover:border-yellow-200', icon: FiClock },
+              { todayLabel: "Today's Confirmed", todayValue: stats.confirmedToday, totalLabel: 'Total Confirmed', totalValue: stats.totalConfirmed, color: 'text-green-600', bg: 'bg-green-50', border: 'hover:border-green-200', icon: FiCheckCircle },
+              { todayLabel: "Today's Cancelled", todayValue: stats.cancelledToday, totalLabel: 'Total Cancelled', totalValue: stats.totalCancelled, color: 'text-red-600', bg: 'bg-red-50', border: 'hover:border-red-200', icon: FiXCircle },
             ].map((stat, idx) => (
-              <div key={idx} className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm flex items-center justify-between group hover:border-blue-200 transition-colors">
+              <div key={idx} className={`bg-white p-5 rounded-3xl border border-slate-200 shadow-sm flex items-center justify-between group ${stat.border} transition-colors`}>
                 <div>
-                  <p className="text-xs font-black text-slate-400 uppercase tracking-[0.15em] mb-1">{stat.label}</p>
-                  <p className={`text-2xl font-black ${stat.color}`}>{stat.value}</p>
+                  <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.15em] mb-0.5">{stat.todayLabel}</p>
+                  <p className={`text-3xl font-black ${stat.color} leading-none mb-1`}>{stat.todayValue}</p>
+                  <p className="text-[10px] text-slate-400 font-semibold">{stat.totalLabel}: <span className="text-slate-600 font-black">{stat.totalValue}</span></p>
                 </div>
-                <div className={`${stat.bg} ${stat.color} w-12 h-12 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform`}>
+                <div className={`${stat.bg} ${stat.color} w-12 h-12 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform shrink-0`}>
                   <stat.icon className="w-6 h-6" />
                 </div>
               </div>
@@ -394,7 +432,6 @@ export default function AdminOrders() {
                 <thead>
                   <tr className='bg-slate-50/80 border-b border-slate-200 text-[11px] font-black text-slate-500 uppercase tracking-widest'>
                     <th className='px-6 py-4'>Action</th>
-                    <th className='px-6 py-4'>Order ID</th>
                     <th className='px-6 py-4'>Customer Profile</th>
                     <th className='px-6 py-4'>Shipping Details</th>
                     <th className='px-6 py-4'>Product Summary</th>
@@ -406,7 +443,7 @@ export default function AdminOrders() {
                 <tbody className='divide-y divide-slate-100'>
                   {loading ? (
                     <tr>
-                      <td colSpan="8" className="py-32 text-center">
+                      <td colSpan="7" className="py-32 text-center">
                         <div className="flex flex-col items-center gap-4">
                           <div className='animate-spin w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full shadow-lg' />
                           <p className="text-slate-400 font-bold animate-pulse text-xs uppercase tracking-[0.2em]">Synchronizing data...</p>
@@ -415,7 +452,7 @@ export default function AdminOrders() {
                     </tr>
                   ) : orders.length === 0 ? (
                     <tr>
-                      <td colSpan="8" className="py-32 text-center">
+                      <td colSpan="7" className="py-32 text-center">
                          <div className="flex flex-col items-center gap-3">
                            <div className="w-16 h-16 bg-slate-50 rounded-3xl flex items-center justify-center mb-2">
                              <FiSearch className="w-8 h-8 text-slate-200" />
@@ -438,7 +475,7 @@ export default function AdminOrders() {
                           className={`group transition-all hover:z-10 relative border-l-4 ${status.color} hover:shadow-md border-transparent hover:border-blue-500`}
                         >
                           <td className='px-6 py-4'>
-                            <button 
+                            <button
                               onClick={() => openUpdateModal(order)}
                               className="flex items-center justify-center w-10 h-10 bg-white border border-slate-200 rounded-xl text-blue-600 shadow-sm hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all"
                               title="Update Order Details"
@@ -447,14 +484,9 @@ export default function AdminOrders() {
                             </button>
                           </td>
                           <td className='px-6 py-4'>
-                            <span className="font-mono text-[11px] px-2.5 py-1 bg-slate-100 text-slate-600 rounded-md border border-slate-200 font-bold tracking-tight">
-                              {order.orderId}
-                            </span>
-                          </td>
-                          <td className='px-6 py-4'>
                             <div className="flex flex-col">
                               <span className='font-bold text-slate-800 text-sm mb-0.5'>{order.name}</span>
-                              <span className='text-xs text-slate-500 font-medium selection:bg-blue-100'>{order.phone}</span>
+                              <span className='text-xs text-slate-500 font-medium selection:bg-blue-100'>{formatPhone(order.phone)}</span>
                             </div>
                           </td>
                           <td className='px-6 py-4 max-w-[250px]'>
@@ -489,14 +521,7 @@ export default function AdminOrders() {
                             </div>
                           </td>
                           <td className='px-6 py-4'>
-                            <div className="flex flex-col">
-                              <span className="text-xs font-bold text-slate-700 whitespace-nowrap mb-0.5">
-                                {order.submissionTime?.split(',')[0] || '—'}
-                              </span>
-                              <span className="text-[10px] text-slate-400 font-medium whitespace-nowrap">
-                                {order.submissionTime?.split(',')[1]?.trim() || '—'}
-                              </span>
-                            </div>
+                            <OrderTime order={order} />
                           </td>
                         </tr>
                       );
@@ -609,7 +634,7 @@ export default function AdminOrders() {
                              <tbody className="divide-y divide-slate-100">
                                {[
                                  { label: 'Customer Name', value: selectedOrder?.name, key: 'name' },
-                                 { label: 'Primary Contact', value: selectedOrder?.phone, key: 'phone' },
+                                 { label: 'Primary Contact', value: formatPhone(selectedOrder?.phone), key: 'phone' },
                                  { label: 'Delivery Address', value: selectedOrder?.address, key: 'address' },
                                  { label: 'Total Payable', value: `৳${selectedOrder?.grandTotal}`, key: 'price' }
                                ].map((field) => (

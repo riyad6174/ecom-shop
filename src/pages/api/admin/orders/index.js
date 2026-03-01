@@ -55,8 +55,12 @@ export default async function handler(req, res) {
       }
     }
 
-    const todayStart = new Date();
-    todayStart.setHours(0, 0, 0, 0);
+    // Calculate today's start in Bangladesh timezone (UTC+6)
+    const BD_OFFSET_MS = 6 * 60 * 60 * 1000;
+    const nowBD = new Date(Date.now() + BD_OFFSET_MS);
+    const todayStartUTC = new Date(
+      Date.UTC(nowBD.getUTCFullYear(), nowBD.getUTCMonth(), nowBD.getUTCDate()) - BD_OFFSET_MS
+    );
 
     const [orders, total, stats] = await Promise.all([
       Order.find(filter)
@@ -66,10 +70,14 @@ export default async function handler(req, res) {
         .lean(),
       Order.countDocuments(filter),
       Promise.all([
-        Order.countDocuments({ createdAt: { $gte: todayStart } }),
-        Order.countDocuments({ orderStatus: 'confirmed', createdAt: { $gte: todayStart } }),
-        Order.countDocuments({ orderStatus: 'cancel', createdAt: { $gte: todayStart } }),
-        Order.countDocuments({}), // Total global
+        Order.countDocuments({ createdAt: { $gte: todayStartUTC } }),                              // [0] today total
+        Order.countDocuments({ orderStatus: 'confirmed', createdAt: { $gte: todayStartUTC } }),    // [1] confirmed today
+        Order.countDocuments({ orderStatus: 'cancel', createdAt: { $gte: todayStartUTC } }),       // [2] cancelled today
+        Order.countDocuments({}),                                                                   // [3] global total
+        Order.countDocuments({ orderStatus: 'pending', createdAt: { $gte: todayStartUTC } }),      // [4] pending today
+        Order.countDocuments({ orderStatus: 'pending' }),                                          // [5] total pending
+        Order.countDocuments({ orderStatus: 'confirmed' }),                                        // [6] total confirmed
+        Order.countDocuments({ orderStatus: 'cancel' }),                                           // [7] total cancelled
       ]),
     ]);
 
@@ -83,6 +91,10 @@ export default async function handler(req, res) {
         confirmedToday: stats[1],
         cancelledToday: stats[2],
         globalTotal: stats[3],
+        pendingToday: stats[4],
+        totalPending: stats[5],
+        totalConfirmed: stats[6],
+        totalCancelled: stats[7],
       },
     });
   } catch (error) {

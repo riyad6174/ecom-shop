@@ -2,7 +2,7 @@ import Navbar from '@/components/common/Navbar';
 import Link from 'next/link';
 import React from 'react';
 
-function coming_soon() {
+function ComingSoon() {
   return (
     <div>
       <Navbar />
@@ -35,4 +35,4 @@ function coming_soon() {
   );
 }
 
-export default coming_soon;
+export default ComingSoon;

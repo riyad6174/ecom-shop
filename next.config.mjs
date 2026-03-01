@@ -1,4 +1,6 @@
 /** @type {import('next').NextConfig} */
+const isProd = process.env.NODE_ENV === 'production';
+
 const nextConfig = {
   reactStrictMode: true,
 
@@ -16,16 +18,23 @@ const nextConfig = {
   // Cache headers for static assets and pages
   async headers() {
     return [
-      // Immutable cache for hashed static assets (_next/static)
-      {
-        source: '/_next/static/:path*',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-        ],
-      },
+      // Immutable cache for hashed static assets (_next/static) — production only.
+      // In development this header breaks Fast Refresh: the browser caches the
+      // webpack hot-update manifest as immutable, keeps requesting the stale
+      // chunk hash after a rebuild, gets a 404, and reloads in an infinite loop.
+      ...(isProd
+        ? [
+            {
+              source: '/_next/static/:path*',
+              headers: [
+                {
+                  key: 'Cache-Control',
+                  value: 'public, max-age=31536000, immutable',
+                },
+              ],
+            },
+          ]
+        : []),
       // Long cache for public images, fonts, icons
       {
         source: '/assets/:path*',

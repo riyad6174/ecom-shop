@@ -80,7 +80,7 @@ const ProductDetails = ({ initialProduct }) => {
       setselectedColor(initialVariant);
       const initialIndex = variantToIndex[initialVariant];
       setActiveImage(
-        initialProduct.images[initialIndex] || initialProduct.images[0] || ''
+        initialProduct.images[initialIndex] || initialProduct.images[0] || '',
       );
 
       // GTM Data Layer Push (only on client-side)
@@ -168,7 +168,7 @@ const ProductDetails = ({ initialProduct }) => {
         quantity: 1,
         image: activeImage,
         variantKey,
-      })
+      }),
     );
 
     // Open order dialog instead of navigating
@@ -317,13 +317,17 @@ const ProductDetails = ({ initialProduct }) => {
       <div className='py-6 sm:py-8 container mx-auto px-4 sm:px-6 lg:px-8'>
         <style jsx>{`
           .image-transition {
-            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+            transition:
+              opacity 0.3s ease-in-out,
+              transform 0.3s ease-in-out;
           }
           .image-transition:hover {
             transform: scale(1.02);
           }
           .small-image {
-            transition: opacity 0.2s ease-in-out, border-color 0.2s ease-in-out;
+            transition:
+              opacity 0.2s ease-in-out,
+              border-color 0.2s ease-in-out;
             border-width: 2px;
           }
           .small-image-active {
@@ -351,7 +355,14 @@ const ProductDetails = ({ initialProduct }) => {
               <div className='grid grid-cols-1 sm:grid-cols-4 gap-4'>
                 <div className='col-span-1 sm:col-span-3'>
                   <div className='relative w-full h-72 lg:h-[400px] rounded-lg overflow-hidden image-transition'>
-                    <Image fill src={activeImage} alt={product.title} className='object-contain' priority sizes='(max-width: 768px) 100vw, 60vw' />
+                    <Image
+                      fill
+                      src={activeImage}
+                      alt={product.title}
+                      className='object-contain'
+                      priority
+                      sizes='(max-width: 768px) 100vw, 60vw'
+                    />
                   </div>
                   <div className='flex justify-center gap-2 mt-4 sm:hidden'>
                     {product.images.map((image, index) => (
@@ -364,7 +375,12 @@ const ProductDetails = ({ initialProduct }) => {
                         }`}
                         onClick={() => handleImageClick(image)}
                       >
-                        <Image fill src={image} alt={`${product.title} থাম্বনেইল ${index + 1}`} className='object-cover' />
+                        <Image
+                          fill
+                          src={image}
+                          alt={`${product.title} থাম্বনেইল ${index + 1}`}
+                          className='object-cover'
+                        />
                       </div>
                     ))}
                   </div>
@@ -380,7 +396,12 @@ const ProductDetails = ({ initialProduct }) => {
                       }`}
                       onClick={() => handleImageClick(image)}
                     >
-                      <Image fill src={image} alt={`${product.title} থাম্বনেইল ${index + 1}`} className='object-cover' />
+                      <Image
+                        fill
+                        src={image}
+                        alt={`${product.title} থাম্বনেইল ${index + 1}`}
+                        className='object-cover'
+                      />
                     </div>
                   ))}
                 </div>
@@ -488,9 +509,25 @@ const ProductDetails = ({ initialProduct }) => {
                 >
                   {isAddingToCart ? (
                     <>
-                      <svg className='animate-spin h-4 w-4 text-white' xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24'>
-                        <circle className='opacity-25' cx='12' cy='12' r='10' stroke='currentColor' strokeWidth='4'></circle>
-                        <path className='opacity-75' fill='currentColor' d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'></path>
+                      <svg
+                        className='animate-spin h-4 w-4 text-white'
+                        xmlns='http://www.w3.org/2000/svg'
+                        fill='none'
+                        viewBox='0 0 24 24'
+                      >
+                        <circle
+                          className='opacity-25'
+                          cx='12'
+                          cy='12'
+                          r='10'
+                          stroke='currentColor'
+                          strokeWidth='4'
+                        ></circle>
+                        <path
+                          className='opacity-75'
+                          fill='currentColor'
+                          d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
+                        ></path>
                       </svg>
                       <span>Processing...</span>
                     </>
@@ -511,10 +548,34 @@ const ProductDetails = ({ initialProduct }) => {
         <div className='px-3 sm:px-4'>
           <div className='bg-white p-4 sm:p-5 rounded-lg'>
             <div>
-              <Image src='/assets/product/adapter/all.png' alt='Product image' width={800} height={500} style={{ width: '100%', height: 'auto' }} />
-              <Image src='/assets/product/adapter/gan.jpg' alt='Product image' width={800} height={500} style={{ width: '100%', height: 'auto' }} />
-              <Image src='/assets/product/adapter/gan2.jpg' alt='Product image' width={800} height={500} style={{ width: '100%', height: 'auto' }} />
-              <Image src='/assets/product/adapter/high-power.jpg' alt='Product image' width={800} height={500} style={{ width: '100%', height: 'auto' }} />
+              <Image
+                src='/assets/product/adapter/all.png'
+                alt='Product image'
+                width={800}
+                height={500}
+                style={{ width: '100%', height: 'auto' }}
+              />
+              <Image
+                src='/assets/product/adapter/gan.jpg'
+                alt='Product image'
+                width={800}
+                height={500}
+                style={{ width: '100%', height: 'auto' }}
+              />
+              <Image
+                src='/assets/product/adapter/gan2.jpg'
+                alt='Product image'
+                width={800}
+                height={500}
+                style={{ width: '100%', height: 'auto' }}
+              />
+              <Image
+                src='/assets/product/adapter/high-power.jpg'
+                alt='Product image'
+                width={800}
+                height={500}
+                style={{ width: '100%', height: 'auto' }}
+              />
             </div>
             <h2 className='text-lg mt-4 sm:text-xl font-semibold mb-3'>
               পণ্যের বিবরণ
@@ -576,7 +637,12 @@ const ProductDetails = ({ initialProduct }) => {
                     className='relative overflow-hidden rounded-lg shadow-md'
                   >
                     <div className='relative w-full h-36'>
-                      <Image fill src={image} alt={`Universal Adapter ${index + 1}`} className='object-cover hover:scale-105 transition-transform duration-300' />
+                      <Image
+                        fill
+                        src={image}
+                        alt={`Universal Adapter ${index + 1}`}
+                        className='object-cover hover:scale-105 transition-transform duration-300'
+                      />
                     </div>
                     <p className='absolute bottom-1 left-1 bg-black bg-opacity-50 text-white text-xs px-1 rounded'>
                       {index === 0 && '20W'} {index === 1 && '35W'}{' '}

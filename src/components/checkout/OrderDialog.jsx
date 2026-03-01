@@ -37,6 +37,13 @@ const OrderDialog = ({ isOpen, onClose }) => {
   const [shippingCharge, setShippingCharge] = useState(60);
   const [grandTotal, setGrandTotal] = useState(0);
 
+  // Pre-warm the server connection so the first order submit is fast
+  useEffect(() => {
+    if (isOpen) {
+      fetch('/api/submit', { method: 'HEAD' }).catch(() => {});
+    }
+  }, [isOpen]);
+
   // Handle open/close animations
   useEffect(() => {
     if (isOpen) {
@@ -209,6 +216,10 @@ const OrderDialog = ({ isOpen, onClose }) => {
     setIsLoading(true);
     setSubmissionError(null);
 
+    // orderId is generated ONCE here and reused on retry.
+    // The DB has a unique index on orderId, so even if both attempts reach
+    // the server, only one order is ever saved — the retry gets a 409 which
+    // we treat as success. No duplicate orders possible.
     const uniqueId = `ORD-${Date.now().toString().slice(-6)}-${Math.floor(1000 + Math.random() * 9000)}`;
     const order = {
       user: { ...formData },
@@ -265,61 +276,85 @@ const OrderDialog = ({ isOpen, onClose }) => {
       return;
     }
 
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000);
-      const response = await fetch('/api/submit', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(sheetData),
-        signal: controller.signal,
-      });
-      clearTimeout(timeoutId);
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        console.error('API error response:', errorData);
-        setSubmissionError(errorData.message || 'Failed to submit order');
-      } else {
-        setOrderDetails(order);
-        setCurrentView('confirmation');
-        // Trigger confirmation fade-in animation
-        setTimeout(() => setConfirmationAnimating(true), 50);
-
-        // Push purchase event to data layer
-        sendGTMEvent({ ecommerce: null });
-        sendGTMEvent({
-          event: 'purchase',
-          ecommerce: {
-            transaction_id: order.order.orderId || 'ORD-UNKNOWN',
-            value: order.order.grandTotal || 0,
-            currency: 'BDT',
-            shipping: order.order.shippingCharge || 0,
-            customer: {
-              customer_first_name: formData.fullName || '',
-              customer_phone: formData.phoneNumber || '',
-              customer_billing_city: formData.address || '',
-              billing_country: 'BD',
-            },
-            items: order.order.items.map((item) => ({
-              item_id: item.id || 'unknown',
-              item_name: item.title || 'unknown',
-              price: item.price || 0,
-              quantity: item.quantity || 1,
-              item_variant: item.selectedColor || item.selectedVariantValue,
-              item_category: item.category || 'Accessories',
-            })),
+    const onSuccess = () => {
+      setOrderDetails(order);
+      setCurrentView('confirmation');
+      setTimeout(() => setConfirmationAnimating(true), 50);
+      sendGTMEvent({ ecommerce: null });
+      sendGTMEvent({
+        event: 'purchase',
+        ecommerce: {
+          transaction_id: order.order.orderId || 'ORD-UNKNOWN',
+          value: order.order.grandTotal || 0,
+          currency: 'BDT',
+          shipping: order.order.shippingCharge || 0,
+          customer: {
+            customer_first_name: formData.fullName || '',
+            customer_phone: formData.phoneNumber || '',
+            customer_billing_city: formData.address || '',
+            billing_country: 'BD',
           },
-        });
-      }
-    } catch (error) {
-      console.error('Fetch error:', error.name, error.message);
-      setSubmissionError('Error submitting order. Please try again.');
-    } finally {
+          items: order.order.items.map((item) => ({
+            item_id: item.id || 'unknown',
+            item_name: item.title || 'unknown',
+            price: item.price || 0,
+            quantity: item.quantity || 1,
+            item_variant: item.selectedColor || item.selectedVariantValue,
+            item_category: item.category || 'Accessories',
+          })),
+        },
+      });
       setIsLoading(false);
+    };
+
+    // Exactly 2 attempts maximum — no infinite loop.
+    // Attempt 1: cold-start may fail. User sees "Confirming..." spinner.
+    // Attempt 2 (if needed): DB is now warm, succeeds silently.
+    // User never sees an error for cold-start failures.
+    for (let attempt = 1; attempt <= 2; attempt++) {
+      try {
+        const response = await fetch('/api/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(sheetData),
+        });
+
+        if (response.ok) {
+          onSuccess();
+          return;
+        }
+
+        // 409 = the first attempt actually saved the order but the network
+        // dropped the response before the client received it. The order
+        // exists in the DB — treat as success, show confirmation.
+        if (response.status === 409) {
+          onSuccess();
+          return;
+        }
+
+        // 4xx (except 409) = bad request data, no point retrying
+        if (response.status >= 400 && response.status < 500) {
+          const errorData = await response.json().catch(() => ({}));
+          setSubmissionError(errorData.message || 'Failed to submit order.');
+          setIsLoading(false);
+          return;
+        }
+
+        // 5xx = server/DB error → wait 2 s then do the one allowed retry
+        if (attempt < 2) {
+          await new Promise((r) => setTimeout(r, 2000));
+        }
+      } catch {
+        // Network / timeout error (typical cold-start) → wait then retry once
+        if (attempt < 2) {
+          await new Promise((r) => setTimeout(r, 2000));
+        }
+      }
     }
+
+    // Reaches here only if both attempts failed
+    setSubmissionError('Failed to submit order. Please try again.');
+    setIsLoading(false);
   };
 
   // Handle close

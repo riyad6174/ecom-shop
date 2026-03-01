@@ -6,7 +6,7 @@ import React from 'react';
 import { FiSmartphone } from 'react-icons/fi';
 import { IoMdArrowBack } from 'react-icons/io';
 import { SlLock } from 'react-icons/sl';
-function sign_in() {
+function SignIn() {
   return (
     <>
       <div className='sm:bg-white sm:h-screen  '>
@@ -175,4 +175,4 @@ function sign_in() {
   );
 }
 
-export default sign_in;
+export default SignIn;
