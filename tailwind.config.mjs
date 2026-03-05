@@ -16,10 +16,10 @@ export default {
         footer: '#212B36',
       },
       fontFamily: {
-        sans: ['Inter', 'sans-serif'], // Default font
+        sans: ['var(--font-inter)', 'sans-serif'],
         serif: ['Merriweather', 'serif'],
-        mont: ['Montserrat', 'serif'],
-        noto: ['Noto Serif Bengali', 'serif'],
+        mont: ['var(--font-montserrat)', 'serif'],
+        noto: ['var(--font-noto)', 'serif'],
       },
       container: {
         center: true,

@@ -4,7 +4,11 @@ import { FaBars, FaTimes, FaHome } from 'react-icons/fa';
 import { FiShoppingCart } from 'react-icons/fi';
 import { useSelector } from 'react-redux';
 import Link from 'next/link';
-import OrderDialog from '@/components/checkout/OrderDialog';
+import dynamic from 'next/dynamic';
+
+const OrderDialog = dynamic(() => import('@/components/checkout/OrderDialog'), {
+  ssr: false,
+});
 
 function Navbar() {
   const router = useRouter();

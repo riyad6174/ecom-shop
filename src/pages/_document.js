@@ -19,34 +19,7 @@ export default function Document() {
           }}
         />
 
-        {/* Preconnect to Google Fonts origin — must come before stylesheet links */}
-        <link rel='preconnect' href='https://fonts.googleapis.com' />
-        <link
-          rel='preconnect'
-          href='https://fonts.gstatic.com'
-          crossOrigin='anonymous'
-        />
-
-        {/*
-          Google Fonts — consolidated into ONE request.
-          Only the weights actually used in tailwind.config are loaded:
-            Inter       → default sans (body text): 400, 500, 600, 700
-            Montserrat  → font-mont (headings/buttons): 400, 600, 700
-            Noto Serif Bengali → font-noto (Bengali text): 400, 600
-          Removed: Josefin Sans, Nanum Myeongjo, Poppins, Roboto Condensed
-                   (not referenced in tailwind config as active font stacks)
-          &display=optional avoids invisible text flash; browser uses cached
-          fallback immediately and swaps only if font arrives in time.
-        */}
-        <link
-          rel='preload'
-          as='style'
-          href='https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@400;600;700&family=Noto+Serif+Bengali:wght@400;600&display=optional'
-        />
-        <link
-          href='https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@400;600;700&family=Noto+Serif+Bengali:wght@400;600&display=optional'
-          rel='stylesheet'
-        />
+        {/* Fonts are served by next/font/google in _app.js — no external requests needed */}
       </Head>
       <body className='antialiased'>
         {/* Stape GTM noscript fallback — immediately after <body> */}
