@@ -222,7 +222,7 @@ export const products = [
       '/assets/product/fan/black.jpg',
       '/assets/product/fan/white.jpg',
       '/assets/product/fan/blue.jpg',
-      '/assets/product/fan/beige.jpg',
+      // '/assets/product/fan/beige.jpg',
       '/assets/product/fan/fan-front-back.avif',
     ],
     variants: [
@@ -231,7 +231,7 @@ export const products = [
       // { color: 'Gray' },
       // { color: 'mistyrose' },
       { color: 'cornflowerblue' },
-      { color: 'Beige' },
+      // { color: 'Beige' },
     ],
   },
   // {
