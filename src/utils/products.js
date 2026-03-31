@@ -1,7 +1,7 @@
 export const products = [
   {
     id: 11,
-    title: 'Energy Booster Essential Oil Nasal Inhaler | Genz Shop',
+    title: 'Energy Booster Essential Oil Nasal Inhaler | Sheii Shop',
     slug: 'energy-booster-essential-oil-nasal-inhaler',
     model: 'Standard',
     price: 490.0,

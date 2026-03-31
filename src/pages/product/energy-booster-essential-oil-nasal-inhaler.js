@@ -179,14 +179,14 @@ const ProductDetails = ({ initialProduct }) => {
   return (
     <>
       <Head>
-        <title>Energy Booster Essential Oil Nasal Inhaler | GenZ Shop</title>
+        <title>Energy Booster Essential Oil Nasal Inhaler | Sheii Shop</title>
         <meta
           name='description'
           content='প্রাকৃতিক এসেনশিয়াল অয়েল নেজাল ইনহেলার – সাইনাস, স্ট্রেস ও টেনশন কমান, এনার্জি বাড়ান। ডুয়াল স্টিক, অর্গানিক ও বহনযোগ্য।'
         />
         <meta
           property='og:title'
-          content='Energy Booster Essential Oil Nasal Inhaler | GenZ Shop'
+          content='Energy Booster Essential Oil Nasal Inhaler | Sheii Shop'
         />
         <meta
           property='og:description'
