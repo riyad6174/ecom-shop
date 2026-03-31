@@ -1,5 +1,31 @@
 export const products = [
   {
+    id: 11,
+    title: 'Energy Booster Essential Oil Nasal Inhaler | Genz Shop',
+    slug: 'energy-booster-essential-oil-nasal-inhaler',
+    model: 'Standard',
+    price: 490.0,
+    originalPrice: 650.0,
+    sectionType: 'hot',
+    inStock: true,
+    thumbnail: '/assets/product/inhaler/rf-main.jpg',
+    description:
+      'আমাদের এসেনশিয়াল অয়েল সমৃদ্ধ ইনহেলার প্রাকৃতিকভাবে সাইনাসের অস্বস্তি, মাথার চাপ, টেনশন ও স্ট্রেস কমাতে সহায়তা করে। এতে ব্যবহৃত হয়েছে খাঁটি ও অর্গানিক এসেনশিয়াল অয়েল, যা নাকে প্রশান্তিদায়ক ও সতেজ অনুভূতি দেয়।',
+    images: [
+      '/assets/product/inhaler/rf-main.jpg',
+      '/assets/product/inhaler/rf-1.jpg',
+      '/assets/product/inhaler/rf-6.jpg',
+    ],
+    variants: [
+      { type: 'Grape' },
+      { type: 'Watermelon' },
+      { type: 'Mint' },
+      { type: 'Peace' },
+      { type: 'Lemon' },
+      { type: 'RedBull' },
+    ],
+  },
+  {
     id: 10,
     title: 'Portable Electric Dental Water Flosser',
     slug: 'portable-electric-dental-water-flosser',
