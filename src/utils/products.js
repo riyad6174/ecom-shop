@@ -211,7 +211,6 @@ export const products = [
       '/assets/product/glass/desc3.jpeg',
     ],
     variants: [{ color: 'Black' }, { color: 'Silver' }, { color: 'Golden' }],
-    variants: [{ color: 'Black' }, { color: 'Silver' }, { color: 'Golden' }],
   },
   // {
   //   id: 1,
