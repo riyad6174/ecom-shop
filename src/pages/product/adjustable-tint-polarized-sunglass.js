@@ -1,21 +1,93 @@
 import React, { useState, useEffect } from 'react';
 import { sendGTMEvent } from '@next/third-parties/google';
 import { useDispatch } from 'react-redux';
-import { GoShareAndroid } from 'react-icons/go';
 import Navbar from '@/components/common/Navbar';
-import Related from '@/components/checkout/Related';
-import CustomSection from '@/components/layout/CustomSection';
 import { products } from '@/utils/products';
 import { addToCart } from '@/store/cartSlice';
 import Footer from '@/components/common/Footer';
-import Image from 'next/image';
 import Head from 'next/head';
 import OrderDialog from '@/components/checkout/OrderDialog';
 
-// Find the specific product for this page
 const productData = products.find(
   (p) => p.slug === 'adjustable-tint-polarized-sunglass',
 );
+
+const StarIcon = ({ filled }) => (
+  <svg
+    className={`w-4 h-4 ${filled ? 'text-amber-400' : 'text-gray-300'}`}
+    fill='currentColor'
+    viewBox='0 0 20 20'
+  >
+    <path d='M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z' />
+  </svg>
+);
+
+const DESC_IMGS = ['size.webp', 'color.jpeg', 'desc3.jpeg'];
+
+function CountdownToMidnight() {
+  const [timeLeft, setTimeLeft] = useState({ h: 0, m: 0, s: 0 });
+
+  useEffect(() => {
+    const tick = () => {
+      const now = new Date();
+      const midnight = new Date(now);
+      midnight.setHours(24, 0, 0, 0);
+      const diff = Math.max(0, Math.floor((midnight - now) / 1000));
+      setTimeLeft({
+        h: Math.floor(diff / 3600),
+        m: Math.floor((diff % 3600) / 60),
+        s: diff % 60,
+      });
+    };
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  const pad = (n) => String(n).padStart(2, '0');
+
+  return (
+    <div
+      className='rounded-xl px-4 py-3 my-3'
+      style={{
+        background: 'linear-gradient(135deg, #fff7ed, #ffedd5)',
+        border: '1.5px solid #fed7aa',
+      }}
+    >
+      <p className='bangla text-sm font-semibold text-center text-orange-700 mb-2'>
+        ⏰ অফার টি চলবে আর
+      </p>
+      <div className='flex items-center justify-center gap-2'>
+        {[
+          { val: pad(timeLeft.h), label: 'ঘণ্টা' },
+          { val: pad(timeLeft.m), label: 'মিনিট' },
+          { val: pad(timeLeft.s), label: 'সেকেন্ড' },
+        ].map((unit, i) => (
+          <React.Fragment key={unit.label}>
+            {i > 0 && (
+              <span className='text-orange-500 font-black text-2xl leading-none mb-4'>
+                :
+              </span>
+            )}
+            <div className='flex flex-col items-center'>
+              <span
+                className='countdown-digit font-mono font-extrabold text-lg px-3 py-1.5 rounded-lg min-w-[44px] text-center shadow-md text-white'
+                style={{
+                  background: 'linear-gradient(135deg, #ea580c, #c2410c)',
+                }}
+              >
+                {unit.val}
+              </span>
+              <span className='text-[10px] text-orange-600 bangla mt-1 font-medium'>
+                {unit.label}
+              </span>
+            </div>
+          </React.Fragment>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 const ProductDetails = ({ initialProduct }) => {
   const dispatch = useDispatch();
@@ -32,7 +104,6 @@ const ProductDetails = ({ initialProduct }) => {
       setSelectedColor(initialProduct.variants?.[0]?.color || '');
       setActiveImage(initialProduct.images?.[0] || '');
 
-      // Push product view event to data layer
       if (typeof window !== 'undefined') {
         sendGTMEvent({ ecommerce: null });
         sendGTMEvent({
@@ -56,31 +127,16 @@ const ProductDetails = ({ initialProduct }) => {
     }
   }, [initialProduct]);
 
-  const handleImageClick = (image) => {
-    setActiveImage(image);
-  };
-
-  const handleColorChange = (color) => {
-    setSelectedColor(color);
-  };
-
   const handleQuantityChange = (type) => {
-    if (type === 'increment' && quantity < 999) {
-      setQuantity(quantity + 1);
-    } else if (type === 'decrement' && quantity > 1) {
-      setQuantity(quantity - 1);
-    }
+    if (type === 'increment' && quantity < 999) setQuantity(quantity + 1);
+    else if (type === 'decrement' && quantity > 1) setQuantity(quantity - 1);
   };
 
   const handleBuyNow = () => {
-    if (!product || isAddingToCart) {
-      if (!product) console.error('Product data is missing');
-      return;
-    }
+    if (!product || isAddingToCart) return;
 
     setIsAddingToCart(true);
 
-    // Push add_to_cart event to data layer
     if (typeof window !== 'undefined') {
       sendGTMEvent({ ecommerce: null });
       sendGTMEvent({
@@ -103,7 +159,6 @@ const ProductDetails = ({ initialProduct }) => {
       });
     }
 
-    // Dispatch to Redux store - always add 1 item, quantity can be changed in dialog
     dispatch(
       addToCart({
         id: product.id,
@@ -116,19 +171,17 @@ const ProductDetails = ({ initialProduct }) => {
       }),
     );
 
-    // Open order dialog instead of navigating
     setIsOrderDialogOpen(true);
     setIsAddingToCart(false);
-
-    // Reset quantity to 1 for next purchase
     setQuantity(1);
   };
 
-  if (!product) {
-    return <div>Product not found</div>;
-  }
+  if (!product) return <div>Product not found</div>;
 
-  // Rest of the JSX remains unchanged
+  const discount = Math.round(
+    ((product.originalPrice - product.price) / product.originalPrice) * 100,
+  );
+
   return (
     <>
       <Head>
@@ -139,7 +192,7 @@ const ProductDetails = ({ initialProduct }) => {
         />
         <meta
           name='keywords'
-          content={`Adjustable Tint Polarized Sunglass, সানগ্লাস বাংলাদেশ, polarized sunglasses price BD, UV protection glasses, men's round sunglasses, adjustable lenses`}
+          content="Adjustable Tint Polarized Sunglass, সানগ্লাস বাংলাদেশ, polarized sunglasses price BD, UV protection glasses, men's round sunglasses, adjustable lenses"
         />
         <meta name='robots' content='index, follow' />
         <meta name='author' content='Sheii Shop' />
@@ -182,10 +235,7 @@ const ProductDetails = ({ initialProduct }) => {
               image: product.images,
               description: product.description,
               sku: product.id,
-              brand: {
-                '@type': 'Brand',
-                name: 'Sheii Shop',
-              },
+              brand: { '@type': 'Brand', name: 'Sheii Shop' },
               offers: {
                 '@type': 'Offer',
                 url: `https://www.sheiishop.com/product/${product.slug}`,
@@ -201,270 +251,495 @@ const ProductDetails = ({ initialProduct }) => {
         />
       </Head>
 
-      <Navbar />
-      <div>
-        <style jsx>{`
-          .image-transition {
-            transition:
-              opacity 0.3s ease-in-out,
-              transform 0.3s ease-in-out;
-          }
-          .image-transition:hover {
-            transform: scale(1.02);
-          }
-          .small-image {
-            transition:
-              opacity 0.2s ease-in-out,
-              border-color 0.2s ease-in-out;
-            border-width: 2px;
-          }
-          .small-image-active {
-            border-color: #3b82f6;
+      <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap');
+        .bangla {
+          font-family: 'Hind Siliguri', sans-serif;
+        }
+        .img-zoom {
+          transition: transform 0.5s ease;
+        }
+        .img-zoom:hover {
+          transform: scale(1.03);
+        }
+        .thumb-sel {
+          border: 2.5px solid #6366f1;
+          box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+        .thumb-unsel {
+          border: 2px solid transparent;
+          opacity: 0.65;
+        }
+        .thumb-unsel:hover {
+          opacity: 1;
+          border-color: #c7d2fe;
+        }
+        .btn-buy {
+          background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+          transition: all 0.3s ease;
+          box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+        }
+        .btn-buy:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 25px rgba(99, 102, 241, 0.5);
+        }
+        .feature-card {
+          transition:
+            transform 0.3s ease,
+            box-shadow 0.3s ease;
+        }
+        .feature-card:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+        }
+        @keyframes offer-pulse {
+          0%,
+          100% {
             opacity: 1;
           }
-          .small-image-inactive {
-            opacity: 0.7;
-            border-color: transparent;
+          50% {
+            opacity: 0.88;
           }
-          .color-button {
-            transition: all 0.2s ease-in-out;
+        }
+        .offer-banner {
+          animation: offer-pulse 2.2s ease-in-out infinite;
+        }
+        @keyframes digit-pop {
+          0% {
+            transform: scale(1.18);
           }
-          .color-button-active {
-            border-color: #3b82f6;
-            transform: scale(1.1);
+          100% {
+            transform: scale(1);
           }
-        `}</style>
-        <div className='py-8 container mx-auto px-4 lg:px-8'>
-          <div className='bg-white md:py-6 rounded-2xl md:rounded-xl shadow-lg'>
-            <div className='flex flex-col md:flex-row gap-4 md:gap-6 -mx-4'>
-              <div className='w-full md:w-3/4 px-4'>
-                <div className='p-2 md:p-0 md:grid md:grid-cols-4 gap-4'>
-                  <div className='col-span-3 md:pl-6'>
-                    <div className='relative w-full h-[267px] md:h-[533px] rounded-lg overflow-hidden image-transition'>
-                      <Image fill src={activeImage} alt={product.title} className='object-cover' priority sizes='(max-width: 768px) 100vw, 60vw' />
-                    </div>
-                    <div className='flex justify-center gap-2 mt-4 md:hidden'>
-                      {product.images.slice(1).map((image, index) => (
-                        <div
-                          key={index}
-                          className={`relative w-[80px] h-[80px] rounded-lg overflow-hidden cursor-pointer small-image ${
-                            activeImage === image
-                              ? 'small-image-active'
-                              : 'small-image-inactive'
-                          }`}
-                          onClick={() => handleImageClick(image)}
-                        >
-                          <Image fill src={image} alt={`${product.title} Thumbnail ${index + 1}`} className='object-cover' />
-                        </div>
-                      ))}
-                    </div>
+        }
+        .countdown-digit {
+          animation: digit-pop 0.15s ease-out;
+        }
+      `}</style>
+
+      <Navbar />
+
+      {/* Offer Banner — sticky below navbar */}
+      <div
+        className='offer-banner sticky top-0 z-40 py-2.5 px-4 text-center'
+        style={{
+          background:
+            'linear-gradient(90deg, #7c3aed 0%, #4f46e5 50%, #7c3aed 100%)',
+          borderBottom: '2px solid #6d28d9',
+        }}
+      >
+        <p className='text-white font-bold bangla text-sm md:text-base tracking-wide drop-shadow'>
+          🎉 {discount}% ডিস্কাউন্ট পাচ্ছেন শুধু আজকের জন্য 🎉
+        </p>
+      </div>
+
+      {/* Hero */}
+      <div className='bg-gradient-to-b from-slate-50 to-white'>
+        <div className='container mx-auto px-4 lg:px-8 py-10'>
+          <div className='bg-white rounded shadow-xl overflow-hidden'>
+            <div className='flex flex-col lg:flex-row'>
+              {/* Images */}
+              <div className='w-full lg:w-[58%] p-5 md:p-8'>
+                <div className='flex flex-col md:grid md:grid-cols-4 gap-4'>
+                  {/* main image */}
+                  <div className='md:col-span-3 overflow-hidden rounded-2xl bg-gray-50'>
+                    <img
+                      className='w-full h-[360px] md:h-[520px] object-cover img-zoom'
+                      src={activeImage}
+                      alt={product.title}
+                    />
                   </div>
-                  <div className='col-span-1 hidden md:flex flex-col items-center gap-4'>
-                    {product.images.slice(1).map((image, index) => (
+                  {/* desktop thumbs */}
+                  <div className='hidden md:flex flex-col gap-3'>
+                    {product.images.slice(0, 3).map((img, i) => (
                       <div
-                        key={index}
-                        className={`relative w-full h-[167px] rounded-lg overflow-hidden cursor-pointer small-image ${
-                          activeImage === image
-                            ? 'small-image-active'
-                            : 'small-image-inactive'
-                        }`}
-                        onClick={() => handleImageClick(image)}
+                        key={i}
+                        onClick={() => setActiveImage(img)}
+                        className={`overflow-hidden rounded-xl cursor-pointer transition-all duration-200 ${activeImage === img ? 'thumb-sel' : 'thumb-unsel'}`}
                       >
-                        <Image fill src={image} alt={`${product.title} Thumbnail ${index + 1}`} className='object-cover' />
+                        <img
+                          src={img}
+                          alt={`thumb ${i + 1}`}
+                          className='w-full h-[155px] object-cover'
+                        />
+                      </div>
+                    ))}
+                  </div>
+                  {/* mobile thumbs */}
+                  <div className='flex md:hidden justify-center gap-2 mt-2'>
+                    {product.images.slice(0, 4).map((img, i) => (
+                      <div
+                        key={i}
+                        onClick={() => setActiveImage(img)}
+                        className={`overflow-hidden rounded-lg cursor-pointer transition-all duration-200 ${activeImage === img ? 'thumb-sel' : 'thumb-unsel'}`}
+                      >
+                        <img
+                          src={img}
+                          alt={`thumb ${i + 1}`}
+                          className='w-[72px] h-[72px] object-cover'
+                        />
                       </div>
                     ))}
                   </div>
                 </div>
               </div>
-              <div className='md:w-1/2 px-7 md:px-0 py-4'>
-                <h2 className='text-lg md:text-2xl font-semibold font-mont text-gray-800 md:mb-4'>
+
+              {/* Product Info */}
+              <div className='w-full lg:w-[42%] px-6 md:px-10 py-8 flex flex-col justify-center border-t lg:border-t-0 lg:border-l border-gray-100'>
+                {/* badges */}
+                <div className='inline-flex items-center gap-2 mb-4'>
+                  <span
+                    style={{
+                      background: 'linear-gradient(135deg,#6366f1,#8b5cf6)',
+                    }}
+                    className='text-white text-xs font-semibold px-3 py-1 rounded-full'
+                  >
+                    ★ বেস্টসেলার
+                  </span>
+                  {product.inStock ? (
+                    <span className='bg-emerald-100 text-emerald-700 text-xs font-semibold px-3 py-1 rounded-full bangla'>
+                      স্টকে আছে
+                    </span>
+                  ) : (
+                    <span className='bg-red-100 text-red-600 text-xs font-semibold px-3 py-1 rounded-full bangla'>
+                      স্টক শেষ
+                    </span>
+                  )}
+                </div>
+
+                {/* title */}
+                <h1 className='text-2xl md:text-3xl font-bold text-gray-900 leading-snug mb-3 bangla'>
                   {product.title}
-                </h2>
-                <p className='text-gray-600 text-sm mb-4 font-mont'>
+                </h1>
+
+                {/* stars */}
+                <div className='flex items-center gap-2 mb-3'>
+                  {[1, 2, 3, 4, 5].map((s) => (
+                    <StarIcon key={s} filled />
+                  ))}
+                  <span className='text-sm text-gray-500 bangla'>
+                    (৪.৮ · ৯৬টি রিভিউ)
+                  </span>
+                </div>
+
+                {/* description */}
+                <p className='text-gray-600 bangla text-sm leading-relaxed mb-4'>
                   {product.description}
                 </p>
-                <div className='mb-6'>
-                  <span className='font-semibold text-gray-700'>
-                    কালার সিলেক্ট করুন
+
+                {/* countdown timer */}
+                <CountdownToMidnight />
+
+                {/* price */}
+                <div className='flex items-end gap-3 mt-4 mb-5'>
+                  <span className='text-4xl font-extrabold text-indigo-600'>
+                    ৳{product.price.toFixed(0)}
                   </span>
-                  <div className='flex items-center gap-3 mt-4'>
-                    {product.variants.map((variant) => (
-                      <div
-                        key={variant.color}
-                        className={`border-2  flex items-center justify-center rounded-full p-1 cursor-pointer color-button ${
-                          selectedColor === variant.color
-                            ? 'color-button-active'
-                            : ''
-                        }`}
-                        onClick={() => handleColorChange(variant.color)}
-                      >
+                  <span className='text-xl text-gray-400 line-through mb-1'>
+                    ৳{product.originalPrice.toFixed(0)}
+                  </span>
+                  <span className='bg-rose-100 text-rose-600 text-sm font-bold px-2 py-0.5 rounded-lg mb-1'>
+                    {discount}% ছাড়
+                  </span>
+                </div>
+
+                {/* color */}
+                <div className='mb-5'>
+                  <p className='text-sm font-semibold text-gray-700 mb-3 bangla'>
+                    রঙ বেছে নিন:{' '}
+                    <span className='text-indigo-600 font-bold bangla'>
+                      {selectedColor}
+                    </span>
+                  </p>
+                  <div className='flex items-center gap-3 flex-wrap'>
+                    {product.variants.map((v) => {
+                      const lc = v.color.toLowerCase();
+                      const bg =
+                        lc === 'golden'
+                          ? '#d4a017'
+                          : lc === 'silver'
+                            ? '#c0c0c0'
+                            : lc;
+                      const isSelected = selectedColor === v.color;
+                      return (
                         <button
-                          className='w-[30px] h-[30px] rounded-full'
+                          key={v.color}
+                          title={v.color}
+                          onClick={() => setSelectedColor(v.color)}
                           style={{
-                            backgroundColor:
-                              variant.color.toLowerCase() == 'golden'
-                                ? 'wheat'
-                                : variant.color.toLowerCase(),
+                            backgroundColor: bg,
+                            width: 36,
+                            height: 36,
+                            borderRadius: '50%',
+                            border:
+                              lc === 'silver' || lc === 'white'
+                                ? '2px solid #9ca3af'
+                                : '2px solid transparent',
+                            outline: isSelected ? '3px solid #6366f1' : 'none',
+                            outlineOffset: 3,
+                            transform: isSelected ? 'scale(1.15)' : 'scale(1)',
+                            transition: 'all 0.2s ease',
+                            cursor: 'pointer',
                           }}
-                        ></button>
-                        <span className='px-1'>{variant.color}</span>
-                      </div>
-                    ))}
+                        />
+                      );
+                    })}
                   </div>
                 </div>
-                <div className='flex items-center justify-start gap-2 text-md mb-6'>
-                  <span className='text-blue-600 font-bold text-xl'>
-                    ৳ {product.price.toFixed(2)}
-                  </span>
-                  <span className='text-gray-500 font-normal text-lg line-through'>
-                    ৳ {product.originalPrice.toFixed(2)}
-                  </span>
-                </div>
-                <div className='flex items-center justify-start gap-4 mb-6'>
-                  <div className='relative flex items-center max-w-[8rem] border border-gray-400 rounded-lg bg-white'>
+
+                {/* qty + buy */}
+                <div className='flex items-center gap-3 mb-6'>
+                  <div className='flex items-center border-2 border-gray-200 rounded-xl overflow-hidden'>
                     <button
-                      type='button'
                       onClick={() => handleQuantityChange('decrement')}
-                      className='hover:bg-gray-200 rounded-s-lg py-3 px-4 h-11 focus:ring-gray-100 focus:ring-2 focus:outline-none'
+                      className='px-4 py-3 text-gray-600 hover:bg-gray-100 transition-colors font-bold text-lg'
                     >
-                      <svg
-                        className='w-2 h-2 text-gray-900'
-                        aria-hidden='true'
-                        xmlns='http://www.w3.org/2000/svg'
-                        fill='none'
-                        viewBox='0 0 18 2'
-                      >
-                        <path
-                          stroke='currentColor'
-                          strokeLinecap='round'
-                          strokeLinejoin='round'
-                          strokeWidth='2'
-                          d='M1 1h16'
-                        />
-                      </svg>
+                      −
                     </button>
-                    <input
-                      type='text'
-                      value={quantity}
-                      readOnly
-                      className='h-11 text-center text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block w-full py-2.5'
-                    />
+                    <span className='px-5 py-3 font-semibold text-gray-800 min-w-[48px] text-center'>
+                      {quantity}
+                    </span>
                     <button
-                      type='button'
                       onClick={() => handleQuantityChange('increment')}
-                      className='hover:bg-gray-200 rounded-e-lg py-3 px-4 h-11 focus:ring-gray-100 focus:ring-2 focus:outline-none'
+                      className='px-4 py-3 text-gray-600 hover:bg-gray-100 transition-colors font-bold text-lg'
                     >
-                      <svg
-                        className='w-2 h-2 text-gray-900'
-                        aria-hidden='true'
-                        xmlns='http://www.w3.org/2000/svg'
-                        fill='none'
-                        viewBox='0 0 18 18'
-                      >
-                        <path
-                          stroke='currentColor'
-                          strokeLinecap='round'
-                          strokeLinejoin='round'
-                          strokeWidth='2'
-                          d='M9 1v16M1 9h16'
-                        />
-                      </svg>
+                      +
                     </button>
                   </div>
                   <button
                     onClick={handleBuyNow}
-                    className='flex items-center bg-gradient-to-r from-blue-700 to-blue-900 text-white justify-center gap-2 px-6 py-[12px] rounded-md font-mont font-semibold text-sm hover:from-blue-800 hover:to-blue-950 transition-all shadow-md disabled:opacity-70'
                     disabled={!product.inStock || isAddingToCart}
+                    className='btn-buy flex-1 text-white font-bold py-3.5 rounded-xl text-sm tracking-wide bangla disabled:opacity-70'
                   >
-                    {isAddingToCart ? (
-                      <>
-                        <svg
-                          className='animate-spin h-4 w-4 text-white'
-                          xmlns='http://www.w3.org/2000/svg'
-                          fill='none'
-                          viewBox='0 0 24 24'
-                        >
-                          <circle
-                            className='opacity-25'
-                            cx='12'
-                            cy='12'
-                            r='10'
-                            stroke='currentColor'
-                            strokeWidth='4'
-                          ></circle>
-                          <path
-                            className='opacity-75'
-                            fill='currentColor'
-                            d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
-                          ></path>
-                        </svg>
-                        <span>Processing...</span>
-                      </>
-                    ) : (
-                      <span>
-                        {product.inStock ? 'Buy Now' : 'Out of Stock'}
-                      </span>
-                    )}
+                    {isAddingToCart
+                      ? 'প্রক্রিয়াকরণ...'
+                      : product.inStock
+                        ? 'এখনই কিনুন'
+                        : 'স্টক শেষ'}
                   </button>
+                </div>
+
+                {/* perks */}
+                <div className='grid grid-cols-2 gap-3 pt-5 border-t border-gray-100'>
+                  {[
+                    { icon: '🚀', text: 'দ্রুত ডেলিভারি' },
+                    { icon: '🔒', text: 'ক্যাশ অন ডেলিভারি' },
+                    { icon: '🎁', text: 'বিশেষ অফার' },
+                  ].map((p) => (
+                    <div key={p.text} className='flex items-center gap-2'>
+                      <span className='text-lg'>{p.icon}</span>
+                      <span className='text-xs text-gray-500 bangla font-medium'>
+                        {p.text}
+                      </span>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <CustomSection>
-        <div className='px-3'>
-          <div className='bg-white p-5 rounded-lg'>
-            <div className='flex justify-between items-center mb-3'>
-              <h2 className='text-lg font-semibold'>Description</h2>
+
+      {/* Description Images */}
+      <div className='w-full'>
+        <div className='flex flex-col md:hidden'>
+          {DESC_IMGS.map((f, i) => (
+            <div key={i} className='overflow-hidden'>
+              <img
+                src={`/assets/product/glass/${f}`}
+                alt={`বিবরণ ${i + 1}`}
+                className='w-full object-cover block'
+              />
             </div>
-            <div className='mt-10'>
-              <p className='text-gray-600 font-mont text-sm'>
-                আপনার দৈনন্দিন জীবনকে আরও আরামদায়ক এবং স্টাইলিশ করে তুলুন এই
-                অ্যাডজাস্টেবল টিন্ট পোলারাইজড সানগ্লাস দিয়ে। এটি একটি
-                প্রিমিয়াম পুরুষদের সানগ্লাস যা সক্রিয় জীবনযাপনের জন্য তৈরি।
-                ১-৯ স্তরের অ্যাডজাস্টেবল লেন্স দিয়ে আপনি যেকোনো আলোর
-                পরিস্থিতিতে দৃষ্টিকে পুরোপুরি নিয়ন্ত্রণ করতে পারবেন। এর
-                অভ্যন্তরীণ এনডি ফিল্টার এবং পোলারাইজড লেন্স ক্ষতিকর ইউভি রশ্মি
-                আটকে দেয় এবং ঝলকানি কমিয়ে দৃষ্টি স্পষ্ট করে।
+          ))}
+        </div>
+        <div className='hidden md:grid md:grid-cols-2'>
+          {DESC_IMGS.map((f, i) => (
+            <div key={i} className='overflow-hidden'>
+              <img
+                src={`/assets/product/glass/${f}`}
+                alt={`বিবরণ ${i + 1}`}
+                className='w-full h-full object-cover block img-zoom'
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Product Description */}
+      <div className='bg-gradient-to-b from-white to-slate-50 py-16'>
+        <div className='container mx-auto px-4 lg:px-8 max-w-4xl'>
+          <div className='text-center mb-12'>
+            <span
+              style={{ background: 'linear-gradient(135deg,#6366f1,#8b5cf6)' }}
+              className='text-white text-xs font-semibold px-4 py-1.5 rounded-full bangla inline-block'
+            >
+              পণ্যের বিবরণ
+            </span>
+            <h2 className='text-3xl md:text-4xl font-extrabold text-gray-900 mt-4 mb-3 bangla'>
+              কেন এই সানগ্লাসটি আপনার জন্য পারফেক্ট?
+            </h2>
+            <div className='w-16 h-1 bg-indigo-500 rounded-full mx-auto'></div>
+          </div>
+
+          <div className='bg-white rounded shadow-md p-8 md:p-12 mb-8'>
+            <p className='text-gray-700 bangla text-lg leading-relaxed mb-5'>
+              আপনার দৈনন্দিন জীবনকে আরও আরামদায়ক ও স্টাইলিশ করে তুলুন —{' '}
+              <strong className='text-indigo-600'>
+                অ্যাডজাস্টেবল টিন্ট পোলারাইজড সানগ্লাস
+              </strong>{' '}
+              আপনার সেরা সঙ্গী। 1-9 স্তরের অ্যাডজাস্টেবল লেন্স দিয়ে আপনি যেকোনো
+              আলোর পরিস্থিতিতে দৃষ্টিকে পুরোপুরি নিয়ন্ত্রণ করতে পারবেন।
+            </p>
+            <p className='text-gray-700 bangla text-lg leading-relaxed mb-5'>
+              এর <strong>অভ্যন্তরীণ এনডি ফিল্টার</strong> ও পোলারাইজড লেন্স
+              ক্ষতিকর UV রশ্মি আটকে দেয় এবং ঝলকানি কমিয়ে দৃষ্টি স্পষ্ট করে।
+              বাইরের অ্যাডভেঞ্চার, বিচ ট্রিপ বা দৈনন্দিন পরিধান — যেকোনো
+              অনুষ্ঠানে এটি আপনার চোখকে দারুণ সুরক্ষা দেয়।
+            </p>
+            <p className='text-gray-700 bangla text-lg leading-relaxed'>
+              উচ্চমানের হালকা উপাদান দিয়ে তৈরি এই সানগ্লাস টেকসই ও সারাদিন পরার
+              জন্য আরামদায়ক। অ্যাডজাস্টেবল নোজ প্যাড ও নন-স্লিপ রাবার টেম্পল
+              নিশ্চিত করে সুরক্ষিত ও স্বাচ্ছন্দ্যময় ফিটিং।
+            </p>
+          </div>
+
+          {/* feature cards */}
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-5 mb-8'>
+            {[
+              {
+                icon: '🔆',
+                title: '1-9 স্তরের অ্যাডজাস্টেবল লেন্স',
+                desc: 'যেকোনো আলোর পরিস্থিতিতে মাত্র একটি ক্লিকে লেন্সের ঘনত্ব পরিবর্তন করুন।',
+                bg: 'bg-indigo-50',
+                ibg: 'bg-indigo-100',
+              },
+              {
+                icon: '☀️',
+                title: 'UV সুরক্ষা ও পোলারাইজড লেন্স',
+                desc: 'ক্ষতিকর UV-A ও UV-B রশ্মি থেকে চোখকে সম্পূর্ণ সুরক্ষিত রাখে।',
+                bg: 'bg-amber-50',
+                ibg: 'bg-amber-100',
+              },
+              {
+                icon: '👓',
+                title: 'ঝলকানি মুক্ত দৃষ্টি',
+                desc: 'এনডি ফিল্টার প্রযুক্তি সড়কের ও পানির উপরের ঝলকানি দূর করে দৃষ্টিকে পরিষ্কার রাখে।',
+                bg: 'bg-sky-50',
+                ibg: 'bg-sky-100',
+              },
+              {
+                icon: '🎨',
+                title: 'স্টাইলিশ ক্লাসিক ডিজাইন',
+                desc: 'আধুনিক রাউন্ড ফ্রেম ডিজাইন — কালো, সিলভার ও গোল্ডেন রঙে পাওয়া যাচ্ছে।',
+                bg: 'bg-purple-50',
+                ibg: 'bg-purple-100',
+              },
+              {
+                icon: '⚖️',
+                title: 'হালকা ও টেকসই উপাদান',
+                desc: 'প্রিমিয়াম লাইটওয়েট ফ্রেম — দীর্ঘ সময় পরেও কোনো অস্বস্তি নেই।',
+                bg: 'bg-emerald-50',
+                ibg: 'bg-emerald-100',
+              },
+              {
+                icon: '🛤️',
+                title: 'বহুমুখী ব্যবহার',
+                desc: 'ড্রাইভিং, সাইক্লিং, বিচ, ট্রেকিং বা প্রতিদিনের ব্যবহারে সমানভাবে উপযুক্ত।',
+                bg: 'bg-rose-50',
+                ibg: 'bg-rose-100',
+              },
+            ].map((f) => (
+              <div
+                key={f.title}
+                className={`feature-card ${f.bg} rounded-2xl p-6 flex gap-4 items-start`}
+              >
+                <div
+                  className={`${f.ibg} rounded-xl p-3 text-2xl flex-shrink-0`}
+                >
+                  {f.icon}
+                </div>
+                <div>
+                  <h3 className='font-bold text-gray-800 bangla text-base mb-1'>
+                    {f.title}
+                  </h3>
+                  <p className='text-gray-600 bangla text-sm leading-relaxed'>
+                    {f.desc}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* specs table */}
+          <div className='bg-white rounded shadow-md overflow-hidden'>
+            <div
+              className='px-8 py-5'
+              style={{
+                background: 'linear-gradient(to right,#6366f1,#7c3aed)',
+              }}
+            >
+              <h3 className='text-white font-bold text-lg bangla'>
+                পণ্যের স্পেসিফিকেশন
+              </h3>
+            </div>
+            <div className='divide-y divide-gray-100'>
+              {[
+                { l: 'মডেল', v: 'অ্যাডজাস্টেবল টিন্ট পোলারাইজড সানগ্লাস' },
+                { l: 'লেন্স টেকনোলজি', v: 'পোলারাইজড + এনডি ফিল্টার' },
+                { l: 'অ্যাডজাস্টমেন্ট লেভেল', v: '১ – ৯ ধাপ' },
+                { l: 'UV সুরক্ষা', v: 'UV-A ও UV-B ১০০%' },
+                { l: 'ফ্রেম ডিজাইন', v: 'ক্লাসিক রাউন্ড' },
+                { l: 'উপাদান', v: 'লাইটওয়েট প্রিমিয়াম ফ্রেম' },
+                { l: 'রঙের বিকল্প', v: 'কালো, সিলভার, গোল্ডেন' },
+                {
+                  l: 'উপযুক্ত',
+                  v: 'ড্রাইভিং, সাইক্লিং, ভ্রমণ, দৈনন্দিন ব্যবহার',
+                },
+              ].map((row, i) => (
+                <div
+                  key={row.l}
+                  className={`flex px-8 py-4 ${i % 2 === 0 ? 'bg-gray-50' : 'bg-white'}`}
+                >
+                  <span className='w-48 text-sm font-semibold text-gray-500 bangla'>
+                    {row.l}
+                  </span>
+                  <span className='text-sm text-gray-800 bangla font-medium'>
+                    {row.v}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* CTA */}
+          <div className='text-center mt-14'>
+            <div
+              className='rounded-2xl p-10 max-w-2xl mx-auto shadow-xl'
+              style={{ background: 'linear-gradient(135deg,#6366f1,#7c3aed)' }}
+            >
+              <h3 className='text-white text-2xl font-extrabold bangla mb-2'>
+                আজই অর্ডার করুন!
+              </h3>
+              <p className='text-indigo-200 bangla text-sm mb-6'>
+                সীমিত স্টক — দেরি না করে এখনই নিশ্চিত করুন আপনার অর্ডার
               </p>
-              <p className='text-gray-600 font-mont text-sm mt-4'>
-                বাইরের অ্যাডভেঞ্চার, বিচ ট্রিপ বা দৈনন্দিন পরিধানে এটি চোখকে
-                দারুণ সুরক্ষা দেয়। ক্লাসিক রাউন্ড ফ্রেম এবং কালো ফিনিশের সাথে
-                এটি আধুনিক স্টাইলের সাথে ব্যবহারিকতা মিশিয়ে দিয়েছে। বিচে,
-                রাস্তায় বা ঘরের ভিতর—যেকোনো জায়গায় এটি আপনার সঙ্গী হয়ে উঠবে।
-                ডিমেবল লেন্স এবং সুন্দর ডিজাইন এটিকে স্পোর্টস, ভ্রমণ, কাজ বা
-                আরামের জন্য আদর্শ করে তোলে। উচ্চমানের হালকা উপাদান দিয়ে তৈরি
-                এটি টেকসই এবং সারাদিন পরার জন্য আরামদায়ক। অ্যাডজাস্টেবল নোজ
-                প্যাড এবং নন-স্লিপ রাবার টেম্পল নিশ্চিত করে যে ফিটিং সুরক্ষিত
-                এবং মন ভালো রাখে।
-              </p>
-              <p className='text-gray-600 font-mont text-sm mt-4'>
-                এটি সব ধরনের আলোর পরিস্থিতিতে মানিয়ে নেয় এবং চোখের স্বাস্থ্য
-                রক্ষা করে, যা ফিটনেসপ্রেমী এবং স্টাইল-সচেতন ব্যক্তিদের জন্য
-                পারফেক্ট।
-              </p>
-              <p className='py-5 text-gray-600 font-mont text-sm mt-4'>
-                Key Features:
-              </p>
-              <ul className='list-disc list-inside text-gray-600 font-mont text-sm'>
-                <li>🔍 ১-৯ স্তরের অ্যাডজাস্টেবল লেন্স</li>
-                <li>☀️ ক্ষতিকর ইউভি রশ্মি থেকে সুরক্ষা</li>
-                <li>🛡️ এনডি ফিল্টার এবং পোলারাইজড লেন্স</li>
-                <li>👓 ঝলকানি কমানো এবং দৃষ্টি স্পষ্টকরণ</li>
-                <li>🎨 স্টাইলিশ রাউন্ড ফ্রেম ডিজাইন</li>
-                <li>🛤️ বহুমুখী: ড্রাইভিং, সাইক্লিং, বিচ অ্যাকটিভিটি</li>
-                <li>⚖️ হালকা ও টেকসই উপাদান</li>
-                <li>🛡️ অ্যাডজাস্টেবল নোজ প্যাড এবং নন-স্লিপ টেম্পল</li>
-                <li>👕 সারাদিন আরামদায়ক পরিধান</li>
-              </ul>
+              <button
+                onClick={handleBuyNow}
+                disabled={!product.inStock || isAddingToCart}
+                className='bg-white text-indigo-600 font-extrabold bangla px-10 py-4 rounded-xl hover:bg-indigo-50 transition-all duration-300 hover:scale-105 shadow-md disabled:opacity-70'
+              >
+                {product.inStock
+                  ? `৳${product.price} — এখনই কিনুন`
+                  : 'স্টক শেষ'}
+              </button>
             </div>
           </div>
         </div>
-      </CustomSection>
+      </div>
+
       <Footer />
 
-      {/* Order Dialog */}
       <OrderDialog
         isOpen={isOrderDialogOpen}
         onClose={() => setIsOrderDialogOpen(false)}
@@ -474,9 +749,7 @@ const ProductDetails = ({ initialProduct }) => {
 };
 
 export async function getStaticProps() {
-  if (!productData) {
-    return { notFound: true };
-  }
+  if (!productData) return { notFound: true };
   return { props: { initialProduct: productData } };
 }
 
