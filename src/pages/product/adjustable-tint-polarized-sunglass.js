@@ -441,7 +441,7 @@ const ProductDetails = ({ initialProduct }) => {
                   <span className='bg-rose-100 text-rose-600 text-sm font-bold px-2 py-0.5 rounded-lg mb-1'>
                     {product.originalPrice.toFixed(0) -
                       product.price.toFixed(0)}
-                    Taka Save
+                 {' '}   Taka Save
                   </span>
                 </div>
 
