@@ -439,7 +439,9 @@ const ProductDetails = ({ initialProduct }) => {
                     ৳{product.originalPrice.toFixed(0)}
                   </span>
                   <span className='bg-rose-100 text-rose-600 text-sm font-bold px-2 py-0.5 rounded-lg mb-1'>
-                    {discount}% ছাড়
+                    {product.originalPrice.toFixed(0) -
+                      product.price.toFixed(0)}
+                    Taka Save
                   </span>
                 </div>
 
