@@ -2,10 +2,11 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import Head from 'next/head';
-import { 
-  FiSearch, FiRefreshCw, FiFilter, FiTrash2, FiEdit3, 
+import {
+  FiSearch, FiRefreshCw, FiFilter, FiTrash2, FiEdit3,
   FiCheckCircle, FiXCircle, FiClock, FiPhone, FiPhoneMissed,
-  FiCopy, FiExternalLink, FiCalendar, FiArrowLeft, FiArrowRight
+  FiCopy, FiExternalLink, FiCalendar, FiArrowLeft, FiArrowRight,
+  FiAlertTriangle, FiMessageSquare, FiSave
 } from 'react-icons/fi';
 import { Dialog, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
@@ -20,6 +21,9 @@ const ORDER_STATUS_CONFIG = {
 const RESPONSE_STATUS_CONFIG = {
   called: { label: 'Called', color: 'text-green-600', icon: FiPhone, badge: 'bg-green-100 text-green-700' },
   did_not_pick: { label: 'Did Not Pick', color: 'text-red-600', icon: FiPhoneMissed, badge: 'bg-red-100 text-red-700' },
+  number_off: { label: 'Number Off', color: 'text-slate-600', icon: FiPhoneMissed, badge: 'bg-slate-100 text-slate-700' },
+  call_later: { label: 'Call Later', color: 'text-orange-600', icon: FiClock, badge: 'bg-orange-100 text-orange-700' },
+  fake_order: { label: 'Fake Order', color: 'text-purple-600', icon: FiAlertTriangle, badge: 'bg-purple-100 text-purple-700' },
   null: { label: 'Not Called', color: 'text-yellow-600', icon: FiPhone, badge: 'bg-yellow-100 text-yellow-700' },
 };
 
@@ -114,6 +118,8 @@ export default function AdminOrders() {
   const [copyFeedback, setCopyFeedback] = useState({});
   const [toast, setToast] = useState(null);
   const [stats, setStats] = useState({ total: 0, today: 0, pendingToday: 0, confirmedToday: 0, cancelledToday: 0, totalPending: 0, totalConfirmed: 0, totalCancelled: 0 });
+  const [noteText, setNoteText] = useState('');
+  const [noteSaving, setNoteSaving] = useState(false);
 
   const debounceRef = useRef(null);
 
@@ -206,6 +212,7 @@ export default function AdminOrders() {
 
   const openUpdateModal = (order) => {
     setSelectedOrder({ ...order });
+    setNoteText(order.note || '');
     setIsUpdateModalOpen(true);
   };
 
@@ -243,6 +250,34 @@ export default function AdminOrders() {
     if (!selectedOrder) return;
     const text = `${selectedOrder.name}\n${formatPhone(selectedOrder.phone)}\n${selectedOrder.address}\n৳${selectedOrder.grandTotal}`;
     copyToClipboard(text, 'fullOrder');
+  };
+
+  const handleNoteSave = async () => {
+    if (!selectedOrder) return;
+    setNoteSaving(true);
+    try {
+      const res = await fetch(`/api/admin/orders/${selectedOrder._id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ note: noteText }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        const savedNote = data.order?.note ?? noteText;
+        setOrders((prev) =>
+          prev.map((o) => (o._id === selectedOrder._id ? { ...o, note: savedNote } : o))
+        );
+        setSelectedOrder((prev) => ({ ...prev, note: savedNote }));
+        showToast('Note saved', 'success');
+      } else {
+        showToast(data.message || 'Failed to save note', 'error');
+      }
+    } catch (err) {
+      console.error(err);
+      showToast('Failed to save note', 'error');
+    } finally {
+      setNoteSaving(false);
+    }
   };
 
 
@@ -383,6 +418,8 @@ export default function AdminOrders() {
                     <option value='called'>📞 Called</option>
                     <option value='number_off'>📵 Number Off</option>
                     <option value='did_not_pick'>📵 Did Not Pick</option>
+                    <option value='call_later'>🕐 Call Later</option>
+                    <option value='fake_order'>⚠️ Fake Order</option>
                   </select>
                 </div>
               </div>
@@ -432,11 +469,11 @@ export default function AdminOrders() {
                 <thead>
                   <tr className='bg-slate-50/80 border-b border-slate-200 text-[11px] font-black text-slate-500 uppercase tracking-widest'>
                     <th className='px-6 py-4'>Action</th>
+                    <th className='px-6 py-4'>Response Status</th>
                     <th className='px-6 py-4'>Customer Profile</th>
                     <th className='px-6 py-4'>Shipping Details</th>
                     <th className='px-6 py-4'>Product Summary</th>
                     <th className='px-6 py-4 text-right'>Revenue</th>
-                    <th className='px-6 py-4'>Response Status</th>
                     <th className='px-6 py-4'>Timestamp</th>
                   </tr>
                 </thead>
@@ -465,8 +502,8 @@ export default function AdminOrders() {
                     </tr>
                   ) : (
                     orders.map((order) => {
-                      const status = ORDER_STATUS_CONFIG[order.orderStatus || 'pending'];
-                      const response = RESPONSE_STATUS_CONFIG[order.responseStatus || 'null'];
+                      const status = ORDER_STATUS_CONFIG[order.orderStatus || 'pending'] || ORDER_STATUS_CONFIG.pending;
+                      const response = RESPONSE_STATUS_CONFIG[order.responseStatus || 'null'] || RESPONSE_STATUS_CONFIG.null;
                       const RespIcon = response.icon;
 
                       return (
@@ -475,13 +512,33 @@ export default function AdminOrders() {
                           className={`group transition-all hover:z-10 relative border-l-4 ${status.color} hover:shadow-md border-transparent hover:border-blue-500`}
                         >
                           <td className='px-6 py-4'>
-                            <button
-                              onClick={() => openUpdateModal(order)}
-                              className="flex items-center justify-center w-10 h-10 bg-white border border-slate-200 rounded-xl text-blue-600 shadow-sm hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all"
-                              title="Update Order Details"
-                            >
-                              <FiEdit3 className="w-5 h-5" />
-                            </button>
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={() => openUpdateModal(order)}
+                                className="flex items-center justify-center w-10 h-10 bg-white border border-slate-200 rounded-xl text-blue-600 shadow-sm hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all"
+                                title="Update Order Details"
+                              >
+                                <FiEdit3 className="w-5 h-5" />
+                              </button>
+                              {order.note && (
+                                <div className="relative group/note">
+                                  <div className="flex items-center justify-center w-10 h-10 text-amber-500 bg-amber-50 border border-amber-100 rounded-xl cursor-default">
+                                    <FiMessageSquare className="w-4 h-4" />
+                                  </div>
+                                  <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-slate-900 text-white text-xs rounded-xl px-3 py-2.5 shadow-xl z-50 invisible group-hover/note:visible opacity-0 group-hover/note:opacity-100 transition-all duration-200 pointer-events-none leading-relaxed">
+                                    <div className="font-bold text-slate-400 text-[10px] uppercase tracking-wider mb-1">Note</div>
+                                    <div className="whitespace-pre-wrap break-words">{order.note}</div>
+                                    <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-slate-900" />
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          </td>
+                          <td className='px-6 py-4'>
+                            <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border ${response.badge} border-white shadow-sm`}>
+                              <RespIcon className="w-3.5 h-3.5" />
+                              <span className="text-[10px] font-bold uppercase tracking-wider whitespace-nowrap">{response.label}</span>
+                            </div>
                           </td>
                           <td className='px-6 py-4'>
                             <div className="flex flex-col">
@@ -512,12 +569,6 @@ export default function AdminOrders() {
                               <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tight">
                                 {parseItemQty(order.items)} Items
                               </span>
-                            </div>
-                          </td>
-                          <td className='px-6 py-4'>
-                            <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border ${response.badge} border-white shadow-sm`}>
-                              <RespIcon className="w-3.5 h-3.5" />
-                              <span className="text-[10px] font-bold uppercase tracking-wider whitespace-nowrap">{response.label}</span>
                             </div>
                           </td>
                           <td className='px-6 py-4'>
@@ -625,10 +676,11 @@ export default function AdminOrders() {
                                 return (
                                   <p className="text-xs text-slate-600 font-medium mt-1.5 leading-snug">
                                     {items.map((it, i) => (
-                                      <span key={i}>
+                                      <span key={i} className="inline-flex items-center gap-1 flex-wrap">
                                         {i > 0 && <span className="text-slate-300 mx-1">·</span>}
                                         {it.title || 'Item'}
-                                        {it.quantity > 1 && <span className="text-blue-500 font-bold ml-0.5">×{it.quantity}</span>}
+                                        <span className="text-blue-500 font-bold">×{it.quantity || 1}</span>
+                                        {it.variant && <span className="text-slate-400 italic text-[10px]">({it.variant})</span>}
                                       </span>
                                     ))}
                                   </p>
@@ -672,6 +724,32 @@ export default function AdminOrders() {
                           </table>
                        </div>
 
+                       {/* Items Detail */}
+                       <div className="mb-6">
+                         <div className="bg-slate-50 rounded-2xl border border-slate-100 overflow-hidden">
+                           <div className="px-5 py-3 border-b border-slate-100">
+                             <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Items Ordered</h4>
+                           </div>
+                           {(() => {
+                             try {
+                               const items = JSON.parse(selectedOrder?.items || '[]');
+                               return items.map((it, i) => (
+                                 <div key={i} className="flex items-center justify-between px-5 py-3 border-b border-slate-100 last:border-0 hover:bg-white transition-colors">
+                                   <div>
+                                     <div className="font-semibold text-sm text-slate-800">{it.title || it.name || 'Item'}</div>
+                                     {it.variant && <div className="text-[11px] text-slate-500 uppercase tracking-tight mt-0.5">{it.variant}</div>}
+                                   </div>
+                                   <div className="flex items-center gap-1">
+                                     <span className="text-[11px] text-slate-400 font-medium">×</span>
+                                     <span className="font-black text-blue-600 text-sm">{it.quantity || 1}</span>
+                                   </div>
+                                 </div>
+                               ));
+                             } catch { return <div className="px-5 py-3 text-sm text-slate-400">No items</div>; }
+                           })()}
+                         </div>
+                       </div>
+
                        {/* Status Update Sections */}
                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
                           {/* Order Status */}
@@ -712,7 +790,9 @@ export default function AdminOrders() {
                               {[
                                 { val: 'null', label: 'Not Called Yet', icon: FiClock, color: 'bg-slate-600' },
                                 { val: 'called', label: 'Call Successful', icon: FiPhone, color: 'bg-green-600' },
-                                { val: 'did_not_pick', label: 'Did Not Pick', icon: FiPhoneMissed, color: 'bg-red-600' }
+                                { val: 'did_not_pick', label: 'Did Not Pick', icon: FiPhoneMissed, color: 'bg-red-600' },
+                                { val: 'call_later', label: 'Call Later', icon: FiClock, color: 'bg-orange-500' },
+                                { val: 'fake_order', label: 'Fake Order', icon: FiAlertTriangle, color: 'bg-purple-600' },
                               ].map((resp) => {
                                 const isActive = (selectedOrder?.responseStatus === null && resp.val === 'null') || (selectedOrder?.responseStatus === resp.val);
                                 return (
@@ -735,6 +815,29 @@ export default function AdminOrders() {
                               })}
                             </div>
                           </div>
+                       </div>
+
+                       {/* Order Note */}
+                       <div className="mb-8">
+                         <h4 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em] mb-3 flex items-center gap-2">
+                           <div className="w-1.5 h-4 bg-amber-500 rounded-full" />
+                           Order Note
+                         </h4>
+                         <textarea
+                           value={noteText}
+                           onChange={(e) => setNoteText(e.target.value)}
+                           placeholder="Add a note about this order..."
+                           rows={3}
+                           className="w-full text-sm border border-slate-200 bg-slate-50 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-400 transition-all resize-none font-medium text-slate-700 placeholder:text-slate-300"
+                         />
+                         <button
+                           onClick={handleNoteSave}
+                           disabled={noteSaving}
+                           className="mt-2 flex items-center gap-2 px-4 py-2 bg-amber-500 text-white rounded-xl text-xs font-black uppercase tracking-wider hover:bg-amber-600 transition-all disabled:opacity-60"
+                         >
+                           <FiSave className="w-3.5 h-3.5" />
+                           {noteSaving ? 'Saving...' : 'Save Note'}
+                         </button>
                        </div>
 
                        {/* Action Footer */}
@@ -779,8 +882,8 @@ export default function AdminOrders() {
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed bottom-5 right-5 z-[60] flex items-center gap-3 bg-slate-900 text-white px-6 py-4 rounded-2xl shadow-2xl border border-slate-800">
-            <FiCheckCircle className="text-green-400 w-5 h-5" />
+          <div className={`fixed bottom-5 right-5 z-[60] flex items-center gap-3 px-6 py-4 rounded-2xl shadow-2xl border ${toast?.type === 'error' ? 'bg-red-600 border-red-700' : 'bg-slate-900 border-slate-800'} text-white`}>
+            {toast?.type === 'error' ? <FiXCircle className="text-white w-5 h-5" /> : <FiCheckCircle className="text-green-400 w-5 h-5" />}
             <span className="text-sm font-bold tracking-tight">{toast?.message}</span>
           </div>
         </Transition>

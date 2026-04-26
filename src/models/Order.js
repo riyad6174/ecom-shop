@@ -20,9 +20,10 @@ const orderSchema = new mongoose.Schema(
     },
     responseStatus: {
       type: String,
-      enum: ['called', 'number_off', 'did_not_pick', null],
+      enum: ['called', 'number_off', 'did_not_pick', 'call_later', 'fake_order', null],
       default: null,
     },
+    note: { type: String, default: '' },
   },
   { timestamps: true },
 );
@@ -32,5 +33,10 @@ orderSchema.index({ name: 'text', phone: 'text', orderId: 'text' });
 orderSchema.index({ createdAt: -1 });
 orderSchema.index({ orderStatus: 1 });
 orderSchema.index({ responseStatus: 1 });
+
+// If cached model is missing new fields (e.g. after schema change), rebuild it
+if (mongoose.models.Order && !mongoose.models.Order.schema.path('note')) {
+  delete mongoose.models.Order;
+}
 
 export default mongoose.models.Order || mongoose.model('Order', orderSchema);

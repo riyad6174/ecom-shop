@@ -12,10 +12,10 @@ export default async function handler(req, res) {
     return res.status(405).json({ message: 'Method not allowed' });
   }
 
-  const { orderStatus, responseStatus } = req.body;
+  const { orderStatus, responseStatus, note } = req.body;
 
   // Validate at least one field is being updated
-  if (orderStatus === undefined && responseStatus === undefined) {
+  if (orderStatus === undefined && responseStatus === undefined && note === undefined) {
     return res.status(400).json({ message: 'No fields to update' });
   }
 
@@ -24,7 +24,7 @@ export default async function handler(req, res) {
     return res.status(400).json({ message: 'Invalid order status' });
   }
 
-  if (responseStatus !== undefined && !['called', 'number_off', 'did_not_pick', null].includes(responseStatus)) {
+  if (responseStatus !== undefined && !['called', 'number_off', 'did_not_pick', 'call_later', 'fake_order', null].includes(responseStatus)) {
     return res.status(400).json({ message: 'Invalid response status' });
   }
 
@@ -34,6 +34,7 @@ export default async function handler(req, res) {
     const update = {};
     if (orderStatus !== undefined) update.orderStatus = orderStatus;
     if (responseStatus !== undefined) update.responseStatus = responseStatus || null;
+    if (note !== undefined) update.note = note;
 
     const order = await Order.findByIdAndUpdate(
       id,

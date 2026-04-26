@@ -41,7 +41,7 @@ export default async function handler(req, res) {
 
     if (responseStatus === 'none') {
       filter.responseStatus = null;
-    } else if (responseStatus && ['called', 'number_off', 'did_not_pick'].includes(responseStatus)) {
+    } else if (responseStatus && ['called', 'number_off', 'did_not_pick', 'call_later', 'fake_order'].includes(responseStatus)) {
       filter.responseStatus = responseStatus;
     }
 
