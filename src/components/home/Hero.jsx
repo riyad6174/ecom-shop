@@ -22,7 +22,7 @@ const Hero = () => {
               {/* First slide: LCP image — load eagerly, high priority */}
               <SwiperSlide>
                 <img
-                  src='/assets/banner/banner-tag.png'
+                  src='/assets/banner/fan-banner1.png'
                   alt='Winter Collection'
                   className='h-full w-full object-fit rounded-xl'
                   fetchpriority='high'
@@ -33,7 +33,7 @@ const Hero = () => {
               {/* Remaining slides: defer loading */}
               <SwiperSlide>
                 <img
-                  src='/assets/banner/fan-banner.png'
+                  src='/assets/banner/fan-banner2.png'
                   alt='Fan Collection'
                   className='h-full w-full object-fit rounded-xl'
                   loading='lazy'
@@ -105,7 +105,7 @@ const Hero = () => {
           {/* First slide: LCP on mobile */}
           <SwiperSlide>
             <img
-              src='/assets/banner/banner-tag.png'
+              src='/assets/banner/fan-banner1.png'
               alt='Winter Collection'
               className='h-full w-full object-cover rounded-xl'
               fetchpriority='high'
@@ -115,7 +115,7 @@ const Hero = () => {
           </SwiperSlide>
           <SwiperSlide>
             <img
-              src='/assets/banner/fan-banner.png'
+              src='/assets/banner/fan-banner2.png'
               alt='Fan Collection'
               className='h-full w-full object-cover rounded-xl'
               loading='lazy'

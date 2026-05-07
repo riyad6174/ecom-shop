@@ -14,7 +14,7 @@ function Footer() {
           <div className='space-y-6'>
             <div>
               <img
-                src='/assets/new-logo.png'
+                src='/assets/logo.png'
                 alt='Sheii Shop Logo'
                 className='w-40 transition-transform duration-300 hover:scale-105'
               />

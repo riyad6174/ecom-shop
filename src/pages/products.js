@@ -259,7 +259,7 @@ function Products() {
         />
         <meta
           property='og:image'
-          content='https://www.sheiishop.com/assets/footer-new-logo.png'
+          content='https://www.sheiishop.com/assets/footer-logo.png'
         />
         <meta property='og:url' content='https://www.sheiishop.com/products' />
         <meta property='og:type' content='website' />
@@ -274,7 +274,7 @@ function Products() {
         />
         <meta
           name='twitter:image'
-          content='https://www.sheiishop.com/assets/footer-new-logo.png'
+          content='https://www.sheiishop.com/assets/footer-logo.png'
         />
 
         {/* Schema.org Structured Data for Product Collection Page */}

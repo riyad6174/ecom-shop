@@ -158,7 +158,7 @@ const ProductDetails = ({ initialProduct }) => {
           property='og:image'
           content={
             product.images[0] ||
-            'https://www.sheiishop.com/assets/footer-new-logo.png'
+            'https://www.sheiishop.com/assets/footer-logo.png'
           }
         />
         <meta
@@ -175,7 +175,7 @@ const ProductDetails = ({ initialProduct }) => {
           name='twitter:image'
           content={
             product.images[0] ||
-            'https://www.sheiishop.com/assets/footer-new-logo.png'
+            'https://www.sheiishop.com/assets/footer-logo.png'
           }
         />
 
@@ -251,7 +251,14 @@ const ProductDetails = ({ initialProduct }) => {
                   {/* Main Image */}
                   <div className='col-span-3 md:pl-6'>
                     <div className='relative w-full h-[300px] md:h-[533px] rounded-lg overflow-hidden image-transition'>
-                      <Image fill src={activeImage} alt={product.title} className='object-cover' priority sizes='(max-width: 768px) 100vw, 60vw' />
+                      <Image
+                        fill
+                        src={activeImage}
+                        alt={product.title}
+                        className='object-cover'
+                        priority
+                        sizes='(max-width: 768px) 100vw, 60vw'
+                      />
                     </div>
                     {/* Small Images for Mobile */}
                     <div className='flex justify-center gap-2 mt-4 md:hidden'>
@@ -265,7 +272,12 @@ const ProductDetails = ({ initialProduct }) => {
                           }`}
                           onClick={() => handleImageClick(image)}
                         >
-                          <Image fill src={image} alt={`${product.title} Thumbnail ${index + 1}`} className='object-cover' />
+                          <Image
+                            fill
+                            src={image}
+                            alt={`${product.title} Thumbnail ${index + 1}`}
+                            className='object-cover'
+                          />
                         </div>
                       ))}
                     </div>
@@ -282,7 +294,12 @@ const ProductDetails = ({ initialProduct }) => {
                         }`}
                         onClick={() => handleImageClick(image)}
                       >
-                        <Image fill src={image} alt={`${product.title} Thumbnail ${index + 1}`} className='object-cover' />
+                        <Image
+                          fill
+                          src={image}
+                          alt={`${product.title} Thumbnail ${index + 1}`}
+                          className='object-cover'
+                        />
                       </div>
                     ))}
                   </div>
@@ -446,7 +463,12 @@ const ProductDetails = ({ initialProduct }) => {
             </div>
             <div className='mt-5'>
               <div className='relative w-full h-[300px] md:h-[400px] rounded-lg mb-4'>
-                <Image fill src='/assets/product/fan/ice.png' alt='portable cooling fan description image' className='object-cover rounded-lg' />
+                <Image
+                  fill
+                  src='/assets/product/fan/ice.png'
+                  alt='portable cooling fan description image'
+                  className='object-cover rounded-lg'
+                />
               </div>
               <p className='text-gray-600 font-mont text-sm'>
                 Beat the heat with the **JF132 Mini Portable Cooling Fan**, your
@@ -464,7 +486,12 @@ const ProductDetails = ({ initialProduct }) => {
                 feels as good as it looks. 💪
               </p>
               <div className='relative w-full h-[350px] md:h-[400px] rounded-lg my-4'>
-                <Image fill src='/assets/product/fan/fan-description.avif' alt='portable cooling fan description image' className='object-cover rounded-lg' />
+                <Image
+                  fill
+                  src='/assets/product/fan/fan-description.avif'
+                  alt='portable cooling fan description image'
+                  className='object-cover rounded-lg'
+                />
               </div>
               <p className='text-gray-600 font-mont text-sm mt-4'>
                 Express your style with **six vibrant color options**: Black,

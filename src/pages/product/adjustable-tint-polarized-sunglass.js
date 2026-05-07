@@ -207,7 +207,7 @@ const ProductDetails = ({ initialProduct }) => {
           property='og:image'
           content={
             product.images?.[0] ||
-            'https://www.sheiishop.com/assets/footer-new-logo.png'
+            'https://www.sheiishop.com/assets/footer-logo.png'
           }
         />
         <meta
@@ -222,7 +222,7 @@ const ProductDetails = ({ initialProduct }) => {
           name='twitter:image'
           content={
             product.images?.[0] ||
-            'https://www.sheiishop.com/assets/footer-new-logo.png'
+            'https://www.sheiishop.com/assets/footer-logo.png'
           }
         />
         <script
@@ -440,8 +440,8 @@ const ProductDetails = ({ initialProduct }) => {
                   </span>
                   <span className='bg-rose-100 text-rose-600 text-sm font-bold px-2 py-0.5 rounded-lg mb-1'>
                     {product.originalPrice.toFixed(0) -
-                      product.price.toFixed(0)}
-                 {' '}   Taka Save
+                      product.price.toFixed(0)}{' '}
+                    Taka Save
                   </span>
                 </div>
 

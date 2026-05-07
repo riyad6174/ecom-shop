@@ -10,7 +10,7 @@ export default function Document() {
         {/* Favicon & App Icons */}
         <link rel='icon' href='/favicon.ico' sizes='any' />
         <link rel='icon' type='image/png' sizes='32x32' href='/favicon.ico' />
-        <link rel='apple-touch-icon' href='/assets/new-logo.png' />
+        <link rel='apple-touch-icon' href='/assets/logo.png' />
 
         {/* Stape Custom GTM Loader — must stay near top of <head> */}
         <script

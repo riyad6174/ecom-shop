@@ -56,7 +56,7 @@ function Index() {
         />
         <meta
           property='og:image'
-          content='https://www.sheiishop.com/assets/new-logo.png'
+          content='https://www.sheiishop.com/assets/logo.png'
         />
         <meta property='og:image:width' content='1200' />
         <meta property='og:image:height' content='630' />
@@ -75,7 +75,7 @@ function Index() {
         />
         <meta
           name='twitter:image'
-          content='https://www.sheiishop.com/assets/new-logo.png'
+          content='https://www.sheiishop.com/assets/logo.png'
         />
 
         {/* JSON-LD: WebSite + SearchAction */}
@@ -108,7 +108,7 @@ function Index() {
               '@type': 'Organization',
               name: 'Sheii Shop',
               url: 'https://www.sheiishop.com',
-              logo: 'https://www.sheiishop.com/assets/new-logo.png',
+              logo: 'https://www.sheiishop.com/assets/logo.png',
               sameAs: [],
               contactPoint: {
                 '@type': 'ContactPoint',

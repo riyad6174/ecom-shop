@@ -203,7 +203,7 @@ const ProductDetails = ({ initialProduct }) => {
           property='og:image'
           content={
             product.images?.[0] ||
-            'https://www.sheiishop.com/assets/footer-new-logo.png'
+            'https://www.sheiishop.com/assets/footer-logo.png'
           }
         />
         <meta
@@ -218,7 +218,7 @@ const ProductDetails = ({ initialProduct }) => {
           name='twitter:image'
           content={
             product.images?.[0] ||
-            'https://www.sheiishop.com/assets/footer-new-logo.png'
+            'https://www.sheiishop.com/assets/footer-logo.png'
           }
         />
         <script
@@ -290,7 +290,14 @@ const ProductDetails = ({ initialProduct }) => {
                 <div className='p-2 md:p-0 md:grid md:grid-cols-4 gap-4'>
                   <div className='col-span-3 md:pl-6'>
                     <div className='relative w-full h-[320px] md:h-[533px] rounded-lg overflow-hidden image-transition'>
-                      <Image fill src={activeImage} alt={product.title} className='object-cover' priority sizes='(max-width: 768px) 100vw, 60vw' />
+                      <Image
+                        fill
+                        src={activeImage}
+                        alt={product.title}
+                        className='object-cover'
+                        priority
+                        sizes='(max-width: 768px) 100vw, 60vw'
+                      />
                     </div>
                     <div className='flex justify-center gap-2 mt-4 md:hidden'>
                       {product.images.slice(1).map((image, index) => (
@@ -303,7 +310,12 @@ const ProductDetails = ({ initialProduct }) => {
                           }`}
                           onClick={() => handleImageClick(image)}
                         >
-                          <Image fill src={image} alt={`${product.title} Thumbnail ${index + 1}`} className='object-cover' />
+                          <Image
+                            fill
+                            src={image}
+                            alt={`${product.title} Thumbnail ${index + 1}`}
+                            className='object-cover'
+                          />
                         </div>
                       ))}
                     </div>
@@ -319,7 +331,12 @@ const ProductDetails = ({ initialProduct }) => {
                         }`}
                         onClick={() => handleImageClick(image)}
                       >
-                        <Image fill src={image} alt={`${product.title} Thumbnail ${index + 1}`} className='object-cover' />
+                        <Image
+                          fill
+                          src={image}
+                          alt={`${product.title} Thumbnail ${index + 1}`}
+                          className='object-cover'
+                        />
                       </div>
                     ))}
                   </div>
@@ -583,7 +600,12 @@ const ProductDetails = ({ initialProduct }) => {
         <div className='px-3 mb-2'>
           <div className='bg-white rounded-lg overflow-hidden shadow-md'>
             <div className='relative w-full h-[420px] md:h-[600px]'>
-              <Image fill src='/assets/product/warmer/comp.jpeg' alt='Product Usage' className='object-cover' />
+              <Image
+                fill
+                src='/assets/product/warmer/comp.jpeg'
+                alt='Product Usage'
+                className='object-cover'
+              />
             </div>
           </div>
         </div>
@@ -637,7 +659,12 @@ const ProductDetails = ({ initialProduct }) => {
                 <SwiperSlide key={review.id} className='!px-2'>
                   <div className='bg-gray-50 rounded-lg overflow-hidden shadow-sm border'>
                     <div className='relative w-full h-[350px] md:h-[300px]'>
-                      <Image fill src={review.image} alt='Review Image' className='object-cover' />
+                      <Image
+                        fill
+                        src={review.image}
+                        alt='Review Image'
+                        className='object-cover'
+                      />
                     </div>
                   </div>
                 </SwiperSlide>

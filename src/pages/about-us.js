@@ -26,7 +26,7 @@ function AboutUs() {
         />
         <meta
           property='og:image'
-          content='https://www.sheiishop.com/assets/new-logo.png'
+          content='https://www.sheiishop.com/assets/logo.png'
         />
         <meta property='og:url' content='https://www.sheiishop.com/about-us' />
         <meta property='og:site_name' content='Sheii Shop' />
@@ -39,7 +39,7 @@ function AboutUs() {
         />
         <meta
           name='twitter:image'
-          content='https://www.sheiishop.com/assets/new-logo.png'
+          content='https://www.sheiishop.com/assets/logo.png'
         />
 
         <script
@@ -57,7 +57,7 @@ function AboutUs() {
                 name: 'Sheii Shop',
                 foundingDate: '2025',
                 url: 'https://www.sheiishop.com',
-                logo: 'https://www.sheiishop.com/assets/new-logo.png',
+                logo: 'https://www.sheiishop.com/assets/logo.png',
               },
             }),
           }}
