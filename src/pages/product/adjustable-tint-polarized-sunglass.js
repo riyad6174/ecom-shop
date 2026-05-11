@@ -22,7 +22,13 @@ const StarIcon = ({ filled }) => (
   </svg>
 );
 
-const DESC_IMGS = ['size.webp', 'color.jpeg', 'desc3.jpeg'];
+const DESC_IMGS = ['desc1.jpeg', 'desc-2.jpeg', 'all.jpeg'];
+
+const COLOR_IMAGE_MAP = {
+  Black: '/assets/product/glass/black-main.jpeg',
+  Silver: '/assets/product/glass/silver-main.jpeg',
+  Golden: '/assets/product/glass/golden-main.jpeg',
+};
 
 function CountdownToMidnight() {
   const [timeLeft, setTimeLeft] = useState({ h: 0, m: 0, s: 0 });
@@ -275,13 +281,27 @@ const ProductDetails = ({ initialProduct }) => {
           border-color: #c7d2fe;
         }
         .btn-buy {
-          background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+          background: linear-gradient(
+            135deg,
+            #1a1a2e 0%,
+            #0f0c1a 50%,
+            #1a1a2e 100%
+          );
           transition: all 0.3s ease;
-          box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+          box-shadow:
+            0 4px 20px rgba(0, 0, 0, 0.55),
+            inset 0 1px 0 rgba(255, 255, 255, 0.06);
+          border: 1px solid rgba(255, 255, 255, 0.08);
         }
         .btn-buy:hover {
           transform: translateY(-2px);
-          box-shadow: 0 8px 25px rgba(99, 102, 241, 0.5);
+          background: linear-gradient(
+            135deg,
+            #2a2a3e 0%,
+            #1a1a2e 50%,
+            #2a2a3e 100%
+          );
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.65);
         }
         .feature-card {
           transition:
@@ -324,12 +344,19 @@ const ProductDetails = ({ initialProduct }) => {
         className='offer-banner sticky top-0 z-40 py-2.5 px-4 text-center'
         style={{
           background:
-            'linear-gradient(90deg, #7c3aed 0%, #4f46e5 50%, #7c3aed 100%)',
-          borderBottom: '2px solid #6d28d9',
+            'linear-gradient(90deg, #0a0a14 0%, #1a1333 25%, #251848 50%, #1a1333 75%, #0a0a14 100%)',
+          borderBottom: '1.5px solid rgba(180,140,255,0.25)',
         }}
       >
-        <p className='text-white font-bold bangla text-sm md:text-base tracking-wide drop-shadow'>
-          🎉 {discount}% ডিস্কাউন্ট পাচ্ছেন শুধু আজকের জন্য 🎉
+        <p
+          className='font-bold bangla text-sm md:text-base tracking-wide'
+          style={{
+            color: '#e8d5ff',
+            textShadow: '0 0 18px rgba(160,100,255,0.45)',
+            letterSpacing: '0.03em',
+          }}
+        >
+          ✦ {discount}% ডিস্কাউন্ট পাচ্ছেন শুধু আজকের জন্য ✦
         </p>
       </div>
 
@@ -448,7 +475,7 @@ const ProductDetails = ({ initialProduct }) => {
                 {/* color */}
                 <div className='mb-5'>
                   <p className='text-sm font-semibold text-gray-700 mb-3 bangla'>
-                    রঙ বেছে নিন:{' '}
+                    ফ্রেম কালার: {selectedColor ? '' : 'নির্বাচন করুন'}
                     <span className='text-indigo-600 font-bold bangla'>
                       {selectedColor}
                     </span>
@@ -467,7 +494,11 @@ const ProductDetails = ({ initialProduct }) => {
                         <button
                           key={v.color}
                           title={v.color}
-                          onClick={() => setSelectedColor(v.color)}
+                          onClick={() => {
+                            setSelectedColor(v.color);
+                            if (COLOR_IMAGE_MAP[v.color])
+                              setActiveImage(COLOR_IMAGE_MAP[v.color]);
+                          }}
                           style={{
                             backgroundColor: bg,
                             width: 36,
@@ -490,7 +521,7 @@ const ProductDetails = ({ initialProduct }) => {
                 </div>
 
                 {/* qty + buy */}
-                <div className='flex items-center gap-3 mb-6'>
+                <div className='flex items-center gap-3 mb-3'>
                   <div className='flex items-center border-2 border-gray-200 rounded-xl overflow-hidden'>
                     <button
                       onClick={() => handleQuantityChange('decrement')}
@@ -519,6 +550,38 @@ const ProductDetails = ({ initialProduct }) => {
                         ? 'এখনই কিনুন'
                         : 'স্টক শেষ'}
                   </button>
+                </div>
+
+                {/* Premium box notice */}
+                <div
+                  className='flex items-center gap-3 mb-5 px-3 py-2.5 rounded-xl'
+                  style={{
+                    background:
+                      'linear-gradient(135deg, #1a1208 0%, #2d1f0a 60%, #1a1208 100%)',
+                    border: '1px solid rgba(212,175,55,0.35)',
+                    boxShadow: '0 2px 12px rgba(0,0,0,0.25)',
+                  }}
+                >
+                  <img
+                    src='/assets/product/glass/box.jpeg'
+                    alt='premium box'
+                    className='w-14 h-14 object-cover rounded-lg flex-shrink-0'
+                    style={{ border: '1px solid rgba(212,175,55,0.4)' }}
+                  />
+                  <div>
+                    <p
+                      className='bangla text-xs font-bold'
+                      style={{ color: '#d4af37', letterSpacing: '0.01em' }}
+                    >
+                      🎁 বোনাস
+                    </p>
+                    <p
+                      className='bangla text-sm font-semibold leading-snug'
+                      style={{ color: '#f0e0a0' }}
+                    >
+                      সানগ্লাসটির সাথে পাচ্ছেন প্রিমিয়াম বক্স
+                    </p>
+                  </div>
                 </div>
 
                 {/* perks */}
@@ -557,7 +620,10 @@ const ProductDetails = ({ initialProduct }) => {
         </div>
         <div className='hidden md:grid md:grid-cols-2'>
           {DESC_IMGS.map((f, i) => (
-            <div key={i} className='overflow-hidden'>
+            <div
+              key={i}
+              className={`overflow-hidden${i === DESC_IMGS.length - 1 && DESC_IMGS.length % 2 !== 0 ? ' md:col-span-2' : ''}`}
+            >
               <img
                 src={`/assets/product/glass/${f}`}
                 alt={`বিবরণ ${i + 1}`}
@@ -717,19 +783,36 @@ const ProductDetails = ({ initialProduct }) => {
           {/* CTA */}
           <div className='text-center mt-14'>
             <div
-              className='rounded-2xl p-10 max-w-2xl mx-auto shadow-xl'
-              style={{ background: 'linear-gradient(135deg,#6366f1,#7c3aed)' }}
+              className='rounded-2xl p-10 max-w-2xl mx-auto shadow-2xl'
+              style={{
+                background:
+                  'linear-gradient(135deg, #0a0a14 0%, #1a1333 40%, #251848 70%, #0a0a14 100%)',
+                border: '1px solid rgba(180,140,255,0.18)',
+              }}
             >
-              <h3 className='text-white text-2xl font-extrabold bangla mb-2'>
+              <h3
+                className='text-2xl font-extrabold bangla mb-2'
+                style={{
+                  color: '#e8d5ff',
+                  textShadow: '0 0 20px rgba(160,100,255,0.4)',
+                }}
+              >
                 আজই অর্ডার করুন!
               </h3>
-              <p className='text-indigo-200 bangla text-sm mb-6'>
+              <p className='bangla text-sm mb-6' style={{ color: '#a08cc0' }}>
                 সীমিত স্টক — দেরি না করে এখনই নিশ্চিত করুন আপনার অর্ডার
               </p>
               <button
                 onClick={handleBuyNow}
                 disabled={!product.inStock || isAddingToCart}
-                className='bg-white text-indigo-600 font-extrabold bangla px-10 py-4 rounded-xl hover:bg-indigo-50 transition-all duration-300 hover:scale-105 shadow-md disabled:opacity-70'
+                className='font-extrabold bangla px-10 py-4 rounded-xl transition-all duration-300 hover:scale-105 shadow-lg disabled:opacity-70'
+                style={{
+                  background:
+                    'linear-gradient(135deg, #d4af37 0%, #c9922a 50%, #d4af37 100%)',
+                  color: '#1a1208',
+                  boxShadow: '0 4px 20px rgba(212,175,55,0.35)',
+                  border: 'none',
+                }}
               >
                 {product.inStock
                   ? `৳${product.price} — এখনই কিনুন`

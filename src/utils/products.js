@@ -1,5 +1,26 @@
 export const products = [
   {
+    id: 12,
+    title: 'Multifunctional Remote Control Outdoor Wall Lamp Waterproof Courtyard Light',
+    slug: 'outdoor-wall-lamp-waterproof',
+    model: 'WL-C6103C(Touch)',
+    price: 800.0,
+    originalPrice: 1200.0,
+    sectionType: 'hot',
+    inStock: true,
+    thumbnail: '/assets/product/light/main.jpg',
+    description:
+      'মাল্টিফাংশনাল রিমোট কন্ট্রোল আউটডোর ওয়াল ল্যাম্প - ওয়াটারপ্রুফ, টাচ ও রিমোট কন্ট্রোল, ২০০০mAh ব্যাটারি সহ। বাড়ির বাইরে, সিঁড়ি বা উঠানে স্মার্ট আলোকসজ্জার পারফেক্ট সমাধান।',
+    images: [
+      '/assets/product/light/main.jpg',
+      '/assets/product/light/img2.jpg',
+      '/assets/product/light/img3.jpg',
+      '/assets/product/light/img4.jpg',
+      '/assets/product/light/img5.jpg',
+    ],
+    variants: [{ type: 'Standard' }],
+  },
+  {
     id: 11,
     title: 'Energy Booster Essential Oil Nasal Inhaler | Sheii Shop',
     slug: 'energy-booster-essential-oil-nasal-inhaler',
@@ -205,10 +226,10 @@ export const products = [
     description:
       '১-৯ বিভিন্ন লেভেলে আপনার সুবিধা অনুযায়ী এডজাস্ট করুন। স্টাইলিশ সানগ্লাসটি আপনাকে দিবে চোখের প্রশান্তি।',
     images: [
-      '/assets/product/glass/black.jpeg',
-      '/assets/product/glass/golden.jpeg',
-      '/assets/product/glass/silver-new.jpeg',
-      '/assets/product/glass/desc3.jpeg',
+      '/assets/product/glass/black-main.jpeg',
+      '/assets/product/glass/silver-main.jpeg',
+      '/assets/product/glass/golden-main.jpeg',
+      '/assets/product/glass/all.jpeg',
     ],
     variants: [{ color: 'Black' }, { color: 'Silver' }, { color: 'Golden' }],
   },
