@@ -8,7 +8,9 @@
       "Bash(Select-Object Name, Mode)",
       "Bash(Format-Table -AutoSize)",
       "PowerShell(New-Item *)",
-      "Bash(dir E:ecommerce-frontendpublic *)"
+      "Bash(dir E:ecommerce-frontendpublic *)",
+      "Bash(npm install *)",
+      "Bash(npm list *)"
     ]
   }
 }
