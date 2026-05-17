@@ -7,17 +7,16 @@ import { MdFormatListBulleted } from 'react-icons/md';
 import { GoChevronDown } from 'react-icons/go';
 import Link from 'next/link';
 import { addToCart } from '@/store/cartSlice';
-import { products } from '@/utils/products';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 
-// Define categories based on product titles/models
 const categories = ['Smart Watches', 'Smart Rings'];
 
 function Products() {
   const dispatch = useDispatch();
   const router = useRouter();
-  const [filteredProducts, setFilteredProducts] = useState(products);
+  const [allProducts, setAllProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
   const [sortOption, setSortOption] = useState('newest');
   const [viewMode, setViewMode] = useState('grid');
   const [filters, setFilters] = useState({
@@ -26,6 +25,17 @@ function Products() {
     stockStatus: [],
   });
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [loadingProducts, setLoadingProducts] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/public/products')
+      .then((r) => r.json())
+      .then((data) => {
+        setAllProducts(data.products || []);
+      })
+      .catch(() => setAllProducts([]))
+      .finally(() => setLoadingProducts(false));
+  }, []);
 
   // Price ranges based on product prices (1500–3850)
   const priceRanges = [
@@ -40,7 +50,7 @@ function Products() {
 
   // Apply filters and sorting
   useEffect(() => {
-    let result = [...products];
+    let result = [...allProducts];
 
     // Apply category filter
     if (filters.categories.length > 0) {
@@ -86,7 +96,7 @@ function Products() {
     }
 
     setFilteredProducts(result);
-  }, [filters, sortOption]);
+  }, [filters, sortOption, allProducts]);
 
   // Handle sort option change
   const handleSortChange = (option) => {
@@ -433,7 +443,9 @@ function Products() {
                   : 'flex flex-col gap-4'
               }`}
             >
-              {filteredProducts.length === 0 ? (
+              {loadingProducts ? (
+                <p className='text-gray-400 col-span-full text-center py-10'>Loading products…</p>
+              ) : filteredProducts.length === 0 ? (
                 <p className='text-gray-500 col-span-full text-center'>
                   No products found.
                 </p>

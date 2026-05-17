@@ -3,7 +3,11 @@
     "allow": [
       "Bash(npx next build:*)",
       "Bash(node -e:*)",
-      "Bash(npm install mongoose@8 bcryptjs jsonwebtoken)"
+      "Bash(npm install mongoose@8 bcryptjs jsonwebtoken)",
+      "Bash(Get-ChildItem -Path \"E:\\\\ecommerce-frontend\" -Force)",
+      "Bash(Select-Object Name, Mode)",
+      "Bash(Format-Table -AutoSize)",
+      "PowerShell(New-Item *)"
     ]
   }
 }

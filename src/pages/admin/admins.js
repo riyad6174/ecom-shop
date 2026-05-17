@@ -152,13 +152,19 @@ export default function AdminsManagement() {
             </div>
             <span className='font-black text-xl tracking-tighter text-slate-900'>SHEII <span className="text-blue-600">ADMIN</span></span>
           </div>
-          <nav className='hidden md:flex items-center gap-1 bg-slate-100 p-1 rounded-xl'>
+          <nav className='hidden md:flex items-center gap-1 bg-slate-100 p-1 rounded-xl flex-wrap'>
             <Link
               href='/admin/orders'
               className='flex items-center gap-2 text-xs font-black uppercase tracking-widest px-4 py-2 rounded-lg text-slate-500 hover:text-slate-900 transition-all'
             >
               <FiShoppingBag className="w-3.5 h-3.5" />
               Orders
+            </Link>
+            <Link
+              href='/admin/products'
+              className='flex items-center gap-2 text-xs font-black uppercase tracking-widest px-4 py-2 rounded-lg text-slate-500 hover:text-slate-900 transition-all'
+            >
+              Manage Product
             </Link>
             <Link
               href='/admin/admins'

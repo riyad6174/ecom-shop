@@ -307,9 +307,12 @@ export default function AdminOrders() {
               <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold italic">S</div>
               <span className='font-bold text-slate-900 tracking-tight hidden sm:block'>Dashboard</span>
             </div>
-            <nav className='flex items-center gap-1 bg-slate-100 p-1 rounded-lg'>
+            <nav className='flex items-center gap-1 bg-slate-100 p-1 rounded-lg flex-wrap'>
               <Link href='/admin/orders' className='text-sm px-4 py-1.5 rounded-md bg-white shadow-sm font-semibold text-blue-700'>
                 Orders
+              </Link>
+              <Link href='/admin/products' className='text-sm px-4 py-1.5 rounded-md text-slate-600 hover:bg-slate-200 transition-colors font-medium'>
+                Manage Product
               </Link>
               <Link href='/admin/admins' className='text-sm px-4 py-1.5 rounded-md text-slate-600 hover:bg-slate-200 transition-colors font-medium'>
                 Admins
