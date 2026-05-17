@@ -15,22 +15,27 @@ export default async function handler(req, res) {
   if (!filename || !data)
     return res.status(400).json({ message: 'filename and data required' });
 
-  const base64Data = data.replace(/^data:image\/\w+;base64,/, '');
-  const buffer = Buffer.from(base64Data, 'base64');
+  try {
+    const base64Data = data.replace(/^data:image\/\w+;base64,/, '');
+    const buffer = Buffer.from(base64Data, 'base64');
 
-  const ext = extname(filename).toLowerCase() || '.jpg';
-  const safeName =
-    filename
-      .replace(extname(filename), '')
-      .replace(/[^a-zA-Z0-9_-]/g, '_')
-      .slice(0, 60) +
-    '_' +
-    Date.now() +
-    ext;
+    const ext = extname(filename).toLowerCase() || '.jpg';
+    const safeName =
+      filename
+        .replace(extname(filename), '')
+        .replace(/[^a-zA-Z0-9_-]/g, '_')
+        .slice(0, 60) +
+      '_' +
+      Date.now() +
+      ext;
 
-  const uploadDir = join(process.cwd(), 'public', 'assets', 'products');
-  await mkdir(uploadDir, { recursive: true });
-  await writeFile(join(uploadDir, safeName), buffer);
+    const uploadDir = join(process.cwd(), 'public', 'uploads');
+    await mkdir(uploadDir, { recursive: true });
+    await writeFile(join(uploadDir, safeName), buffer);
 
-  res.status(200).json({ url: `/assets/products/${safeName}` });
+    res.status(200).json({ url: `/uploads/${safeName}` });
+  } catch (err) {
+    console.error('Upload error:', err);
+    res.status(500).json({ message: 'Upload failed: ' + err.message });
+  }
 }
