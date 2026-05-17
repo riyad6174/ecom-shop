@@ -369,7 +369,7 @@ export default function DynamicProductPage({ product, notFound }) {
 
       {/* Hero */}
       <div className='bg-gradient-to-b from-slate-50 to-white'>
-        <div className='container mx-auto px-4 lg:px-8 py-6'>
+        <div className='container mx-auto px-0 lg:px-8 py-0 md:py-6'>
           <div className='bg-white rounded shadow-xl overflow-hidden'>
             <div className='flex flex-col lg:flex-row'>
               {/* Images */}
