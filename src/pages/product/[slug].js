@@ -320,27 +320,166 @@ export default function DynamicProductPage({ product, notFound }) {
         .countdown-digit {
           animation: digit-pop 0.15s ease-out;
         }
-        .dp-html-content img {
-          max-width: 100%;
-          height: auto;
+        @keyframes banner-shimmer {
+          0% {
+            transform: translateX(-150%) skewX(-20deg);
+            opacity: 0;
+          }
+          10% {
+            opacity: 1;
+          }
+          90% {
+            opacity: 1;
+          }
+          100% {
+            transform: translateX(300%) skewX(-20deg);
+            opacity: 0;
+          }
         }
-        .dp-html-content h1,
-        .dp-html-content h2,
-        .dp-html-content h3 {
-          font-weight: 700;
-          margin: 1rem 0 0.5rem;
+        .banner-shimmer-line {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 35%;
+          height: 100%;
+          background: linear-gradient(
+            90deg,
+            transparent 0%,
+            rgba(255, 230, 80, 0.15) 50%,
+            transparent 100%
+          );
+          animation: banner-shimmer 3.5s ease-in-out infinite;
+          pointer-events: none;
         }
-        .dp-html-content ul,
-        .dp-html-content ol {
-          padding-left: 1.5rem;
-          margin: 0.5rem 0;
+        @keyframes icon-sparkle {
+          0%,
+          100% {
+            text-shadow: 0 0 6px rgba(255, 220, 80, 0.4);
+            transform: scale(1) rotate(0deg);
+          }
+          30% {
+            text-shadow:
+              0 0 18px rgba(255, 240, 80, 1),
+              0 0 36px rgba(212, 175, 55, 0.7);
+            transform: scale(1.35) rotate(20deg);
+          }
+          60% {
+            text-shadow: 0 0 6px rgba(255, 220, 80, 0.4);
+            transform: scale(1) rotate(0deg);
+          }
+          80% {
+            text-shadow:
+              0 0 18px rgba(255, 240, 80, 1),
+              0 0 36px rgba(212, 175, 55, 0.7);
+            transform: scale(1.35) rotate(-20deg);
+          }
         }
-        .dp-html-content li {
-          margin-bottom: 0.25rem;
+        .shine-icon {
+          display: inline-block;
+          animation: icon-sparkle 2.4s ease-in-out infinite;
+          color: #ffe87c;
         }
-        .dp-html-content p {
-          margin-bottom: 0.75rem;
+        /* ── dp-html-content: full Quill output rendering ── */
+        .dp-html-content { line-height: 1.75; color: #1e293b; }
+        .dp-html-content p { margin-bottom: 0.85rem; }
+        /* Headings */
+        .dp-html-content h1 { font-size: 1.875rem; font-weight: 700; margin: 1.25rem 0 0.5rem; line-height: 1.2; }
+        .dp-html-content h2 { font-size: 1.5rem;   font-weight: 700; margin: 1.1rem 0 0.5rem;  line-height: 1.25; }
+        .dp-html-content h3 { font-size: 1.25rem;  font-weight: 700; margin: 1rem 0 0.4rem;    line-height: 1.3; }
+        .dp-html-content h4 { font-size: 1.125rem; font-weight: 600; margin: 0.9rem 0 0.4rem; }
+        .dp-html-content h5 { font-size: 1rem;     font-weight: 600; margin: 0.8rem 0 0.3rem; }
+        .dp-html-content h6 { font-size: 0.875rem; font-weight: 600; margin: 0.75rem 0 0.3rem; }
+        /* Inline text */
+        .dp-html-content strong { font-weight: 700; }
+        .dp-html-content em     { font-style: italic; }
+        .dp-html-content u      { text-decoration: underline; }
+        .dp-html-content s      { text-decoration: line-through; }
+        /* Lists */
+        .dp-html-content ul { list-style-type: disc;    padding-left: 1.75rem; margin: 0.5rem 0 0.75rem; }
+        .dp-html-content ol { list-style-type: decimal; padding-left: 1.75rem; margin: 0.5rem 0 0.75rem; }
+        .dp-html-content ul ul { list-style-type: circle; margin: 0.25rem 0; }
+        .dp-html-content ul ul ul { list-style-type: square; }
+        .dp-html-content li { margin-bottom: 0.3rem; display: list-item; }
+        /* Quill indent (nested list / block indent) */
+        .dp-html-content .ql-indent-1 { padding-left: 3em; }
+        .dp-html-content .ql-indent-2 { padding-left: 6em; }
+        .dp-html-content .ql-indent-3 { padding-left: 9em; }
+        .dp-html-content .ql-indent-4 { padding-left: 12em; }
+        .dp-html-content .ql-indent-5 { padding-left: 15em; }
+        /* Quill alignment */
+        .dp-html-content .ql-align-center  { text-align: center; }
+        .dp-html-content .ql-align-right   { text-align: right; }
+        .dp-html-content .ql-align-justify { text-align: justify; }
+        /* Images */
+        .dp-html-content img { max-width: 100%; height: auto; border-radius: 4px; }
+        /* Links */
+        .dp-html-content a { color: #2563eb; text-decoration: underline; }
+        .dp-html-content a:hover { color: #1d4ed8; }
+        /* Blockquote */
+        .dp-html-content blockquote {
+          border-left: 4px solid #d4af37;
+          padding: 0.6em 1em;
+          margin: 1em 0;
+          color: #4b5563;
+          font-style: italic;
+          background: #fafaf7;
+          border-radius: 0 4px 4px 0;
         }
+        /* Code */
+        .dp-html-content code {
+          background: #f1f5f9;
+          padding: 0.15em 0.45em;
+          border-radius: 4px;
+          font-size: 0.875em;
+          font-family: ui-monospace, monospace;
+          color: #be123c;
+        }
+        .dp-html-content pre,
+        .dp-html-content pre.ql-syntax {
+          background: #1e293b;
+          color: #e2e8f0;
+          padding: 1rem 1.25rem;
+          border-radius: 8px;
+          overflow-x: auto;
+          font-family: ui-monospace, monospace;
+          font-size: 0.875rem;
+          line-height: 1.6;
+          margin: 1rem 0;
+        }
+        /* Tables */
+        .dp-html-content table,
+        .dp-html-content .quill-better-table {
+          width: 100%;
+          border-collapse: collapse;
+          margin: 1.25rem 0;
+          font-size: 0.9rem;
+          overflow: hidden;
+          border-radius: 6px;
+          box-shadow: 0 0 0 1px #e2e8f0;
+        }
+        .dp-html-content th,
+        .dp-html-content td,
+        .dp-html-content .quill-better-table td {
+          border: 1px solid #e2e8f0;
+          padding: 9px 13px;
+          text-align: left;
+          vertical-align: top;
+        }
+        .dp-html-content th,
+        .dp-html-content thead td {
+          background: #f8fafc;
+          font-weight: 600;
+          color: #374151;
+        }
+        .dp-html-content tr:nth-child(even) td { background: #fafafa; }
+        /* HR */
+        .dp-html-content hr {
+          border: none;
+          border-top: 1px solid #e5e7eb;
+          margin: 1.5rem 0;
+        }
+        /* Video iframe wrapper */
+        .dp-html-content iframe { max-width: 100%; border-radius: 6px; }
       `}</style>
 
       <Navbar />
@@ -348,21 +487,24 @@ export default function DynamicProductPage({ product, notFound }) {
       {/* Sticky Offer Banner */}
       {discount > 0 && (
         <div
-          className='offer-banner sticky top-0 z-40 py-2.5 px-4 text-center'
+          className='offer-banner sticky top-0 z-40 py-2.5 px-4 text-center relative overflow-hidden'
           style={{
             background:
               'linear-gradient(90deg,#0d0d0d 0%,#1a1208 30%,#2d1f0a 50%,#1a1208 70%,#0d0d0d 100%)',
             borderBottom: '1.5px solid rgba(212,175,55,0.3)',
           }}
         >
+          <div className='banner-shimmer-line' />
           <p
-            className='font-bold bangla text-sm md:text-base tracking-wide'
+            className='font-bold bangla text-sm md:text-base tracking-wide relative z-10'
             style={{
               color: '#f0d080',
               textShadow: '0 0 16px rgba(212,175,55,0.5)',
             }}
           >
-            ✦ {discount}% ডিস্কাউন্ট পাচ্ছেন শুধু আজকের জন্য ✦
+            <span className='shine-icon'>✦</span>{' '}
+            {discount}% ডিস্কাউন্ট পাচ্ছেন শুধু আজকের জন্য{' '}
+            <span className='shine-icon'>✦</span>
           </p>
         </div>
       )}
@@ -466,7 +608,7 @@ export default function DynamicProductPage({ product, notFound }) {
                 <div className='flex items-end gap-3 mt-4 mb-5'>
                   <span
                     className='text-4xl font-extrabold'
-                    style={{ color: '#c9922a' }}
+                    style={{ color: '#f97316' }}
                   >
                     ৳{Number(product.price).toFixed(0)}
                   </span>
@@ -476,9 +618,9 @@ export default function DynamicProductPage({ product, notFound }) {
                   {discount > 0 && (
                     <span
                       style={{
-                        background: '#1a1208',
-                        color: '#d4af37',
-                        border: '1px solid rgba(212,175,55,0.25)',
+                        background: '#fde047',
+                        color: '#991b1b',
+                        border: '1px solid #f59e0b',
                       }}
                       className='text-sm font-bold px-2 py-0.5 rounded-lg mb-1'
                     >
@@ -602,6 +744,7 @@ export default function DynamicProductPage({ product, notFound }) {
                   {[
                     { icon: '🚀', text: 'দ্রুত ডেলিভারি' },
                     { icon: '🔒', text: 'ক্যাশ অন ডেলিভারি' },
+                    { icon: '💯', text: 'অরিজিনাল প্রোডাক্টের নিশ্চয়তা' },
                     { icon: '🎁', text: 'বিশেষ অফার' },
                   ].map((p) => (
                     <div key={p.text} className='flex items-center gap-2'>
@@ -620,7 +763,7 @@ export default function DynamicProductPage({ product, notFound }) {
 
       {/* Gallery — mobile only: full width, 1 per row, no gaps, before description */}
       {product.gallery && product.gallery.length > 0 && (
-        <div className='md:hidden w-full px-4'>
+        <div className='md:hidden w-full '>
           {product.gallery.map((img, i) => (
             <div key={i} className='w-full'>
               <img
