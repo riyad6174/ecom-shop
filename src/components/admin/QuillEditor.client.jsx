@@ -9,7 +9,7 @@ import Image from '@tiptap/extension-image';
 import TextAlign from '@tiptap/extension-text-align';
 import { Table, TableRow, TableHeader, TableCell } from '@tiptap/extension-table';
 import Youtube from '@tiptap/extension-youtube';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 function Btn({ onClick, active, title, children, danger }) {
   return (
@@ -37,6 +37,9 @@ function Sep() {
 export default function QuillEditorClient({ value, onChange }) {
   const [tRows, setTRows] = useState(3);
   const [tCols, setTCols] = useState(3);
+  // Track the last HTML we emitted so we can distinguish external value
+  // changes (e.g. initialData loading) from our own onChange echoes.
+  const lastEmitted = useRef('');
 
   const editor = useEditor({
     extensions: [
@@ -58,8 +61,22 @@ export default function QuillEditorClient({ value, onChange }) {
       Youtube.configure({ width: '100%', height: 480 }),
     ],
     content: value || '',
-    onUpdate: ({ editor }) => onChange(editor.getHTML()),
+    onUpdate: ({ editor }) => {
+      const html = editor.getHTML();
+      lastEmitted.current = html;
+      onChange(html);
+    },
   });
+
+  // When the parent sets a new value from outside (e.g. initialData arrives
+  // after the editor already mounted), push it into the editor.
+  // Skip if it's just our own onChange echoing back.
+  useEffect(() => {
+    if (!editor || !value) return;
+    if (value === lastEmitted.current) return;
+    editor.commands.setContent(value, false); // false = don't fire onUpdate
+    lastEmitted.current = value;
+  }, [value, editor]);
 
   if (!editor) return (
     <div className="h-[400px] bg-slate-50 flex items-center justify-center text-slate-400 text-sm animate-pulse">
