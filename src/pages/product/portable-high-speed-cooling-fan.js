@@ -18,6 +18,71 @@ const productData = products.find(
   (p) => p.slug === 'portable-high-speed-cooling-fan',
 );
 
+function CountdownToMidnight() {
+  const [timeLeft, setTimeLeft] = useState({ h: 0, m: 0, s: 0 });
+
+  useEffect(() => {
+    const tick = () => {
+      const now = new Date();
+      const midnight = new Date(now);
+      midnight.setHours(24, 0, 0, 0);
+      const diff = Math.max(0, Math.floor((midnight - now) / 1000));
+      setTimeLeft({
+        h: Math.floor(diff / 3600),
+        m: Math.floor((diff % 3600) / 60),
+        s: diff % 60,
+      });
+    };
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  const pad = (n) => String(n).padStart(2, '0');
+
+  return (
+    <div
+      className='rounded-xl px-4 py-3 my-3'
+      style={{
+        background: 'linear-gradient(135deg, #fff7ed, #ffedd5)',
+        border: '1.5px solid #fed7aa',
+      }}
+    >
+      <p className='bangla text-sm font-semibold text-center text-orange-700 mb-2'>
+        ⏰ অফার টি চলবে আর
+      </p>
+      <div className='flex items-center justify-center gap-2'>
+        {[
+          { val: pad(timeLeft.h), label: 'ঘণ্টা' },
+          { val: pad(timeLeft.m), label: 'মিনিট' },
+          { val: pad(timeLeft.s), label: 'সেকেন্ড' },
+        ].map((unit, i) => (
+          <React.Fragment key={unit.label}>
+            {i > 0 && (
+              <span className='text-orange-500 font-black text-2xl leading-none mb-4'>
+                :
+              </span>
+            )}
+            <div className='flex flex-col items-center'>
+              <span
+                className='countdown-digit font-mono font-extrabold text-lg px-3 py-1.5 rounded-lg min-w-[44px] text-center shadow-md text-white'
+                style={{
+                  background: 'linear-gradient(135deg, #ea580c, #c2410c)',
+                }}
+              >
+                {unit.val}
+              </span>
+              <span className='text-[10px] text-orange-600 bangla mt-1 font-medium'>
+                {unit.label}
+              </span>
+            </div>
+          </React.Fragment>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 const ProductDetails = ({ initialProduct }) => {
   const dispatch = useDispatch();
   const [product, setProduct] = useState(initialProduct);
@@ -127,6 +192,10 @@ const ProductDetails = ({ initialProduct }) => {
     return <div>Product not found</div>;
   }
 
+  const discount = Math.round(
+    ((product.originalPrice - product.price) / product.originalPrice) * 100,
+  );
+
   return (
     <>
       <Head>
@@ -210,8 +279,57 @@ const ProductDetails = ({ initialProduct }) => {
       </Head>
 
       <Navbar />
+
+      {/* Offer Banner — sticky below navbar */}
+      <div
+        className='offer-banner sticky top-0 z-40 py-2.5 px-4 text-center'
+        style={{
+          background:
+            'linear-gradient(90deg, #0a1428 0%, #132244 25%, #1a3060 50%, #132244 75%, #0a1428 100%)',
+          borderBottom: '1.5px solid rgba(59,130,246,0.35)',
+        }}
+      >
+        <p
+          className='font-bold bangla text-sm md:text-base tracking-wide'
+          style={{
+            color: '#bfdbfe',
+            textShadow: '0 0 18px rgba(59,130,246,0.45)',
+            letterSpacing: '0.03em',
+          }}
+        >
+          ✦ {discount}% ডিস্কাউন্ট পাচ্ছেন শুধু আজকের জন্য ✦
+        </p>
+      </div>
+
       <div>
         <style jsx>{`
+          @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap');
+          .bangla {
+            font-family: 'Hind Siliguri', sans-serif;
+          }
+          @keyframes offer-pulse {
+            0%,
+            100% {
+              opacity: 1;
+            }
+            50% {
+              opacity: 0.88;
+            }
+          }
+          .offer-banner {
+            animation: offer-pulse 2.2s ease-in-out infinite;
+          }
+          @keyframes digit-pop {
+            0% {
+              transform: scale(1.18);
+            }
+            100% {
+              transform: scale(1);
+            }
+          }
+          .countdown-digit {
+            animation: digit-pop 0.15s ease-out;
+          }
           .image-transition {
             transition:
               opacity 0.3s ease-in-out,
@@ -339,6 +457,9 @@ const ProductDetails = ({ initialProduct }) => {
                     ))}
                   </div>
                 </div>
+
+                {/* Countdown timer */}
+                <CountdownToMidnight />
 
                 {/* Price */}
                 <div className='flex items-center justify-start gap-2 text-md mb-6'>

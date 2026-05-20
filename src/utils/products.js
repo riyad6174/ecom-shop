@@ -1,7 +1,8 @@
 export const products = [
   {
     id: 12,
-    title: 'Multifunctional Remote Control Outdoor Wall Lamp Waterproof Courtyard Light',
+    title:
+      'Multifunctional Remote Control Outdoor Wall Lamp Waterproof Courtyard Light',
     slug: 'outdoor-wall-lamp-waterproof',
     model: 'WL-C6103C(Touch)',
     price: 800.0,
@@ -258,8 +259,8 @@ export const products = [
     title: 'JF132-Portable High-speed Cooling Fan',
     slug: 'portable-high-speed-cooling-fan',
     model: 'JF132',
-    price: 1599.0,
-    originalPrice: 1750.0,
+    price: 1499.0,
+    originalPrice: 1850.0,
     sectionType: 'hot',
     inStock: true,
     thumbnail: '/assets/product/fan/black.jpg',
@@ -268,7 +269,7 @@ export const products = [
     images: [
       '/assets/product/fan/black.jpg',
       '/assets/product/fan/black.jpg',
-      '/assets/product/fan/blue.jpg',
+      // '/assets/product/fan/blue.jpg',
       '/assets/product/fan/pink.jpg',
       '/assets/product/fan/white.jpg',
       // '/assets/product/fan/blue.jpg',
@@ -278,7 +279,7 @@ export const products = [
       { color: 'White' },
       // { color: 'Gray' },
       { color: 'mistyrose' },
-      { color: 'cornflowerblue' },
+      // { color: 'cornflowerblue' },
       // { color: 'Beige' },
     ],
   },
