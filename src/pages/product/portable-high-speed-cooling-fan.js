@@ -184,8 +184,18 @@ const ReviewSlider = ({ handleBuyNow, product }) => {
               }}
               className='bg-white/80 backdrop-blur-sm hover:bg-white text-gray-800 w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-110'
             >
-              <svg className='w-5 h-5' fill='none' stroke='currentColor' strokeWidth='2.5' viewBox='0 0 24 24'>
-                <path strokeLinecap='round' strokeLinejoin='round' d='M15 19l-7-7 7-7' />
+              <svg
+                className='w-5 h-5'
+                fill='none'
+                stroke='currentColor'
+                strokeWidth='2.5'
+                viewBox='0 0 24 24'
+              >
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  d='M15 19l-7-7 7-7'
+                />
               </svg>
             </button>
             <button
@@ -199,8 +209,18 @@ const ReviewSlider = ({ handleBuyNow, product }) => {
               }}
               className='bg-white/80 backdrop-blur-sm hover:bg-white text-gray-800 w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-110'
             >
-              <svg className='w-5 h-5' fill='none' stroke='currentColor' strokeWidth='2.5' viewBox='0 0 24 24'>
-                <path strokeLinecap='round' strokeLinejoin='round' d='M9 5l7 7-7 7' />
+              <svg
+                className='w-5 h-5'
+                fill='none'
+                stroke='currentColor'
+                strokeWidth='2.5'
+                viewBox='0 0 24 24'
+              >
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  d='M9 5l7 7-7 7'
+                />
               </svg>
             </button>
           </div>
@@ -234,7 +254,11 @@ const ReviewSlider = ({ handleBuyNow, product }) => {
                   outlineOffset: 2,
                 }}
               >
-                <img src={src} alt='' style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <img
+                  src={src}
+                  alt=''
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
               </button>
             ))}
           </div>
@@ -382,7 +406,10 @@ const ProductDetails = ({ initialProduct }) => {
         <meta property='og:type' content='product' />
         <meta
           property='og:image'
-          content={product.images[0] || 'https://www.sheiishop.com/assets/footer-logo.png'}
+          content={
+            product.images[0] ||
+            'https://www.sheiishop.com/assets/footer-logo.png'
+          }
         />
         <meta
           property='og:url'
@@ -394,7 +421,10 @@ const ProductDetails = ({ initialProduct }) => {
         <meta name='twitter:description' content={product.description} />
         <meta
           name='twitter:image'
-          content={product.images[0] || 'https://www.sheiishop.com/assets/footer-logo.png'}
+          content={
+            product.images[0] ||
+            'https://www.sheiishop.com/assets/footer-logo.png'
+          }
         />
         <script
           type='application/ld+json'
@@ -455,22 +485,33 @@ const ProductDetails = ({ initialProduct }) => {
           box-shadow: 0 8px 25px rgba(99, 102, 241, 0.5);
         }
         .feature-card {
-          transition: transform 0.3s ease, box-shadow 0.3s ease;
+          transition:
+            transform 0.3s ease,
+            box-shadow 0.3s ease;
         }
         .feature-card:hover {
           transform: translateY(-4px);
           box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
         }
         @keyframes offer-pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.88; }
+          0%,
+          100% {
+            opacity: 1;
+          }
+          50% {
+            opacity: 0.88;
+          }
         }
         .offer-banner {
           animation: offer-pulse 2.2s ease-in-out infinite;
         }
         @keyframes digit-pop {
-          0% { transform: scale(1.18); }
-          100% { transform: scale(1); }
+          0% {
+            transform: scale(1.18);
+          }
+          100% {
+            transform: scale(1);
+          }
         }
         .countdown-digit {
           animation: digit-pop 0.15s ease-out;
@@ -491,7 +532,8 @@ const ProductDetails = ({ initialProduct }) => {
       <div
         className='offer-banner sticky top-0 z-40 py-2.5 px-4 text-center'
         style={{
-          background: 'linear-gradient(90deg, #7c3aed 0%, #4f46e5 50%, #7c3aed 100%)',
+          background:
+            'linear-gradient(90deg, #7c3aed 0%, #4f46e5 50%, #7c3aed 100%)',
           borderBottom: '2px solid #6d28d9',
         }}
       >
@@ -568,7 +610,9 @@ const ProductDetails = ({ initialProduct }) => {
               <div className='w-full lg:w-[42%] px-6 md:px-10 py-8 flex flex-col justify-center border-t lg:border-t-0 lg:border-l border-gray-100'>
                 <div className='inline-flex items-center gap-2 mb-4'>
                   <span
-                    style={{ background: 'linear-gradient(135deg,#6366f1,#8b5cf6)' }}
+                    style={{
+                      background: 'linear-gradient(135deg,#6366f1,#8b5cf6)',
+                    }}
                     className='text-white text-xs font-semibold px-3 py-1 rounded-full'
                   >
                     ★ বেস্টসেলার
@@ -610,7 +654,9 @@ const ProductDetails = ({ initialProduct }) => {
                 <div className='mb-6'>
                   <p className='text-sm font-semibold text-gray-700 mb-3 bangla'>
                     রঙ বেছে নিন:{' '}
-                    <span className='text-indigo-600 font-bold'>{selectedColor}</span>
+                    <span className='text-indigo-600 font-bold'>
+                      {selectedColor}
+                    </span>
                   </p>
                   <div className='flex items-center gap-3 flex-wrap'>
                     {product.variants.map((v) => {
@@ -628,7 +674,9 @@ const ProductDetails = ({ initialProduct }) => {
                             width: 36,
                             height: 36,
                             borderRadius: '50%',
-                            border: isWhite ? '2px solid #9ca3af' : '2px solid transparent',
+                            border: isWhite
+                              ? '2px solid #9ca3af'
+                              : '2px solid transparent',
                             outline: isSelected ? '3px solid #6366f1' : 'none',
                             outlineOffset: 3,
                             transform: isSelected ? 'scale(1.15)' : 'scale(1)',
@@ -672,10 +720,10 @@ const ProductDetails = ({ initialProduct }) => {
                 {/* Perks */}
                 <div className='grid grid-cols-2 gap-3 pt-5 border-t border-gray-100'>
                   {[
-                    { icon: '🚀', text: 'দ্রুত ডেলিভারি' },
-                    { icon: '🔒', text: 'ক্যাশ অন ডেলিভারি' },
-                    { icon: '🔄', text: '6 মাসের সার্ভিস ওয়ারেন্টি' },
-                    { icon: '🎁', text: 'বিশেষ অফার' },
+                    { icon: '🔋', text: '4০০০ mAh ব্যাটারি' },
+                    { icon: '🍃', text: '10500 RPM Maximum Speed' },
+                    { icon: '✅', text: '6 মাসের রিপ্লেসমেন্ট ওয়ারেন্টি' },
+                    { icon: '🔄', text: '1-199 Speed Adjustment' },
                   ].map((p) => (
                     <div key={p.text} className='flex items-center gap-2'>
                       <span className='text-lg'>{p.icon}</span>
@@ -806,7 +854,9 @@ const ProductDetails = ({ initialProduct }) => {
                 key={f.title}
                 className={`feature-card ${f.bg} rounded-2xl p-6 flex gap-4 items-start`}
               >
-                <div className={`${f.ibg} rounded-xl p-3 text-2xl flex-shrink-0`}>
+                <div
+                  className={`${f.ibg} rounded-xl p-3 text-2xl flex-shrink-0`}
+                >
                   {f.icon}
                 </div>
                 <div>
@@ -825,7 +875,9 @@ const ProductDetails = ({ initialProduct }) => {
           <div className='bg-white rounded shadow-md overflow-hidden'>
             <div
               className='px-8 py-5'
-              style={{ background: 'linear-gradient(to right,#6366f1,#7c3aed)' }}
+              style={{
+                background: 'linear-gradient(to right,#6366f1,#7c3aed)',
+              }}
             >
               <h3 className='text-white font-bold text-lg bangla'>
                 পণ্যের স্পেসিফিকেশন
@@ -876,7 +928,10 @@ const ProductDetails = ({ initialProduct }) => {
               controls
               poster='/assets/product/fan/userguide.jpg'
             >
-              <source src='/assets/product/fan/userguide.mp4' type='video/mp4' />
+              <source
+                src='/assets/product/fan/userguide.mp4'
+                type='video/mp4'
+              />
             </video>
           </div>
         </div>
@@ -893,7 +948,8 @@ const ProductDetails = ({ initialProduct }) => {
       <div
         className='fixed-offer-bar py-3 px-4'
         style={{
-          background: 'linear-gradient(90deg, #ea580c 0%, #c2410c 50%, #ea580c 100%)',
+          background:
+            'linear-gradient(90deg, #ea580c 0%, #c2410c 50%, #ea580c 100%)',
           borderTop: '2px solid #9a3412',
         }}
       >
