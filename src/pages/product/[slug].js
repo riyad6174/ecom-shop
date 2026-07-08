@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { sendGTMEvent } from '@next/third-parties/google';
 import { useDispatch } from 'react-redux';
 import Navbar from '@/components/common/Navbar';
-import { addToCart } from '@/store/cartSlice';
+import { addToCart, clearCart } from '@/store/cartSlice';
 import Footer from '@/components/common/Footer';
 import Head from 'next/head';
 import OrderDialog from '@/components/checkout/OrderDialog';
@@ -175,6 +175,7 @@ export default function DynamicProductPage({ product, notFound }) {
       });
     }
 
+    dispatch(clearCart());
     dispatch(
       addToCart({
         id: product.id || product._id,
@@ -182,7 +183,7 @@ export default function DynamicProductPage({ product, notFound }) {
         slug: product.slug,
         price: product.price,
         selectedColor: selectedVariant,
-        quantity: 1,
+        quantity: quantity,
         image: activeImage,
       }),
     );

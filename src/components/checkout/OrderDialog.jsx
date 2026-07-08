@@ -150,35 +150,35 @@ const OrderDialog = ({ isOpen, onClose }) => {
     switch (name) {
       case 'fullName':
         if (!value.trim()) {
-          newErrors.fullName = 'Full name is required';
+          newErrors.fullName = 'পুরো নাম লিখুন';
         } else if (value.length < 2) {
-          newErrors.fullName = 'Full name must be at least 2 characters';
+          newErrors.fullName = 'নাম কমপক্ষে ২ অক্ষরের হতে হবে';
         } else {
           delete newErrors.fullName;
         }
         break;
       case 'phoneNumber':
         if (!value) {
-          newErrors.phoneNumber = 'Phone number is required';
-        } else if (!/^\+880\d{10}$/.test(value)) {
+          newErrors.phoneNumber = 'ফোন নম্বর দিন';
+        } else if (!/^(\+880\d{10}|0\d{10})$/.test(value)) {
           newErrors.phoneNumber =
-            'Please enter a valid Bangladesh phone number';
+            'সঠিক বাংলাদেশী ফোন নম্বর লিখুন';
         } else {
           delete newErrors.phoneNumber;
         }
         break;
       case 'deliveryZone':
         if (!value) {
-          newErrors.deliveryZone = 'Please select a delivery zone';
+          newErrors.deliveryZone = 'ডেলিভারি জোন সিলেক্ট করুন';
         } else {
           delete newErrors.deliveryZone;
         }
         break;
       case 'address':
         if (!value.trim()) {
-          newErrors.address = 'Address is required';
+          newErrors.address = 'ঠিকানা লিখুন';
         } else if (value.length < 5) {
-          newErrors.address = 'Address must be at least 5 characters';
+          newErrors.address = 'ঠিকানা কমপক্ষে ৫ অক্ষরের হতে হবে';
         } else {
           delete newErrors.address;
         }
@@ -192,18 +192,18 @@ const OrderDialog = ({ isOpen, onClose }) => {
   // Validate entire form on submit
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.fullName.trim()) newErrors.fullName = 'Full name is required';
+    if (!formData.fullName.trim()) newErrors.fullName = 'পুরো নাম লিখুন';
     else if (formData.fullName.length < 2)
-      newErrors.fullName = 'Full name must be at least 2 characters';
+      newErrors.fullName = 'নাম কমপক্ষে ২ অক্ষরের হতে হবে';
     if (!formData.phoneNumber)
-      newErrors.phoneNumber = 'Phone number is required';
-    else if (!/^\+880\d{10}$/.test(formData.phoneNumber))
-      newErrors.phoneNumber = 'Please enter a valid Bangladesh phone number';
+      newErrors.phoneNumber = 'ফোন নম্বর দিন';
+    else if (!/^(\+880\d{10}|0\d{10})$/.test(formData.phoneNumber))
+      newErrors.phoneNumber = 'সঠিক বাংলাদেশী ফোন নম্বর লিখুন';
     if (!formData.deliveryZone)
-      newErrors.deliveryZone = 'Please select a delivery zone';
-    if (!formData.address.trim()) newErrors.address = 'Address is required';
+      newErrors.deliveryZone = 'ডেলিভারি জোন সিলেক্ট করুন';
+    if (!formData.address.trim()) newErrors.address = 'ঠিকানা লিখুন';
     else if (formData.address.length < 5)
-      newErrors.address = 'Address must be at least 5 characters';
+      newErrors.address = 'ঠিকানা কমপক্ষে ৫ অক্ষরের হতে হবে';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -211,7 +211,18 @@ const OrderDialog = ({ isOpen, onClose }) => {
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!validateForm()) return;
+    if (!validateForm()) {
+      if (!formData.fullName || formData.fullName.trim().length < 2) {
+        document.getElementById('fullName')?.focus();
+      } else if (!formData.phoneNumber || !/^(\+880\d{10}|0\d{10})$/.test(formData.phoneNumber)) {
+        document.getElementById('phoneNumber')?.focus();
+      } else if (!formData.deliveryZone) {
+        document.querySelector('[data-zone="dhaka"]')?.focus();
+      } else if (!formData.address || formData.address.trim().length < 5) {
+        document.getElementById('address')?.focus();
+      }
+      return;
+    }
 
     setIsLoading(true);
     setSubmissionError(null);
@@ -276,7 +287,7 @@ const OrderDialog = ({ isOpen, onClose }) => {
       !sheetData.deliveryZone ||
       !sheetData.address
     ) {
-      setSubmissionError('Please fill all required fields.');
+      setSubmissionError('অনুগ্রহ করে সব তথ্য পূরণ করুন।');
       setIsLoading(false);
       return;
     }
@@ -358,7 +369,9 @@ const OrderDialog = ({ isOpen, onClose }) => {
     }
 
     // Reaches here only if both attempts failed
-    setSubmissionError('Failed to submit order. Please try again.');
+    setSubmissionError(
+      'আপনার অর্ডারটি অনলাইনে সাবমিট করা সম্ভব হয়নি। অনুগ্রহ করে +8801814575428 নাম্বারে কল করুন অথবা WhatsApp এ মেসেজ দিন।',
+    );
     setIsLoading(false);
   };
 
@@ -495,7 +508,7 @@ const OrderDialog = ({ isOpen, onClose }) => {
                         </svg>
                       </div>
                       <p className='text-gray-500 text-sm'>
-                        Your cart is empty
+                        আপনার কার্ট খালি
                       </p>
                     </div>
                   ) : (
@@ -619,6 +632,16 @@ const OrderDialog = ({ isOpen, onClose }) => {
                   </h3>
 
                   <form onSubmit={handleSubmit} className='space-y-4'>
+                    {Object.keys(errors).length > 0 && (
+                      <div className='bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700'>
+                        <p className='font-semibold mb-1 bangla'>অনুগ্রহ করে নিচের তথ্যগুলো পূরণ করুন:</p>
+                        <ul className='list-disc list-inside text-xs space-y-0.5'>
+                          {Object.entries(errors).map(([key, msg]) => (
+                            <li key={key}>{msg}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                     {/* Full Name */}
                     <div>
                       <label
@@ -674,6 +697,7 @@ const OrderDialog = ({ isOpen, onClose }) => {
                       <div className='flex gap-3'>
                         <button
                           type='button'
+                          data-zone='dhaka'
                           onClick={() =>
                             handleDeliveryZoneChange({
                               target: { value: 'ঢাকার ভেতরে' },
@@ -758,18 +782,16 @@ const OrderDialog = ({ isOpen, onClose }) => {
 
                     {/* Submission Error */}
                     {submissionError && (
-                      <p className='text-red-500 text-sm'>{submissionError}</p>
+                      <div className='bg-red-50 border-2 border-red-300 rounded-lg p-3 text-red-700 text-sm'>
+                        <p className='font-semibold mb-1 bangla'>অর্ডার সাবমিট করা যায়নি</p>
+                        <p>{submissionError}</p>
+                      </div>
                     )}
 
                     {/* Submit Button */}
                     <button
                       type='submit'
                       disabled={
-                        Object.keys(errors).length > 0 ||
-                        !formData.fullName ||
-                        !formData.phoneNumber ||
-                        !formData.deliveryZone ||
-                        !formData.address ||
                         cartItems.length === 0 ||
                         isLoading
                       }
