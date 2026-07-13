@@ -232,7 +232,7 @@ export const products = [
       '/assets/product/glass/golden-main.jpeg',
       '/assets/product/glass/all.jpeg',
     ],
-    variants: [{ color: 'Black' }, { color: 'Silver' }, { color: 'Golden' }],
+    variants: [{ color: 'Black' }, { color: 'Golden' }],
   },
   // {
   //   id: 1,
