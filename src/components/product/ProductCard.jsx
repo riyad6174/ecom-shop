@@ -1,18 +1,43 @@
 import React from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { sendGTMEvent } from '@next/third-parties/google';
 
 const ProductCard = ({ product }) => {
+  const router = useRouter();
   // Support both database format (_id, basePrice) and static format (id, price)
   const price = product.basePrice || product.price;
   const originalPrice = product.baseOriginalPrice || product.originalPrice;
   const isInStock = product.inStock !== undefined ? product.inStock : true;
+
+  const handleProductClick = (e) => {
+    e.preventDefault();
+    if (typeof window !== 'undefined') {
+      sendGTMEvent({ ecommerce: null });
+      sendGTMEvent({
+        event: 'select_item',
+        ecommerce: {
+          items: [
+            {
+              item_id: product.id || product._id || 'unknown',
+              item_name: product.title || 'unknown',
+              price: price || 0,
+              item_category: product.category || 'General',
+              item_list_name: 'Product List',
+            },
+          ],
+        },
+      });
+    }
+    router.push(`/product/${product?.slug}`);
+  };
 
   return (
     <div className='bg-white rounded-xl p-2 md:p-3 w-44 md:w-56 flex flex-col h-[300px] md:h-[360px]'>
       {/* Product Image Section */}
       <div className='relative flex-shrink-0'>
         {isInStock ? (
-          <Link href={`/product/${product?.slug}`}>
+          <a href={`/product/${product?.slug}`} onClick={handleProductClick}>
             <img
               src={product?.thumbnail}
               alt={product?.title}
@@ -20,7 +45,7 @@ const ProductCard = ({ product }) => {
               loading='lazy'
               decoding='async'
             />
-          </Link>
+          </a>
         ) : (
           <img
             src={product?.thumbnail}
@@ -39,12 +64,13 @@ const ProductCard = ({ product }) => {
 
       {/* Product Details */}
       {isInStock ? (
-        <Link
+        <a
           href={`/product/${product?.slug}`}
+          onClick={handleProductClick}
           className='text-gray-900 font-semibold text-sm mt-5 block line-clamp-2 h-[40px] md:h-[48px] overflow-hidden'
         >
           {product?.title}
-        </Link>
+        </a>
       ) : (
         <span className='text-gray-900 font-semibold text-sm mt-5 block line-clamp-2 h-[40px] md:h-[48px] overflow-hidden'>
           {product?.title}
@@ -68,12 +94,13 @@ const ProductCard = ({ product }) => {
       {/* Buy Now Button */}
       {isInStock ? (
         <div className='mt-auto flex items-center justify-center'>
-          <Link
+          <a
             href={`/product/${product?.slug}`}
+            onClick={handleProductClick}
             className='text-xs bg-gradient-to-r from-blue-600 via-blue-700 to-blue-600 text-center w-full py-2 rounded-md font-semibold text-white hover:from-blue-800 hover:to-blue-950 transition-all'
           >
             Order Now
-          </Link>
+          </a>
         </div>
       ) : (
         <div className='mt-auto flex items-center justify-center'>

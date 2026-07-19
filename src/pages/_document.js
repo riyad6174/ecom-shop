@@ -12,20 +12,20 @@ export default function Document() {
         <link rel='icon' type='image/png' sizes='32x32' href='/favicon.ico' />
         <link rel='apple-touch-icon' href='/assets/logo.png' />
 
-        {/* Stape Custom GTM Loader — must stay near top of <head> */}
+        {/* Google Tag Manager */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s);j.async=true;j.src="https://data.sheiishop.com/7rkxzywpkozt.js?"+i;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','58xvcd=HR5SLCQ6VDc%2BIjghQkMvXAJHXUVBUR0USQkHDhkeChIbCkEIHxo%3D');`,
+            __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-5V6SWB8R');`,
           }}
         />
 
         {/* Fonts are served by next/font/google in _app.js — no external requests needed */}
       </Head>
       <body className='antialiased'>
-        {/* Stape GTM noscript fallback — immediately after <body> */}
+        {/* Google Tag Manager (noscript) */}
         <noscript>
           <iframe
-            src='https://data.sheiishop.com/ns.html?id=GTM-MJXWJ24V'
+            src='https://www.googletagmanager.com/ns.html?id=GTM-5V6SWB8R'
             height='0'
             width='0'
             style={{ display: 'none', visibility: 'hidden' }}

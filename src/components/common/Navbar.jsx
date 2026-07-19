@@ -5,6 +5,7 @@ import { FiShoppingCart } from 'react-icons/fi';
 import { useSelector } from 'react-redux';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
+import { sendGTMEvent } from '@next/third-parties/google';
 
 const OrderDialog = dynamic(() => import('@/components/checkout/OrderDialog'), {
   ssr: false,
@@ -16,6 +17,31 @@ function Navbar() {
   const [isOrderDialogOpen, setIsOrderDialogOpen] = useState(false);
   const cartItems = useSelector((state) => state.cart.items);
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+
+  const handleCartOpen = () => {
+    if (typeof window !== 'undefined' && cartItems.length > 0) {
+      sendGTMEvent({ ecommerce: null });
+      sendGTMEvent({
+        event: 'view_cart',
+        ecommerce: {
+          currency: 'BDT',
+          value: cartItems.reduce(
+            (sum, i) => sum + (i.price || 0) * (i.quantity || 1),
+            0,
+          ),
+          items: cartItems.map((item) => ({
+            item_id: item.id || 'unknown',
+            item_name: item.title || 'unknown',
+            price: item.price || 0,
+            quantity: item.quantity || 1,
+            item_variant: item.selectedColor || item.selectedVariantValue,
+            item_category: item.category || 'Accessories',
+          })),
+        },
+      });
+    }
+    setIsOrderDialogOpen(true);
+  };
 
   const navLinks = [
     { name: 'Home', href: '/' },
@@ -61,7 +87,7 @@ function Navbar() {
             {/* Cart - Right */}
             <div className='flex justify-end'>
               <button
-                onClick={() => setIsOrderDialogOpen(true)}
+                onClick={handleCartOpen}
                 className='relative p-2 text-white hover:text-amber-400 transition-colors'
                 aria-label='Open cart'
               >
@@ -99,7 +125,7 @@ function Navbar() {
             </Link>
 
             <button
-              onClick={() => setIsOrderDialogOpen(true)}
+              onClick={handleCartOpen}
               className='relative p-2 text-white'
               aria-label='Open cart'
             >

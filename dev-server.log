@@ -1,0 +1,23 @@
+
+> brand-explorer@0.1.0 dev
+> next dev
+
+   ▲ Next.js 15.1.11
+   - Local:        http://localhost:3001
+   - Network:      http://192.168.0.72:3001
+   - Environments: .env
+
+ ✓ Starting...
+ ✓ Ready in 19.4s
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 17.9s (427 modules)
+ GET /location/abbots-langley 404 in 21088ms
+ GET /location/abbots-langley 404 in 247ms
+ ○ Compiling / ...
+ ✓ Compiled / in 12.4s (676 modules)
+ GET / 200 in 15170ms
+ ○ Compiling /api/public/products ...
+ ✓ Compiled /api/public/products in 737ms (199 modules)
+ GET /api/public/products 200 in 6860ms
+ GET /api/public/products 304 in 54ms
+[?25h

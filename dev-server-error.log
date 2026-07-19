@@ -1,0 +1,8 @@
+ ⚠ Port 3000 is in use, trying 3001 instead.
+[Error: EPERM: operation not permitted, open 'E:\ecommerce-frontend\.next\trace'] {
+  errno: -4048,
+  code: 'EPERM',
+  syscall: 'open',
+  path: 'E:\\ecommerce-frontend\\.next\\trace'
+}
+Invalid DOM property `fetchpriority`. Did you mean `fetchPriority`?

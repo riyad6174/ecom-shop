@@ -2,11 +2,32 @@ import React from 'react';
 import { useDispatch } from 'react-redux';
 import { HiOutlineTrash } from 'react-icons/hi2';
 import { removeFromCart } from '@/store/cartSlice';
+import { sendGTMEvent } from '@next/third-parties/google';
 
 const CartCard = ({ item }) => {
   const dispatch = useDispatch();
 
   const handleRemove = () => {
+    if (typeof window !== 'undefined') {
+      sendGTMEvent({ ecommerce: null });
+      sendGTMEvent({
+        event: 'remove_from_cart',
+        ecommerce: {
+          currency: 'BDT',
+          value: (item.price || 0) * (item.quantity || 1),
+          items: [
+            {
+              item_id: item.id || 'unknown',
+              item_name: item.title || 'unknown',
+              price: item.price || 0,
+              quantity: item.quantity || 1,
+              item_variant: item.selectedColor || item.selectedVariantValue,
+              item_category: item.category || 'Accessories',
+            },
+          ],
+        },
+      });
+    }
     dispatch(
       removeFromCart({
         id: item.id,

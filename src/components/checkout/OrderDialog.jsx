@@ -405,6 +405,26 @@ const OrderDialog = ({ isOpen, onClose }) => {
 
   // Handle remove item from cart
   const handleRemoveItem = (item) => {
+    if (typeof window !== 'undefined') {
+      sendGTMEvent({ ecommerce: null });
+      sendGTMEvent({
+        event: 'remove_from_cart',
+        ecommerce: {
+          currency: 'BDT',
+          value: (item.price || 0) * (item.quantity || 1),
+          items: [
+            {
+              item_id: item.id || 'unknown',
+              item_name: item.title || 'unknown',
+              price: item.price || 0,
+              quantity: item.quantity || 1,
+              item_variant: item.selectedColor || item.selectedVariantValue,
+              item_category: item.category || 'Accessories',
+            },
+          ],
+        },
+      });
+    }
     dispatch(
       removeFromCart({ id: item.id, selectedColor: item.selectedColor }),
     );
