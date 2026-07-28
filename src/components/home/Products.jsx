@@ -1,19 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import CustomSection from '../layout/CustomSection';
 import { FaArrowRight } from 'react-icons/fa6';
 import ProductCard from '../product/ProductCard';
 import Link from 'next/link';
 
-function Products() {
-  const [products, setProducts] = useState([]);
-
-  useEffect(() => {
-    fetch('/api/public/products')
-      .then((r) => r.json())
-      .then((d) => setProducts(d.products || []))
-      .catch(() => {});
-  }, []);
-
+function Products({ products = [] }) {
   return (
     <CustomSection>
       <div className='md:bg-[#FAFAFA] px-6 md:px-10 md:py-6 rounded-2xl pb-32 md:pb-0'>

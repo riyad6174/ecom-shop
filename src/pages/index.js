@@ -12,7 +12,9 @@ import Trending from '@/components/home/Trending';
 
 import React from 'react';
 
-function Index() {
+import { getAllProducts } from '@/lib/products';
+
+function Index({ products }) {
   return (
     <>
       <Head>
@@ -132,14 +134,33 @@ function Index() {
         <Navbar />
         <Hero />
         <Offer />
-        <Trending />
+        <Trending products={products} />
         <Promo />
         <Refer />
-        <Products />
+        <Products products={products} />
         <Footer />
       </div>
     </>
   );
+}
+
+export async function getServerSideProps({ res }) {
+  // Fetch the catalog once here instead of letting Trending and Products
+  // each hit /api/public/products independently on mount — halves the
+  // network/DB load per homepage view and removes the empty-grid flash
+  // while the client-side fetch resolves.
+  res.setHeader(
+    'Cache-Control',
+    'public, s-maxage=60, stale-while-revalidate=300',
+  );
+
+  try {
+    const products = await getAllProducts();
+    return { props: { products: JSON.parse(JSON.stringify(products)) } };
+  } catch (err) {
+    console.error(err);
+    return { props: { products: [] } };
+  }
 }
 
 export default Index;

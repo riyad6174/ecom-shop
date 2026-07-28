@@ -981,8 +981,17 @@ export default function DynamicProductPage({ product, notFound }) {
   );
 }
 
-export async function getServerSideProps({ params }) {
+export async function getServerSideProps({ params, res }) {
   const { slug } = params;
+
+  // Product pages are the main entry point for most visitors but change
+  // infrequently (admin-edited). Cache at the edge/CDN so repeat visits to
+  // the same product skip the DB round trip entirely; still revalidate
+  // often enough that price/stock edits show up quickly.
+  res.setHeader(
+    'Cache-Control',
+    'public, s-maxage=60, stale-while-revalidate=300',
+  );
 
   try {
     const { connectDB } = await import('@/lib/mongodb');

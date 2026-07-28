@@ -1,21 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import CustomSection from '../layout/CustomSection';
 import ProductCard from '../product/ProductCard';
 import { FaArrowRight } from 'react-icons/fa6';
 import Link from 'next/link';
 
-function Trending() {
-  const [hotProducts, setHotProducts] = useState([]);
-
-  useEffect(() => {
-    fetch('/api/public/products')
-      .then((r) => r.json())
-      .then((d) => {
-        const hot = (d.products || []).filter((p) => p.sectionType === 'hot');
-        setHotProducts(hot);
-      })
-      .catch(() => {});
-  }, []);
+function Trending({ products = [] }) {
+  const hotProducts = products.filter((p) => p.sectionType === 'hot');
 
   return (
     <CustomSection>

@@ -14,7 +14,9 @@
       "Bash(npm uninstall *)",
       "Bash(Get-Content \"E:\\\\ecommerce-frontend\\\\src\\\\pages\\\\admin\\\\products\\\\edit\\\\[id].js\")",
       "Bash(Select-Object -First 60)",
-      "PowerShell(Select-String *)"
+      "PowerShell(Select-String *)",
+      "Bash(grep -iE \"page\\\\.\\(tsx|jsx|ts|js\\)$\")",
+      "Bash(npx next *)"
     ]
   }
 }
