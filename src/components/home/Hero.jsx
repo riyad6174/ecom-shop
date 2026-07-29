@@ -4,6 +4,7 @@ import 'swiper/css';
 import 'swiper/css/pagination';
 import { Pagination, Autoplay } from 'swiper/modules';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const Hero = () => {
   return (
@@ -21,46 +22,52 @@ const Hero = () => {
             >
               {/* First slide: LCP image — load eagerly, high priority */}
               <SwiperSlide>
-                <img
-                  src='/assets/banner/fan-banner1.png'
-                  alt='Winter Collection'
-                  className='h-full w-full object-fit rounded-xl'
-                  fetchpriority='high'
-                  loading='eager'
-                  decoding='sync'
-                />
+                <div className='relative h-full w-full'>
+                  <Image
+                    src='/assets/banner/fan-banner1.png'
+                    alt='Winter Collection'
+                    fill
+                    priority
+                    sizes='(max-width: 768px) 100vw, 66vw'
+                    className='object-cover rounded-xl'
+                  />
+                </div>
               </SwiperSlide>
               {/* Remaining slides: defer loading */}
               <SwiperSlide>
-                <img
-                  src='/assets/banner/fan-banner2.png'
-                  alt='Fan Collection'
-                  className='h-full w-full object-fit rounded-xl'
-                  loading='lazy'
-                  decoding='async'
-                />
+                <div className='relative h-full w-full'>
+                  <Image
+                    src='/assets/banner/fan-banner2.png'
+                    alt='Fan Collection'
+                    fill
+                    sizes='(max-width: 768px) 100vw, 66vw'
+                    className='object-cover rounded-xl'
+                  />
+                </div>
               </SwiperSlide>
               <SwiperSlide>
-                <img
-                  src='/assets/banner/watch2.webp'
-                  alt='Watch Collection'
-                  className='h-full w-full object-fit rounded-xl'
-                  loading='lazy'
-                  decoding='async'
-                />
+                <div className='relative h-full w-full'>
+                  <Image
+                    src='/assets/banner/watch2.webp'
+                    alt='Watch Collection'
+                    fill
+                    sizes='(max-width: 768px) 100vw, 66vw'
+                    className='object-cover rounded-xl'
+                  />
+                </div>
               </SwiperSlide>
             </Swiper>
           </div>
 
           {/* Right Side — these are above-fold so load eagerly but without highest priority */}
           <div className='flex flex-col gap-4'>
-            <div className='relative rounded-xl overflow-hidden'>
-              <img
+            <div className='relative rounded-xl overflow-hidden h-[262px] w-full'>
+              <Image
                 src='/assets/banner/watch2.webp'
                 alt='Online Shopping'
-                className='h-[262px] w-full object-cover'
-                loading='eager'
-                decoding='async'
+                fill
+                sizes='33vw'
+                className='object-cover'
               />
               <div className='absolute bottom-0 p-4'>
                 <Link
@@ -72,13 +79,13 @@ const Hero = () => {
               </div>
             </div>
 
-            <div className='relative rounded-xl overflow-hidden'>
-              <img
+            <div className='relative rounded-xl overflow-hidden h-[222px] w-full'>
+              <Image
                 src='/assets/banner/ring.webp'
                 alt='Trade-In Offer'
-                className='h-[222px] w-full object-cover'
-                loading='eager'
-                decoding='async'
+                fill
+                sizes='33vw'
+                className='object-cover'
               />
               <div className='absolute bottom-0 p-4'>
                 <Link
@@ -104,32 +111,38 @@ const Hero = () => {
         >
           {/* First slide: LCP on mobile */}
           <SwiperSlide>
-            <img
-              src='/assets/banner/fan-banner1.png'
-              alt='Winter Collection'
-              className='h-full w-full object-cover rounded-xl'
-              fetchpriority='high'
-              loading='eager'
-              decoding='sync'
-            />
+            <div className='relative h-full w-full'>
+              <Image
+                src='/assets/banner/fan-banner1.png'
+                alt='Winter Collection'
+                fill
+                priority
+                sizes='100vw'
+                className='object-cover rounded-xl'
+              />
+            </div>
           </SwiperSlide>
           <SwiperSlide>
-            <img
-              src='/assets/banner/fan-banner2.png'
-              alt='Fan Collection'
-              className='h-full w-full object-cover rounded-xl'
-              loading='lazy'
-              decoding='async'
-            />
+            <div className='relative h-full w-full'>
+              <Image
+                src='/assets/banner/fan-banner2.png'
+                alt='Fan Collection'
+                fill
+                sizes='100vw'
+                className='object-cover rounded-xl'
+              />
+            </div>
           </SwiperSlide>
           <SwiperSlide>
-            <img
-              src='/assets/banner/watch2.webp'
-              alt='Watch Collection'
-              className='h-full w-full object-cover rounded-xl'
-              loading='lazy'
-              decoding='async'
-            />
+            <div className='relative h-full w-full'>
+              <Image
+                src='/assets/banner/watch2.webp'
+                alt='Watch Collection'
+                fill
+                sizes='100vw'
+                className='object-cover rounded-xl'
+              />
+            </div>
           </SwiperSlide>
         </Swiper>
 

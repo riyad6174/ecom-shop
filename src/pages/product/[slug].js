@@ -5,6 +5,7 @@ import Navbar from '@/components/common/Navbar';
 import { addToCart, clearCart } from '@/store/cartSlice';
 import Footer from '@/components/common/Footer';
 import Head from 'next/head';
+import Image from 'next/image';
 import OrderDialog from '@/components/checkout/OrderDialog';
 
 const StarIcon = ({ filled }) => (
@@ -85,7 +86,9 @@ function CountdownToMidnight() {
 export default function DynamicProductPage({ product, notFound }) {
   const dispatch = useDispatch();
   const [selectedVariant, setSelectedVariant] = useState('');
-  const [activeImage, setActiveImage] = useState('');
+  const [activeImage, setActiveImage] = useState(
+    () => product?.images?.[0] || product?.thumbnail || '',
+  );
   const [quantity, setQuantity] = useState(1);
   const [isAdding, setIsAdding] = useState(false);
   const [isOrderDialogOpen, setIsOrderDialogOpen] = useState(false);
@@ -518,24 +521,31 @@ export default function DynamicProductPage({ product, notFound }) {
               {/* Images */}
               <div className='w-full lg:w-[58%] p-5 md:p-8'>
                 <div className='flex flex-col md:grid md:grid-cols-4 gap-4'>
-                  <div className='md:col-span-3 overflow-hidden rounded-2xl bg-gray-50'>
-                    <img
-                      className='w-full h-[360px] md:h-[520px] object-cover img-zoom'
-                      src={activeImage}
-                      alt={product.title}
-                    />
+                  <div className='relative md:col-span-3 overflow-hidden rounded-2xl bg-gray-50 h-[360px] md:h-[520px]'>
+                    {activeImage && (
+                      <Image
+                        className='object-cover img-zoom'
+                        src={activeImage}
+                        alt={product.title}
+                        fill
+                        priority
+                        sizes='(max-width: 768px) 100vw, 58vw'
+                      />
+                    )}
                   </div>
                   <div className='hidden md:flex flex-col gap-3'>
                     {product.images?.slice(0, 3).map((img, i) => (
                       <div
                         key={i}
                         onClick={() => setActiveImage(img)}
-                        className={`overflow-hidden rounded-xl cursor-pointer transition-all duration-200 ${activeImage === img ? 'thumb-sel' : 'thumb-unsel'}`}
+                        className={`relative overflow-hidden rounded-xl cursor-pointer transition-all duration-200 h-[155px] ${activeImage === img ? 'thumb-sel' : 'thumb-unsel'}`}
                       >
-                        <img
+                        <Image
                           src={img}
                           alt={`thumb ${i + 1}`}
-                          className='w-full h-[155px] object-cover'
+                          fill
+                          sizes='150px'
+                          className='object-cover'
                         />
                       </div>
                     ))}
@@ -545,12 +555,14 @@ export default function DynamicProductPage({ product, notFound }) {
                       <div
                         key={i}
                         onClick={() => setActiveImage(img)}
-                        className={`overflow-hidden rounded-lg cursor-pointer transition-all duration-200 ${activeImage === img ? 'thumb-sel' : 'thumb-unsel'}`}
+                        className={`relative overflow-hidden rounded-lg cursor-pointer transition-all duration-200 w-[72px] h-[72px] ${activeImage === img ? 'thumb-sel' : 'thumb-unsel'}`}
                       >
-                        <img
+                        <Image
                           src={img}
                           alt={`thumb ${i + 1}`}
-                          className='w-[72px] h-[72px] object-cover'
+                          fill
+                          sizes='72px'
+                          className='object-cover'
                         />
                       </div>
                     ))}
@@ -771,6 +783,8 @@ export default function DynamicProductPage({ product, notFound }) {
                 src={img}
                 alt={`gallery-${i}`}
                 className='w-full block object-cover'
+                loading='lazy'
+                decoding='async'
               />
             </div>
           ))}
@@ -923,6 +937,8 @@ export default function DynamicProductPage({ product, notFound }) {
                   src={img}
                   alt={`gallery-${i}`}
                   className='w-full object-cover block img-zoom'
+                  loading='lazy'
+                  decoding='async'
                 />
               </div>
             ))}
@@ -981,17 +997,31 @@ export default function DynamicProductPage({ product, notFound }) {
   );
 }
 
-export async function getServerSideProps({ params, res }) {
-  const { slug } = params;
+export async function getStaticPaths() {
+  try {
+    const { connectDB } = await import('@/lib/mongodb');
+    const ProductModel = (await import('@/models/Product')).default;
+    const { products: staticProducts } = await import('@/utils/products');
 
-  // Product pages are the main entry point for most visitors but change
-  // infrequently (admin-edited). Cache at the edge/CDN so repeat visits to
-  // the same product skip the DB round trip entirely; still revalidate
-  // often enough that price/stock edits show up quickly.
-  res.setHeader(
-    'Cache-Control',
-    'public, s-maxage=60, stale-while-revalidate=300',
-  );
+    await connectDB();
+    const staticSlugSet = new Set(staticProducts.map((p) => p.slug));
+    const dbProducts = await ProductModel.find({}, 'slug').lean();
+
+    // Pre-render every known DB product at build time; anything created
+    // afterwards is rendered on first visit and cached by `fallback: 'blocking'`.
+    const paths = dbProducts
+      .filter((p) => !staticSlugSet.has(p.slug))
+      .map((p) => ({ params: { slug: p.slug } }));
+
+    return { paths, fallback: 'blocking' };
+  } catch (err) {
+    console.error(err);
+    return { paths: [], fallback: 'blocking' };
+  }
+}
+
+export async function getStaticProps({ params }) {
+  const { slug } = params;
 
   try {
     const { connectDB } = await import('@/lib/mongodb');
@@ -1006,7 +1036,7 @@ export async function getServerSideProps({ params, res }) {
     await connectDB();
     const product = await ProductModel.findOne({ slug }).lean();
 
-    if (!product) return { props: { notFound: true } };
+    if (!product) return { props: { notFound: true }, revalidate: 60 };
 
     return {
       props: {
@@ -1014,9 +1044,13 @@ export async function getServerSideProps({ params, res }) {
           JSON.stringify({ ...product, id: product._id.toString() }),
         ),
       },
+      // Regenerate in the background at most once a minute so price/stock
+      // edits in the admin panel show up promptly, while most visits are
+      // served an already-built static page instead of hitting Mongo.
+      revalidate: 60,
     };
   } catch (err) {
     console.error(err);
-    return { props: { notFound: true } };
+    return { props: { notFound: true }, revalidate: 60 };
   }
 }

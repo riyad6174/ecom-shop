@@ -1,6 +1,13 @@
 /** @type {import('next').NextConfig} */
 const isProd = process.env.NODE_ENV === 'production';
 
+// Product photos uploaded via the admin panel are stored in Cloudflare R2
+// and served from R2_PUBLIC_URL — derive its hostname so next/image is
+// allowed to optimise them without hardcoding the bucket's hash subdomain.
+const r2Hostname = process.env.R2_PUBLIC_URL
+  ? new URL(process.env.R2_PUBLIC_URL).hostname
+  : null;
+
 const nextConfig = {
   reactStrictMode: true,
 
@@ -13,6 +20,9 @@ const nextConfig = {
     minimumCacheTTL: 31536000, // 1 year
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
     imageSizes: [16, 32, 48, 64, 96, 128, 256],
+    remotePatterns: r2Hostname
+      ? [{ protocol: 'https', hostname: r2Hostname, pathname: '/**' }]
+      : [],
   },
 
   // Cache headers for static assets and pages

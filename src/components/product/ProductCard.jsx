@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { sendGTMEvent } from '@next/third-parties/google';
 
@@ -37,23 +38,29 @@ const ProductCard = ({ product }) => {
       {/* Product Image Section */}
       <div className='relative flex-shrink-0'>
         {isInStock ? (
-          <a href={`/product/${product?.slug}`} onClick={handleProductClick}>
-            <img
+          <a
+            href={`/product/${product?.slug}`}
+            onClick={handleProductClick}
+            className='relative block w-full h-36 md:h-44 rounded-lg overflow-hidden'
+          >
+            <Image
               src={product?.thumbnail}
               alt={product?.title}
-              className='w-full h-36 md:h-44 object-cover rounded-lg'
-              loading='lazy'
-              decoding='async'
+              fill
+              sizes='(max-width: 768px) 45vw, 220px'
+              className='object-cover'
             />
           </a>
         ) : (
-          <img
-            src={product?.thumbnail}
-            alt={product?.title}
-            className='w-full h-36 md:h-44 object-cover rounded-lg opacity-70'
-            loading='lazy'
-            decoding='async'
-          />
+          <div className='relative block w-full h-36 md:h-44 rounded-lg overflow-hidden opacity-70'>
+            <Image
+              src={product?.thumbnail}
+              alt={product?.title}
+              fill
+              sizes='(max-width: 768px) 45vw, 220px'
+              className='object-cover'
+            />
+          </div>
         )}
         {product?.sectionType === 'hot' && (
           <span className='absolute top-2 left-2 bg-accent text-white text-xs font-semibold px-2 py-1 rounded'>
