@@ -292,13 +292,19 @@ const ProductDetails = ({ initialProduct }) => {
           border-color: #fca5a5;
         }
         .btn-buy {
-          background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+          background: linear-gradient(135deg, #1a1a1a 0%, #000000 100%);
           transition: all 0.3s ease;
-          box-shadow: 0 4px 20px rgba(220, 38, 38, 0.4);
+          box-shadow:
+            0 4px 20px rgba(0, 0, 0, 0.5),
+            inset 0 1px 0 rgba(255, 255, 255, 0.08);
+          border: 1px solid rgba(255, 255, 255, 0.1);
         }
         .btn-buy:hover {
           transform: translateY(-2px);
-          box-shadow: 0 8px 30px rgba(220, 38, 38, 0.5);
+          box-shadow:
+            0 8px 30px rgba(0, 0, 0, 0.6),
+            inset 0 1px 0 rgba(255, 255, 255, 0.12);
+          background: linear-gradient(135deg, #2a2a2a 0%, #111111 100%);
         }
         .feature-card {
           transition:
@@ -318,8 +324,43 @@ const ProductDetails = ({ initialProduct }) => {
             opacity: 0.88;
           }
         }
+        @keyframes offer-bg-radiate {
+          0%,
+          100% {
+            background-position: 0% 50%;
+          }
+          25% {
+            background-position: 100% 0%;
+          }
+          50% {
+            background-position: 100% 100%;
+          }
+          75% {
+            background-position: 0% 100%;
+          }
+        }
+        @keyframes offer-text-sparkle {
+          0%,
+          100% {
+            text-shadow:
+              0 0 8px rgba(255, 255, 255, 0.6),
+              0 0 16px rgba(220, 38, 38, 0.4);
+          }
+          50% {
+            text-shadow:
+              0 0 14px rgba(255, 255, 255, 0.9),
+              0 0 28px rgba(220, 38, 38, 0.7),
+              0 0 40px rgba(255, 200, 50, 0.6);
+          }
+        }
         .offer-banner {
-          animation: offer-pulse 2.2s ease-in-out infinite;
+          background-size: 300% 300%;
+          animation:
+            offer-bg-radiate 6s ease infinite,
+            offer-pulse 2.2s ease-in-out infinite;
+        }
+        .offer-banner-text {
+          animation: offer-text-sparkle 2.5s ease-in-out infinite;
         }
         @keyframes digit-pop {
           0% {
@@ -385,13 +426,25 @@ const ProductDetails = ({ initialProduct }) => {
             background-position: 200% center;
           }
         }
+        @keyframes fixed-bar-bg {
+          0%,
+          100% {
+            background-position: 0% 50%;
+          }
+          50% {
+            background-position: 100% 50%;
+          }
+        }
         .fixed-offer-bar {
           position: fixed;
           bottom: 0;
           left: 0;
           right: 0;
           z-index: 50;
-          animation: offer-pulse 2.2s ease-in-out infinite;
+          background-size: 300% 300%;
+          animation:
+            offer-pulse 2.2s ease-in-out infinite,
+            fixed-bar-bg 4s ease infinite;
         }
       `}</style>
 
@@ -402,12 +455,12 @@ const ProductDetails = ({ initialProduct }) => {
         className='offer-banner sticky top-0 z-40 py-2.5 px-4 text-center'
         style={{
           background:
-            'linear-gradient(90deg, #991b1b 0%, #7f1d1d 50%, #991b1b 100%)',
+            'linear-gradient(125deg, #991b1b 0%, #1a1a1a 25%, #dc2626 50%, #0f0f0f 75%, #991b1b 100%)',
           borderBottom: '2px solid #450a0a',
         }}
       >
-        <p className='text-white font-bold bangla text-sm md:text-base tracking-wide drop-shadow'>
-          🔴 {discount}% ডিস্কাউন্ট পাচ্ছেন শুধু আজকের জন্য 🔴
+        <p className='offer-banner-text text-white font-bold bangla text-sm md:text-base tracking-wide drop-shadow'>
+          🔥 {discount}% ডিস্কাউন্ট পাচ্ছেন শুধু আজকের জন্য 🔥
         </p>
       </div>
 
@@ -466,7 +519,7 @@ const ProductDetails = ({ initialProduct }) => {
                 <div className='inline-flex items-center gap-2 mb-4'>
                   <span
                     style={{
-                      background: 'linear-gradient(135deg,#dc2626,#991b1b)',
+                      background: 'linear-gradient(135deg,#0f0f0f,#dc2626)',
                     }}
                     className='text-white text-xs font-semibold px-3 py-1 rounded-full'
                   >
@@ -629,7 +682,8 @@ const ProductDetails = ({ initialProduct }) => {
           <div className='text-center mb-12'>
             <span
               style={{
-                background: 'linear-gradient(135deg,#dc2626,#991b1b)',
+                background:
+                  'linear-gradient(135deg, #0f0f0f, #7f1d1d, #dc2626)',
               }}
               className='text-white text-xs font-semibold px-4 py-1.5 rounded-full bangla inline-block'
             >
@@ -674,7 +728,8 @@ const ProductDetails = ({ initialProduct }) => {
             <div
               className='px-8 py-5 rounded-t-2xl'
               style={{
-                background: 'linear-gradient(to right, #dc2626, #991b1b)',
+                background:
+                  'linear-gradient(125deg, #1a1a1a 0%, #991b1b 50%, #dc2626 100%)',
               }}
             >
               <h3 className='text-white font-bold text-xl bangla'>
@@ -696,7 +751,11 @@ const ProductDetails = ({ initialProduct }) => {
                 ].map((benefit, i) => (
                   <div
                     key={i}
-                    className='flex items-start gap-3 bg-slate-50 rounded-xl p-4'
+                    className='flex items-start gap-3 rounded-xl p-4'
+                    style={{
+                      background:
+                        'linear-gradient(135deg, #f8f9fa, #fef2f2)',
+                    }}
                   >
                     <span className='text-red-500 font-bold text-lg mt-0.5 flex-shrink-0'>
                       ✓
@@ -724,10 +783,14 @@ const ProductDetails = ({ initialProduct }) => {
                 'স্টাইলিশ, মজবুত ও দীর্ঘস্থায়ী ডিজাইন',
               ].map((point, i) => (
                 <div key={i} className='flex items-center gap-3'>
-                  <div className='w-6 h-6 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0'>
-                    <span className='text-red-600 text-sm font-bold'>
-                      {i + 1}
-                    </span>
+                  <div
+                    className='w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 text-white text-sm font-bold'
+                    style={{
+                      background:
+                        'linear-gradient(135deg, #1a1a1a, #dc2626)',
+                    }}
+                  >
+                    <span>{i + 1}</span>
                   </div>
                   <span className='text-gray-700 bangla text-base'>
                     {point}
@@ -742,7 +805,8 @@ const ProductDetails = ({ initialProduct }) => {
             <div
               className='px-8 py-5'
               style={{
-                background: 'linear-gradient(to right, #dc2626, #991b1b)',
+                background:
+                  'linear-gradient(125deg, #1a1a1a 0%, #7f1d1d 50%, #dc2626 100%)',
               }}
             >
               <h3 className='text-white font-bold text-lg bangla'>
@@ -783,7 +847,8 @@ const ProductDetails = ({ initialProduct }) => {
             <div className='text-center mb-8'>
               <span
                 style={{
-                  background: 'linear-gradient(135deg,#dc2626,#991b1b)',
+                  background:
+                    'linear-gradient(135deg, #0f0f0f, #7f1d1d, #dc2626)',
                 }}
                 className='text-white text-xs font-semibold px-4 py-1.5 rounded-full bangla inline-block'
               >
@@ -824,7 +889,11 @@ const ProductDetails = ({ initialProduct }) => {
               ].map((review, i) => (
                 <div
                   key={i}
-                  className='bg-slate-50 rounded-2xl p-6 flex flex-col gap-3'
+                  className='rounded-2xl p-6 flex flex-col gap-3'
+                  style={{
+                    background:
+                      'linear-gradient(135deg, #f8f9fa, #fef2f2)',
+                  }}
                 >
                   <div className='flex gap-1'>
                     {[1, 2, 3, 4, 5].map((s) => (
@@ -848,8 +917,8 @@ const ProductDetails = ({ initialProduct }) => {
               className='rounded-2xl p-10 max-w-2xl mx-auto shadow-2xl'
               style={{
                 background:
-                  'linear-gradient(135deg, #0a0a0a 0%, #1a0000 40%, #0d0d0d 70%, #0a0a0a 100%)',
-                border: '1px solid rgba(220, 38, 38, 0.25)',
+                  'linear-gradient(135deg, #0a0a0a 0%, #1c0a0a 30%, #0f0f0f 60%, #0a0a0a 100%)',
+                border: '1px solid rgba(220, 38, 38, 0.3)',
               }}
             >
               <h3
@@ -870,10 +939,10 @@ const ProductDetails = ({ initialProduct }) => {
                 className='font-extrabold bangla px-10 py-4 rounded-xl transition-all duration-300 hover:scale-105 shadow-lg disabled:opacity-70'
                 style={{
                   background:
-                    'linear-gradient(135deg, #dc2626 0%, #b91c1c 50%, #dc2626 100%)',
+                    'linear-gradient(135deg, #1f1f1f 0%, #000000 50%, #1f1f1f 100%)',
                   color: '#fff',
-                  boxShadow: '0 4px 25px rgba(220, 38, 38, 0.45)',
-                  border: 'none',
+                  boxShadow: '0 4px 25px rgba(0, 0, 0, 0.55)',
+                  border: '1px solid rgba(255, 255, 255, 0.12)',
                 }}
               >
                 {product.inStock
@@ -894,7 +963,7 @@ const ProductDetails = ({ initialProduct }) => {
         className='fixed-offer-bar py-3 px-4'
         style={{
           background:
-            'linear-gradient(90deg, #991b1b 0%, #7f1d1d 50%, #991b1b 100%)',
+            'linear-gradient(125deg, #0f0f0f 0%, #991b1b 25%, #dc2626 50%, #1a1a1a 75%, #991b1b 100%)',
           borderTop: '2px solid #450a0a',
         }}
       >
