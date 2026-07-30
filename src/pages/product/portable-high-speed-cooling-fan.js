@@ -910,33 +910,6 @@ const ProductDetails = ({ initialProduct }) => {
         </div>
       </div>
 
-      {/* Video */}
-      <div className='bg-slate-900 py-16'>
-        <div className='container mx-auto px-4 lg:px-8 max-w-3xl text-center'>
-          <span className='text-indigo-400 text-xs font-semibold uppercase tracking-widest bangla'>
-            ব্যবহার নির্দেশিকা
-          </span>
-          <h2 className='text-3xl font-extrabold text-white mt-3 mb-2 bangla'>
-            কীভাবে ব্যবহার করবেন?
-          </h2>
-          <p className='text-slate-400 bangla mb-8 text-sm'>
-            নিচের ভিডিওটি দেখুন এবং সহজেই পণ্যটি সেট আপ করুন
-          </p>
-          <div className='rounded-2xl overflow-hidden shadow-2xl'>
-            <video
-              className='w-full'
-              controls
-              poster='/assets/product/fan/userguide.jpg'
-            >
-              <source
-                src='/assets/product/fan/userguide.mp4'
-                type='video/mp4'
-              />
-            </video>
-          </div>
-        </div>
-      </div>
-
       {/* Review Slider */}
       <ReviewSlider handleBuyNow={handleBuyNow} product={product} />
 
