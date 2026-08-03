@@ -65,62 +65,64 @@ export default function AdminProducts() {
           </div>
         ) : (
           <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="text-[11px] uppercase tracking-wider text-slate-500 border-b border-slate-100" style={{ background: 'linear-gradient(to right,#1a1208,#2d1f0a)' }}>
-                  <th className="px-4 py-3 text-left text-amber-200/80">Product</th>
-                  <th className="px-4 py-3 text-left text-amber-200/80">Category</th>
-                  <th className="px-4 py-3 text-right text-amber-200/80">Price</th>
-                  <th className="px-4 py-3 text-center text-amber-200/80">Stock</th>
-                  <th className="px-4 py-3 text-center text-amber-200/80">Section</th>
-                  <th className="px-4 py-3 text-center text-amber-200/80">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-50">
-                {products.map((p) => (
-                  <tr key={p._id} className="hover:bg-amber-50/30 transition-colors">
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-3">
-                        {p.thumbnail && (
-                          <img src={p.thumbnail} alt={p.title} className="w-10 h-10 object-cover rounded-lg flex-shrink-0 border border-slate-100" />
-                        )}
-                        <div>
-                          <p className="font-semibold text-slate-800 line-clamp-1 max-w-xs">{p.title}</p>
-                          <p className="text-[11px] text-slate-400 font-mono">{p.slug}</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 text-slate-500 text-xs">{p.category || '—'}</td>
-                    <td className="px-4 py-3 text-right">
-                      <span className="font-bold text-amber-700">৳{p.price}</span>
-                      {p.originalPrice > p.price && (
-                        <span className="text-xs text-slate-400 line-through ml-1">৳{p.originalPrice}</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-semibold ${p.inStock ? 'bg-emerald-900 text-emerald-200' : 'bg-red-100 text-red-600'}`}>
-                        {p.inStock ? 'In Stock' : 'Out'}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-semibold ${p.sectionType === 'hot' ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-600'}`}>
-                        {p.sectionType === 'hot' ? '🔥 Hot' : 'Normal'}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center justify-center gap-2">
-                        <Link href={`/admin/products/edit/${p._id}`} className="p-1.5 bg-amber-50 text-amber-700 rounded-lg hover:bg-amber-100 transition-colors">
-                          <FiEdit3 className="w-4 h-4" />
-                        </Link>
-                        <button onClick={() => handleDelete(p._id, p.title)} className="p-1.5 bg-red-50 text-red-500 rounded-lg hover:bg-red-100 transition-colors">
-                          <FiTrash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </td>
+            <div className="overflow-x-auto -mx-4 sm:mx-0">
+              <table className="w-full text-sm min-w-[700px]">
+                <thead>
+                  <tr className="text-[11px] uppercase tracking-wider text-slate-500 border-b border-slate-100" style={{ background: 'linear-gradient(to right,#1a1208,#2d1f0a)' }}>
+                    <th className="px-4 py-3 text-left text-amber-200/80">Product</th>
+                    <th className="px-4 py-3 text-left text-amber-200/80">Category</th>
+                    <th className="px-4 py-3 text-right text-amber-200/80">Price</th>
+                    <th className="px-4 py-3 text-center text-amber-200/80">Stock</th>
+                    <th className="px-4 py-3 text-center text-amber-200/80">Section</th>
+                    <th className="px-4 py-3 text-center text-amber-200/80">Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-slate-50">
+                  {products.map((p) => (
+                    <tr key={p._id} className="hover:bg-amber-50/30 transition-colors">
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-3">
+                          {p.thumbnail && (
+                            <img src={p.thumbnail} alt={p.title} className="w-10 h-10 object-cover rounded-lg flex-shrink-0 border border-slate-100" />
+                          )}
+                          <div>
+                            <p className="font-semibold text-slate-800 line-clamp-1 max-w-xs">{p.title}</p>
+                            <p className="text-[11px] text-slate-400 font-mono">{p.slug}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-slate-500 text-xs">{p.category || '—'}</td>
+                      <td className="px-4 py-3 text-right">
+                        <span className="font-bold text-amber-700">৳{p.price}</span>
+                        {p.originalPrice > p.price && (
+                          <span className="text-xs text-slate-400 line-through ml-1">৳{p.originalPrice}</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-semibold ${p.inStock ? 'bg-emerald-900 text-emerald-200' : 'bg-red-100 text-red-600'}`}>
+                          {p.inStock ? 'In Stock' : 'Out'}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-semibold ${p.sectionType === 'hot' ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-600'}`}>
+                          {p.sectionType === 'hot' ? '🔥 Hot' : 'Normal'}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center justify-center gap-2">
+                          <Link href={`/admin/products/edit/${p._id}`} className="p-1.5 bg-amber-50 text-amber-700 rounded-lg hover:bg-amber-100 transition-colors">
+                            <FiEdit3 className="w-4 h-4" />
+                          </Link>
+                          <button onClick={() => handleDelete(p._id, p.title)} className="p-1.5 bg-red-50 text-red-500 rounded-lg hover:bg-red-100 transition-colors">
+                            <FiTrash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </AdminProductLayout>

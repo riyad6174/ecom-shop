@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { FiArrowLeft, FiSave, FiPlus, FiTrash2, FiUpload } from 'react-icons/fi';
+import { FiArrowLeft, FiSave, FiPlus, FiTrash2, FiUpload, FiGripVertical } from 'react-icons/fi';
 import HtmlEditor from './HtmlEditor';
 
 function slugify(text) {
@@ -14,6 +14,8 @@ function slugify(text) {
 
 function ImageUploader({ label, value, onChange, multiple = false }) {
   const [uploading, setUploading] = useState(false);
+  const [dragIndex, setDragIndex] = useState(null);
+  const [dragOverIndex, setDragOverIndex] = useState(null);
   const inputRef = useRef();
 
   async function uploadFile(file) {
@@ -43,6 +45,49 @@ function ImageUploader({ label, value, onChange, multiple = false }) {
       else onChange(urls[0]);
     } catch { alert('Upload failed'); }
     finally { setUploading(false); }
+  }
+
+  function onDragStart(i) {
+    setDragIndex(i);
+  }
+
+  function onDragOver(e, i) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    if (dragIndex !== null && dragIndex !== i) {
+      setDragOverIndex(i);
+    }
+  }
+
+  function onDragLeave() {
+    setDragOverIndex(null);
+  }
+
+  function onDrop(i) {
+    if (dragIndex === null || dragIndex === i) {
+      setDragIndex(null);
+      setDragOverIndex(null);
+      return;
+    }
+    const arr = [...value];
+    const [moved] = arr.splice(dragIndex, 1);
+    arr.splice(i, 0, moved);
+    onChange(arr);
+    setDragIndex(null);
+    setDragOverIndex(null);
+  }
+
+  function onDragEnd() {
+    setDragIndex(null);
+    setDragOverIndex(null);
+  }
+
+  function moveImage(i, direction) {
+    const arr = [...value];
+    const target = i + direction;
+    if (target < 0 || target >= arr.length) return;
+    [arr[i], arr[target]] = [arr[target], arr[i]];
+    onChange(arr);
   }
 
   return (
@@ -83,12 +128,65 @@ function ImageUploader({ label, value, onChange, multiple = false }) {
             {value && value.length > 0 && (
               <div className="flex flex-wrap gap-2 mb-2">
                 {value.map((url, i) => (
-                  <div key={i} className="relative">
+                  <div
+                    key={i}
+                    draggable
+                    onDragStart={() => onDragStart(i)}
+                    onDragOver={(e) => onDragOver(e, i)}
+                    onDragLeave={onDragLeave}
+                    onDrop={() => onDrop(i)}
+                    onDragEnd={onDragEnd}
+                    className={`relative group cursor-grab active:cursor-grabbing transition-all duration-150 ${
+                      dragIndex === i ? 'opacity-40 scale-95' : ''
+                    } ${dragOverIndex === i ? 'ring-2 ring-amber-400 scale-105' : ''}`}
+                  >
                     <img src={url} alt={`img-${i}`} className="w-16 h-16 object-cover rounded-lg border border-slate-200" />
-                    <button type="button" onClick={() => onChange(value.filter((_, j) => j !== i))} className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs">×</button>
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 rounded-lg transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
+                      <FiGripVertical className="w-4 h-4 text-white drop-shadow" />
+                    </div>
+                    <div className="absolute -top-1 -right-1 flex gap-0">
+                      {value.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={(e) => { e.stopPropagation(); moveImage(i, -1); }}
+                          disabled={i === 0}
+                          className="bg-slate-600 text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] leading-none hover:bg-slate-700 disabled:opacity-30 disabled:cursor-default"
+                          title="Move left"
+                        >
+                          ‹
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={(e) => { e.stopPropagation(); onChange(value.filter((_, j) => j !== i)); }}
+                        className="bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs hover:bg-red-600"
+                        title="Remove"
+                      >
+                        ×
+                      </button>
+                      {value.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={(e) => { e.stopPropagation(); moveImage(i, 1); }}
+                          disabled={i === value.length - 1}
+                          className="bg-slate-600 text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] leading-none hover:bg-slate-700 disabled:opacity-30 disabled:cursor-default"
+                          title="Move right"
+                        >
+                          ›
+                        </button>
+                      )}
+                    </div>
+                    {value.length > 1 && (
+                      <div className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 bg-slate-700 text-white text-[9px] font-bold px-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                        {i + 1}/{value.length}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
+            )}
+            {multiple && value && value.length > 1 && (
+              <p className="text-[10px] text-slate-400 mb-2">Drag to reorder · use ← → buttons to move</p>
             )}
             <input
               type="text"
@@ -289,20 +387,20 @@ export default function ProductForm({ title, initialData, onSubmit, saving, erro
   return (
     <form id="product-form" onSubmit={handleSubmit}>
       {/* Sticky toolbar */}
-      <div className="flex items-center justify-between bg-white border-b border-slate-100 px-0 py-3 mb-6 sticky top-0 z-10 -mx-4 sm:-mx-6 px-4 sm:px-6 shadow-sm">
-        <Link href={backHref} className="flex items-center gap-1.5 text-slate-500 hover:text-slate-900 text-sm font-medium transition-colors">
-          <FiArrowLeft className="w-4 h-4" /> Back to Products
+      <div className="flex items-center justify-between bg-white border-b border-slate-100 py-3 mb-6 sticky top-0 z-10 shadow-sm flex-wrap gap-2 -mx-4 sm:-mx-6 px-4 sm:px-6">
+        <Link href={backHref} className="flex items-center gap-1.5 text-slate-500 hover:text-slate-900 text-sm font-medium transition-colors flex-shrink-0">
+          <FiArrowLeft className="w-4 h-4" /> Back
         </Link>
         <div className="flex items-center gap-3">
-          {error && <p className="text-xs text-red-600 font-medium max-w-xs truncate">{error}</p>}
+          {error && <p className="text-xs text-red-600 font-medium max-w-[160px] sm:max-w-xs truncate">{error}</p>}
           <button
             type="submit"
             disabled={saving}
-            className="flex items-center gap-2 text-white px-5 py-2 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50"
+            className="flex items-center gap-2 text-white px-4 sm:px-5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-colors disabled:opacity-50 flex-shrink-0"
             style={{ background: saving ? '#9ca3af' : 'linear-gradient(135deg,#c9922a,#d4af37)' }}
           >
             <FiSave className="w-4 h-4" />
-            {saving ? 'Saving…' : 'Save Product'}
+            {saving ? 'Saving…' : 'Save'}
           </button>
         </div>
       </div>

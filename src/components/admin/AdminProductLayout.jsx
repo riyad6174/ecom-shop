@@ -120,8 +120,8 @@ export default function AdminProductLayout({ children, title }) {
       {sidebarOpen && (
         <div className="lg:hidden fixed inset-0 z-50 flex">
           <div className="absolute inset-0 bg-black/40" onClick={() => setSidebarOpen(false)} />
-          <div className="relative z-10 flex flex-col">
-            <button onClick={() => setSidebarOpen(false)} className="absolute top-3 right-3 text-slate-500 p-1">
+          <div className="relative z-10 h-full w-56 flex-shrink-0">
+            <button onClick={() => setSidebarOpen(false)} className="absolute top-3 right-3 z-20 text-slate-500 p-1 bg-white/80 rounded-lg">
               <FiX className="w-5 h-5" />
             </button>
             {sidebar}
@@ -129,12 +129,12 @@ export default function AdminProductLayout({ children, title }) {
         </div>
       )}
 
-      <div className="flex flex-1">
+      <div className="flex flex-1 min-h-0">
         {/* Desktop sidebar */}
         <div className="hidden lg:flex">{sidebar}</div>
 
         {/* Main content */}
-        <main className="flex-1 min-w-0 bg-slate-50">
+        <main className="flex-1 min-w-0 bg-slate-50 overflow-x-hidden">
           {/* Page header */}
           <div className="hidden lg:flex items-center justify-between px-6 py-3 bg-white border-b border-slate-100 sticky top-0 z-10 shadow-sm">
             <h1 className="text-base font-bold text-slate-900">{title}</h1>
