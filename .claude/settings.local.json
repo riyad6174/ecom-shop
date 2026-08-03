@@ -16,7 +16,24 @@
       "Bash(Select-Object -First 60)",
       "PowerShell(Select-String *)",
       "Bash(grep -iE \"page\\\\.\\(tsx|jsx|ts|js\\)$\")",
-      "Bash(npx next *)"
+      "Bash(npx next *)",
+      "Bash(npm run *)",
+      "Bash(curl -s -i http://localhost:3000/api/admin/products/6a70b5d1a1ad5d92976b62b1)",
+      "Bash(xargs -I{} sh -c 'echo {}; od -c {} | head -1')",
+      "Bash(curl -s -i http://localhost:3000/api/admin/products)",
+      "Bash(wmic process *)",
+      "Bash(powershell -Command \"Get-CimInstance Win32_Process -Filter 'ProcessId=13052' | Select-Object CommandLine\")",
+      "Read(//tmp/**)",
+      "Bash(netstat -ano)",
+      "Bash(powershell -Command \"Get-CimInstance Win32_Process -Filter 'ProcessId=3992' | Select-Object CommandLine\" 2>&1)",
+      "Bash(curl -s -i http://localhost:3010/api/admin/products/6a70b5d1a1ad5d92976b62b1)",
+      "Bash(powershell -Command \"Stop-Process -Id 3992 -Force -ErrorAction SilentlyContinue; Stop-Process -Id 13052 -ErrorAction SilentlyContinue\")",
+      "Bash(curl -sv -m 15 http://localhost:3010/api/admin/products/6a70b5d1a1ad5d92976b62b1 -o /tmp/resp.txt)",
+      "Bash(echo \"EXIT:$?\")",
+      "Bash(powershell -Command \"Get-CimInstance Win32_Process -Filter \\\\\"Name='node.exe'\\\\\" | Select-Object ProcessId,CommandLine | Format-List\")",
+      "Bash(curl -s -m 15 -i http://localhost:3001/api/admin/products/6a70b5d1a1ad5d92976b62b1)",
+      "Bash(curl *)",
+      "Bash(node *)"
     ]
   }
 }
