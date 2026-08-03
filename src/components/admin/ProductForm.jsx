@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { FiArrowLeft, FiSave, FiPlus, FiTrash2, FiUpload, FiGripVertical } from 'react-icons/fi';
+import { FiArrowLeft, FiSave, FiPlus, FiTrash2, FiUpload, FiMove } from 'react-icons/fi';
 import HtmlEditor from './HtmlEditor';
 
 function slugify(text) {
@@ -142,7 +142,7 @@ function ImageUploader({ label, value, onChange, multiple = false }) {
                   >
                     <img src={url} alt={`img-${i}`} className="w-16 h-16 object-cover rounded-lg border border-slate-200" />
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 rounded-lg transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-                      <FiGripVertical className="w-4 h-4 text-white drop-shadow" />
+                      <FiMove className="w-4 h-4 text-white drop-shadow" />
                     </div>
                     <div className="absolute -top-1 -right-1 flex gap-0">
                       {value.length > 1 && (
