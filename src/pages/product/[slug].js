@@ -6,6 +6,7 @@ import { addToCart, clearCart } from '@/store/cartSlice';
 import Footer from '@/components/common/Footer';
 import Head from 'next/head';
 import Image from 'next/image';
+import { FaWhatsapp, FaPhoneAlt } from 'react-icons/fa';
 import OrderDialog from '@/components/checkout/OrderDialog';
 
 const StarIcon = ({ filled }) => (
@@ -204,7 +205,7 @@ export default function DynamicProductPage({ product, notFound }) {
   return (
     <>
       <Head>
-        <title>{product.title} | Buy Online in Bangladesh | Sheii Shop</title>
+        <title>{`${product.title} | Buy Online in Bangladesh | Sheii Shop`}</title>
         <meta
           name='description'
           content={
@@ -751,6 +752,27 @@ export default function DynamicProductPage({ product, notFound }) {
                         ? 'এখনই কিনুন'
                         : 'স্টক শেষ'}
                   </button>
+                </div>
+
+                <div className='grid grid-cols-2 gap-3 mb-5'>
+                  <a
+                    href={`https://wa.me/8801814575428?text=${encodeURIComponent(`${product.title} সম্পর্কে জানতে চাই`)}`}
+                    target='_blank'
+                    rel='noreferrer'
+                    className='flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold text-white bangla transition-all hover:opacity-90'
+                    style={{ background: '#25D366' }}
+                  >
+                    <FaWhatsapp size={18} />
+                    হোয়াটসঅ্যাপে অর্ডার করুন
+                  </a>
+                  <a
+                    href='tel:8801609599652'
+                    className='flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold text-white bangla transition-all hover:opacity-90'
+                    style={{ background: '#1a1208' }}
+                  >
+                    <FaPhoneAlt size={16} />
+                    কল করুন: 01609599652
+                  </a>
                 </div>
 
                 <div className='grid grid-cols-2 gap-3 pt-5 border-t border-gray-100'>

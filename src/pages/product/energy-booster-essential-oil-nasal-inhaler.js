@@ -11,6 +11,7 @@ import Footer from '@/components/common/Footer';
 import Head from 'next/head';
 import OrderDialog from '@/components/checkout/OrderDialog';
 import { SiRedbull } from 'react-icons/si';
+import { FaWhatsapp, FaPhoneAlt } from 'react-icons/fa';
 
 // Find the specific product for this page
 const productData = products.find(
@@ -372,6 +373,27 @@ const ProductDetails = ({ initialProduct }) => {
                       : 'স্টক নেই'}
                   </span>
                 </button>
+              </div>
+
+              <div className='grid grid-cols-2 gap-3 mt-4'>
+                <a
+                  href={`https://wa.me/8801814575428?text=${encodeURIComponent(`${product.title} সম্পর্কে জানতে চাই`)}`}
+                  target='_blank'
+                  rel='noreferrer'
+                  className='flex items-center justify-center gap-2 rounded-md py-2.5 text-sm font-mont font-semibold text-white transition-all shadow-md hover:opacity-90'
+                  style={{ background: '#25D366' }}
+                >
+                  <FaWhatsapp size={18} />
+                  হোয়াটসঅ্যাপে অর্ডার করুন
+                </a>
+                <a
+                  href='tel:8801609599652'
+                  className='flex items-center justify-center gap-2 rounded-md py-2.5 text-sm font-mont font-semibold text-white transition-all shadow-md hover:opacity-90'
+                  style={{ background: '#1e3a8a' }}
+                >
+                  <FaPhoneAlt size={16} />
+                  কল করুন: 01609599652
+                </a>
               </div>
 
               <div className='mt-4 p-3 bg-red-50 border border-red-200 rounded-lg'>

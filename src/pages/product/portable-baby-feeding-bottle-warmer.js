@@ -11,6 +11,7 @@ import Footer from '@/components/common/Footer';
 import Image from 'next/image';
 import Head from 'next/head';
 import OrderDialog from '@/components/checkout/OrderDialog';
+import { FaWhatsapp, FaPhoneAlt } from 'react-icons/fa';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules';
 import 'swiper/css';
@@ -181,7 +182,7 @@ const ProductDetails = ({ initialProduct }) => {
   return (
     <>
       <Head>
-        <title>{product.title} | Buy Online in Bangladesh | Sheii Shop</title>
+        <title>{`${product.title} | Buy Online in Bangladesh | Sheii Shop`}</title>
         <meta
           name='description'
           content={`বাংলাদেশে সেরা দামে ${product.title} কিনুন। ৬০০০ মিলি অ্যাম্পিয়ার রিচার্জেবল ব্যাটারি, টাইপ সি ফাস্ট চার্জ, অ্যান্টি হিট প্রটেকশন এবং ভ্রমণকারীদের জন্য আদর্শ। শীতকালে শিশুর উষ্ণ খাবারের জন্য নিখুঁত।`}
@@ -469,6 +470,28 @@ const ProductDetails = ({ initialProduct }) => {
                     )}
                   </button>
                 </div>
+
+                <div className='grid grid-cols-2 gap-3 mt-3 mb-3'>
+                  <a
+                    href={`https://wa.me/8801814575428?text=${encodeURIComponent(`${product.title} সম্পর্কে জানতে চাই`)}`}
+                    target='_blank'
+                    rel='noreferrer'
+                    className='flex items-center justify-center gap-2 rounded-md py-2.5 text-sm font-mont font-semibold text-white transition-all shadow-md hover:opacity-90'
+                    style={{ background: '#25D366' }}
+                  >
+                    <FaWhatsapp size={18} />
+                    হোয়াটসঅ্যাপে অর্ডার করুন
+                  </a>
+                  <a
+                    href='tel:8801609599652'
+                    className='flex items-center justify-center gap-2 rounded-md py-2.5 text-sm font-mont font-semibold text-white transition-all shadow-md hover:opacity-90'
+                    style={{ background: '#1e3a8a' }}
+                  >
+                    <FaPhoneAlt size={16} />
+                    কল করুন: 01609599652
+                  </a>
+                </div>
+
                 <p className='text-xs text-gray-600'>
                   প্রোডাক্টটি অরিজিনাল হবে কিনা চিন্তা করছেন? ১০০% অরিজিনাল হবে
                   এই গ্যারান্টি আমরা দিচ্ছি। নকল প্রোডাক্ট কিনে প্রতারিত হবেন

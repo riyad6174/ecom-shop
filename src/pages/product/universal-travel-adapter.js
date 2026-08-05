@@ -17,6 +17,7 @@ import Footer from '@/components/common/Footer';
 import Image from 'next/image';
 import Head from 'next/head';
 import { BsThunderbolt } from 'react-icons/bs';
+import { FaWhatsapp, FaPhoneAlt } from 'react-icons/fa';
 import OrderDialog from '@/components/checkout/OrderDialog';
 
 // Find the specific product for this page
@@ -536,6 +537,28 @@ const ProductDetails = ({ initialProduct }) => {
                   )}
                 </button>
               </div>
+
+              <div className='grid grid-cols-2 gap-3 mb-4'>
+                <a
+                  href={`https://wa.me/8801814575428?text=${encodeURIComponent(`${product.title} সম্পর্কে জানতে চাই`)}`}
+                  target='_blank'
+                  rel='noreferrer'
+                  className='flex items-center justify-center gap-2 rounded-md py-2.5 text-sm font-mont font-semibold text-white transition-all shadow-md hover:opacity-90'
+                  style={{ background: '#25D366' }}
+                >
+                  <FaWhatsapp size={18} />
+                  হোয়াটসঅ্যাপে অর্ডার করুন
+                </a>
+                <a
+                  href='tel:8801609599652'
+                  className='flex items-center justify-center gap-2 rounded-md py-2.5 text-sm font-mont font-semibold text-white transition-all shadow-md hover:opacity-90'
+                  style={{ background: '#1e3a8a' }}
+                >
+                  <FaPhoneAlt size={16} />
+                  কল করুন: 01609599652
+                </a>
+              </div>
+
               <p className='text-sm text-gray-600 font-semibold'>
                 *প্রতিটি প্রোডাক্টের সাথে পেয়ে যাচ্ছেন ১ বছরের ওয়ারেন্টি ।
               </p>

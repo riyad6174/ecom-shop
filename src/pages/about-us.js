@@ -84,18 +84,30 @@ function AboutUs() {
                 About <span className='text-primary'>Sheii Shop</span>
               </h1>
               <p className='text-gray-700'>
-                Founded in 2025, Sheii Shop is your go-to destination for
-                stylish, high-quality, and innovative products that elevate
-                everyday living. Specializing in imported accessories,
-                cutting-edge devices, home essentials, and trendy must-haves, we
-                curate a collection that blends functionality with flair. <br />{' '}
-                <br /> Our mission is simple: to delight our customers with
-                reliable, fashionable, and forward-thinking goods that inspire
-                and enhance their lifestyle. At Sheii Shop, we&apos;re committed
-                to exceptional quality, seamless shopping experiences, and
-                bringing global trends right to your doorstep. <br /> Join us on
-                this journey to redefine everyday elegance—shop with Sheii,
-                where style meets innovation.
+                <strong>Sheii Shop</strong>, founded in 2025, is a retailer
+                specializing in imported accessories, smart devices, home
+                essentials, and trendy lifestyle products. We are proud to be
+                a{' '}
+                <strong>
+                  sister concern of{' '}
+                  <a
+                    href='https://www.sfcorporation.co'
+                    target='_blank'
+                    rel='noreferrer'
+                    className='text-primary underline'
+                  >
+                    SF Corporation
+                  </a>
+                </strong>
+                , committed to delivering quality, innovation, and value to
+                our customers. <br /> <br /> Our mission is simple: to
+                delight our customers with reliable, fashionable, and
+                forward-thinking goods that inspire and enhance their
+                lifestyle. At Sheii Shop, we&apos;re committed to exceptional
+                quality, seamless shopping experiences, and bringing global
+                trends right to your doorstep. <br /> Join us on this journey
+                to redefine everyday elegance—shop with Sheii, where style
+                meets innovation.
               </p>
             </div>
           </div>

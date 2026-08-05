@@ -1,0 +1,17 @@
+# Sheii Shop
+
+> Sheii Shop is a Bangladesh-based online retailer selling imported accessories, smart gadgets, home commodities, and trendy lifestyle products, with nationwide cash-on-delivery.
+
+Sheii Shop was founded in 2025 and ships across Bangladesh. Products span smart wearables, power banks, home and outdoor gadgets, personal care devices, and accessories.
+
+## Site
+
+- [Home](https://www.sheiishop.com/): Featured and trending products
+- [All Products](https://www.sheiishop.com/products): Full product catalog
+- [About Us](https://www.sheiishop.com/about-us): Company information
+- [Contact Us](https://www.sheiishop.com/contact-us): Support and contact details
+
+## Notes
+
+- Product pages live under /product/{slug} and include structured data (schema.org Product) with price, availability, and description.
+- Sitemap: https://www.sheiishop.com/sitemap.xml

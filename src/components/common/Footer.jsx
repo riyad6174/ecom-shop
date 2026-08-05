@@ -20,10 +20,25 @@ function Footer() {
               />
             </div>
             <p className='max-w-xs text-sm leading-relaxed opacity-80'>
-              Sheii Shop, founded in 2025, is a vibrant retailer specializing in
-              imported accessories, cutting-edge devices, home commodities, and
-              trendy products. We deliver high-quality, stylish, and innovative
-              goods to enhance everyday living.
+              <strong>Sheii Shop</strong>, founded in 2025, is a retailer
+              specializing in imported accessories, smart devices, home
+              essentials, and trendy lifestyle products. We are proud to be a{' '}
+              <strong>
+                sister concern of{' '}
+                <a
+                  href='https://www.sfcorporation.co'
+                  target='_blank'
+                  rel='noreferrer'
+                  className='underline hover:text-white'
+                >
+                  SF Corporation
+                </a>
+              </strong>
+              , committed to delivering quality, innovation, and value to our
+              customers.
+            </p>
+            <p className='text-xs opacity-70'>
+              Trade License: TRAD/DNCC/004449/2026
             </p>
             <div className='flex gap-4'>
               <a
@@ -119,9 +134,13 @@ function Footer() {
 
         {/* Divider and Copyright */}
         <hr className='my-8 border-white/20' />
-        <div className='flex flex-col items-center justify-center gap-4 text-sm sm:flex-row'>
+        <div className='flex flex-col items-center justify-center gap-2 text-sm sm:flex-row sm:gap-4'>
           <p className='opacity-80'>
             &copy; {new Date().getFullYear()} Sheii Shop. All Rights Reserved.
+          </p>
+          <span className='hidden opacity-50 sm:inline'>|</span>
+          <p className='opacity-80'>
+            Developed by Scela Venture - Sister concern of SF Corporation
           </p>
         </div>
       </div>

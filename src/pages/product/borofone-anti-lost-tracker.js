@@ -13,6 +13,7 @@ import {
   FaUser,
   FaRegCommentDots,
 } from 'react-icons/fa';
+import { FaWhatsapp, FaPhoneAlt } from 'react-icons/fa';
 import Navbar from '@/components/common/Navbar';
 import CustomSection from '@/components/layout/CustomSection';
 import { products } from '@/utils/products';
@@ -475,6 +476,27 @@ const ProductDetails = ({ initialProduct }) => {
                     <span>{product.inStock ? 'এখনই কিনুন' : 'স্টক নেই'}</span>
                   )}
                 </button>
+              </div>
+
+              <div className='grid grid-cols-2 gap-3 mb-4'>
+                <a
+                  href={`https://wa.me/8801814575428?text=${encodeURIComponent(`${product.title} সম্পর্কে জানতে চাই`)}`}
+                  target='_blank'
+                  rel='noreferrer'
+                  className='flex items-center justify-center gap-2 rounded-md py-2.5 text-sm font-mont font-semibold text-white transition-all shadow-md hover:opacity-90'
+                  style={{ background: '#25D366' }}
+                >
+                  <FaWhatsapp size={18} />
+                  হোয়াটসঅ্যাপে অর্ডার করুন
+                </a>
+                <a
+                  href='tel:8801609599652'
+                  className='flex items-center justify-center gap-2 rounded-md py-2.5 text-sm font-mont font-semibold text-white transition-all shadow-md hover:opacity-90'
+                  style={{ background: '#1e3a8a' }}
+                >
+                  <FaPhoneAlt size={16} />
+                  কল করুন: 01609599652
+                </a>
               </div>
             </div>
           </div>

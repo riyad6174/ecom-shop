@@ -7,6 +7,7 @@ import { addToCart } from '@/store/cartSlice';
 import Footer from '@/components/common/Footer';
 import Head from 'next/head';
 import OrderDialog from '@/components/checkout/OrderDialog';
+import { FaWhatsapp, FaPhoneAlt } from 'react-icons/fa';
 
 const productData = products.find(
   (p) => p.slug === 'adjustable-tint-polarized-sunglass',
@@ -191,7 +192,7 @@ const ProductDetails = ({ initialProduct }) => {
   return (
     <>
       <Head>
-        <title>{product.title} | Buy Online in Bangladesh | Sheii Shop</title>
+        <title>{`${product.title} | Buy Online in Bangladesh | Sheii Shop`}</title>
         <meta
           name='description'
           content={`বাংলাদেশে সেরা দামে ${product.title} কিনুন। বৈশিষ্ট্যসমূহের মধ্যে রয়েছে ১-৯ স্তরের অ্যাডজাস্টেবল লেন্স, ইউভি সুরক্ষা, পোলারাইজড টেকনোলজি এবং আরও অনেক কিছু।`}
@@ -550,6 +551,27 @@ const ProductDetails = ({ initialProduct }) => {
                         ? 'এখনই কিনুন'
                         : 'স্টক শেষ'}
                   </button>
+                </div>
+
+                <div className='grid grid-cols-2 gap-3 mb-5'>
+                  <a
+                    href={`https://wa.me/8801814575428?text=${encodeURIComponent(`${product.title} সম্পর্কে জানতে চাই`)}`}
+                    target='_blank'
+                    rel='noreferrer'
+                    className='flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold text-white bangla transition-all hover:opacity-90'
+                    style={{ background: '#25D366' }}
+                  >
+                    <FaWhatsapp size={18} />
+                    হোয়াটসঅ্যাপে অর্ডার করুন
+                  </a>
+                  <a
+                    href='tel:8801609599652'
+                    className='flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold text-white bangla transition-all hover:opacity-90'
+                    style={{ background: '#1a1208' }}
+                  >
+                    <FaPhoneAlt size={16} />
+                    কল করুন: 01609599652
+                  </a>
                 </div>
 
                 {/* Premium box notice */}
