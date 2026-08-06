@@ -165,7 +165,12 @@ function Cart() {
     setIsLoading(true);
     setSubmissionError(null);
 
-    const uniqueId = `ORD-${Date.now().toString().slice(-6)}-${Math.floor(1000 + Math.random() * 9000)}`;
+    // Format: {month}{day}-{last5DigitsOfPhone}-{2digitRandom}
+    // e.g. Jul 8, phone ...01455 -> "78-01455-31". The random suffix keeps
+    // the id unique if the same phone orders again the same day.
+    const nowBD = new Date();
+    const phoneDigits = (formData.phoneNumber || '').replace(/\D/g, '');
+    const uniqueId = `${nowBD.getMonth() + 1}${nowBD.getDate()}-${phoneDigits.slice(-5) || '00000'}-${Math.floor(10 + Math.random() * 90)}`;
     const order = {
       user: { ...formData },
       order: {

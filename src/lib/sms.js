@@ -3,7 +3,6 @@ import SmsLog from '@/models/SmsLog';
 
 const API_KEY = process.env.BULKSMS_API_KEY || 'PH7HSfBBakv0S569DcUK';
 const SENDER_ID = process.env.BULKSMS_SENDER_ID || 'SHEII SHOP';
-const CONTACT_NUMBER = '01814575428';
 
 const BASE_URL = 'http://bulksmsbd.net/api';
 
@@ -35,8 +34,9 @@ function normalizePhone(phone) {
 
 function buildConfirmationMessage(order) {
   const amount = Number(order.grandTotal) || 0;
+  const id = order.orderId || '';
   return (
-    `অর্ডার গ্রহণ করা হয়েছে।\nমোট: ৳${amount}\n-SHEII SHOP : ${CONTACT_NUMBER}`
+    `ধন্যবাদ, অর্ডারটি সফল হয়েছে।\nমোট ${amount} Tk\n#ORD${id}\n-সেইই শপ`
   );
 }
 
