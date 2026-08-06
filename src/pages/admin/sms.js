@@ -5,7 +5,7 @@ import Head from 'next/head';
 import {
   FiSearch, FiRefreshCw, FiFilter, FiTrash2, FiCheckCircle,
   FiXCircle, FiAlertTriangle, FiSkipForward, FiMessageSquare,
-  FiCalendar, FiArrowLeft, FiArrowRight, FiCreditCard,
+  FiCalendar, FiArrowLeft, FiArrowRight, FiCreditCard, FiDownload,
 } from 'react-icons/fi';
 
 const STATUS_CONFIG = {
@@ -43,13 +43,16 @@ export default function AdminSms() {
   const [balance, setBalance] = useState(null);
   const [balanceLoading, setBalanceLoading] = useState(false);
   const [stats, setStats] = useState({ totalSent: 0, totalFailed: 0, totalSuspicious: 0, totalDeduped: 0 });
+  const [exporting, setExporting] = useState(false);
 
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [productFilter, setProductFilter] = useState('');
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
 
   const debounceRef = useRef(null);
+  const productDebounceRef = useRef(null);
 
   const fetchBalance = useCallback(async () => {
     setBalanceLoading(true);
@@ -74,6 +77,7 @@ export default function AdminSms() {
         limit: 30,
         search,
         status: statusFilter,
+        product: productFilter,
         from: fromDate,
         to: toDate,
       });
@@ -89,7 +93,7 @@ export default function AdminSms() {
     } finally {
       setLoading(false);
     }
-  }, [page, search, statusFilter, fromDate, toDate]);
+  }, [page, search, statusFilter, productFilter, fromDate, toDate]);
 
   useEffect(() => {
     fetch('/api/admin/me')
@@ -114,7 +118,7 @@ export default function AdminSms() {
 
   useEffect(() => {
     setPage(1);
-  }, [search, statusFilter, fromDate, toDate]);
+  }, [search, statusFilter, productFilter, fromDate, toDate]);
 
   const handleSearchChange = (e) => {
     const val = e.target.value;
@@ -122,12 +126,96 @@ export default function AdminSms() {
     debounceRef.current = setTimeout(() => setSearch(val), 400);
   };
 
+  const handleProductChange = (e) => {
+    const val = e.target.value;
+    clearTimeout(productDebounceRef.current);
+    productDebounceRef.current = setTimeout(() => setProductFilter(val), 400);
+  };
+
   const handleResetFilters = () => {
     setSearch('');
     setStatusFilter('');
+    setProductFilter('');
     setFromDate('');
     setToDate('');
     setPage(1);
+  };
+
+  const buildParams = (overrides = {}) => {
+    const params = new URLSearchParams({
+      page: 1,
+      limit: 100,
+      search,
+      status: statusFilter,
+      product: productFilter,
+      from: fromDate,
+      to: toDate,
+      ...overrides,
+    });
+    return params;
+  };
+
+  const handleExportCsv = async () => {
+    setExporting(true);
+    try {
+      // Fetch ALL rows matching the current filters (paginate through every page).
+      const rows = [];
+      let currentPage = 1;
+      let totalPages = 1;
+      do {
+        const res = await fetch(`/api/admin/sms?${buildParams({ page: currentPage })}`);
+        if (!res.ok) throw new Error('Failed');
+        const data = await res.json();
+        rows.push(...data.logs);
+        totalPages = data.totalPages;
+        currentPage += 1;
+      } while (currentPage <= totalPages);
+
+      if (rows.length === 0) {
+        window.alert('No SMS logs match the current filters.');
+        return;
+      }
+
+      const esc = (val) => {
+        const s = String(val ?? '');
+        return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+      };
+
+      const header = [
+        'Status', 'Customer Name', 'Phone', 'Order ID', 'Products',
+        'Order Value (Tk)', 'API Code', 'Reason', 'Sent Date', 'Timestamp',
+      ];
+      const lines = [
+        header.join(','),
+        ...rows.map((log) => [
+          esc(log.status),
+          esc(log.name),
+          esc(formatPhone(log.phone)),
+          esc(log.orderId),
+          esc(log.productNames),
+          esc(log.orderValue),
+          esc(log.apiCode),
+          esc(log.reason),
+          esc(log.sentDate),
+          esc(log.createdAt ? new Date(log.createdAt).toLocaleString('en-US', { timeZone: 'Asia/Dhaka' }) : ''),
+        ].join(',')),
+      ];
+
+      const blob = new Blob(['\uFEFF' + lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `sms-log-${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error(error);
+      window.alert('Failed to export SMS log.');
+    } finally {
+      setExporting(false);
+    }
   };
 
   const handleLogout = async () => {
@@ -204,6 +292,14 @@ export default function AdminSms() {
               </h1>
               <p className="text-slate-500 text-sm mt-1 font-medium tracking-tight">Order confirmation messages & delivery log.</p>
             </div>
+            <button
+              onClick={handleExportCsv}
+              disabled={exporting}
+              className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-bold shadow-blue-200 shadow-lg hover:bg-blue-700 transition-all disabled:opacity-60 disabled:pointer-events-none"
+            >
+              <FiDownload className="w-4 h-4" />
+              {exporting ? 'Exporting...' : 'Export CSV'}
+            </button>
           </div>
 
           {/* ── Stats Row ── */}
@@ -260,6 +356,19 @@ export default function AdminSms() {
                     defaultValue={search}
                     onChange={handleSearchChange}
                     placeholder='Customer name, phone, or order number...'
+                    className='w-full text-sm border border-slate-200 bg-slate-50/50 rounded-xl pl-10 pr-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all'
+                  />
+                </div>
+              </div>
+              <div className='relative xl:col-span-2'>
+                <label className='text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 block'>Filter by Product</label>
+                <div className="relative">
+                  <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
+                  <input
+                    type='text'
+                    defaultValue={productFilter}
+                    onChange={handleProductChange}
+                    placeholder='Search a product name in orders...'
                     className='w-full text-sm border border-slate-200 bg-slate-50/50 rounded-xl pl-10 pr-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all'
                   />
                 </div>
@@ -321,18 +430,19 @@ export default function AdminSms() {
                 <thead>
                   <tr className='bg-slate-50/80 border-b border-slate-200 text-[11px] font-black text-slate-500 uppercase tracking-widest'>
                     <th className='px-6 py-4'>Status</th>
+                    <th className='px-6 py-4'>Status Code</th>
+                    <th className='px-6 py-4'>Status Message</th>
                     <th className='px-6 py-4'>Customer</th>
                     <th className='px-6 py-4'>Order Number</th>
                     <th className='px-6 py-4'>Product(s)</th>
                     <th className='px-6 py-4 text-right'>Order Value</th>
-                    <th className='px-6 py-4'>Message</th>
                     <th className='px-6 py-4'>Timestamp</th>
                   </tr>
                 </thead>
                 <tbody className='divide-y divide-slate-100'>
                   {loading ? (
                     <tr>
-                      <td colSpan="7" className="py-32 text-center">
+                      <td colSpan="8" className="py-32 text-center">
                         <div className="flex flex-col items-center gap-4">
                           <div className='animate-spin w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full shadow-lg' />
                           <p className="text-slate-400 font-bold animate-pulse text-xs uppercase tracking-[0.2em]">Loading SMS log...</p>
@@ -341,7 +451,7 @@ export default function AdminSms() {
                     </tr>
                   ) : logs.length === 0 ? (
                     <tr>
-                      <td colSpan="7" className="py-32 text-center">
+                      <td colSpan="8" className="py-32 text-center">
                         <div className="flex flex-col items-center gap-3">
                           <div className="w-16 h-16 bg-slate-50 rounded-3xl flex items-center justify-center mb-2">
                             <FiMessageSquare className="w-8 h-8 text-slate-200" />
@@ -365,10 +475,20 @@ export default function AdminSms() {
                               <span className="text-[10px] font-bold uppercase tracking-wider whitespace-nowrap">{config.label}</span>
                             </div>
                             {log.reason && (
-                              <div className="mt-1 text-[10px] text-slate-400 font-medium" title={log.apiMessage}>
+                              <div className="mt-1 text-[10px] text-slate-400 font-medium">
                                 {log.reason}
                               </div>
                             )}
+                          </td>
+                          <td className='px-6 py-4'>
+                            <span className='inline-flex items-center px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 text-xs font-black font-mono'>
+                              {log.apiCode ?? '—'}
+                            </span>
+                          </td>
+                          <td className='px-6 py-4 max-w-[220px]'>
+                            <span className='text-xs text-slate-600 font-medium block truncate' title={log.apiMessage}>
+                              {log.apiMessage || '—'}
+                            </span>
                           </td>
                           <td className='px-6 py-4'>
                             <div className="flex flex-col">
@@ -388,22 +508,6 @@ export default function AdminSms() {
                             <span className='font-black text-slate-900 text-sm'>
                               ৳{Number(log.orderValue || 0).toLocaleString('en-BD')}
                             </span>
-                          </td>
-                          <td className='px-6 py-4 max-w-[260px]'>
-                            {log.message ? (
-                              <div className="flex flex-col">
-                                <span className='text-xs text-slate-600 font-medium whitespace-pre-line line-clamp-2' title={log.message}>
-                                  {log.message}
-                                </span>
-                                {log.apiCode !== 0 && (
-                                  <span className='text-[10px] text-slate-400 font-medium mt-1' title={log.apiMessage}>
-                                    Code {log.apiCode}{log.apiMessage ? ` — ${log.apiMessage}` : ''}
-                                  </span>
-                                )}
-                              </div>
-                            ) : (
-                              <span className='text-xs text-slate-400 italic'>No message sent</span>
-                            )}
                           </td>
                           <td className='px-6 py-4'>
                             <div className="flex flex-col">

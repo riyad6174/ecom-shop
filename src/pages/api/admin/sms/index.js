@@ -20,6 +20,7 @@ export default async function handler(req, res) {
       limit = 30,
       search = '',
       status = '',
+      product = '',
       from = '',
       to = '',
     } = req.query;
@@ -33,6 +34,11 @@ export default async function handler(req, res) {
     if (search.trim()) {
       const regex = new RegExp(search.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
       filter.$or = [{ name: regex }, { phone: regex }, { orderId: regex }];
+    }
+
+    if (product.trim()) {
+      const regex = new RegExp(product.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+      filter.productNames = regex;
     }
 
     if (status && VALID_STATUSES.includes(status)) {

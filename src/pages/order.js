@@ -203,6 +203,7 @@ function Cart() {
           title: item.title || 'Unknown',
           price: item.price || 0,
           quantity: item.quantity || 1,
+          image: item.image || '',
           variant: (item.selectedColor ? `Color: ${item.selectedColor}` : '') || (item.selectedVariantValue ? `Type: ${item.selectedVariantValue}` : '') || 'Standard',
         }))
       ),
