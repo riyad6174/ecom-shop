@@ -1,6 +1,7 @@
 import { connectDB } from '@/lib/mongodb';
 import Order from '@/models/Order';
 import { sendOrderConfirmationSMS } from '@/lib/sms';
+import { logOrderError } from '@/lib/orderErrors';
 
 export default async function handler(req, res) {
   // HEAD: pre-warm the DB connection when the order dialog opens
@@ -31,10 +32,44 @@ export default async function handler(req, res) {
 
   if (!name || !phone || !deliveryZone || !address) {
     console.warn(`[ORDER] Missing fields for ${orderId}`);
+    logOrderError({
+      type: 'validation',
+      source: 'server',
+      statusCode: 400,
+      message: 'Missing required fields',
+      name,
+      phone,
+      deliveryZone,
+      address,
+      orderId,
+      items,
+      totalPrice,
+      shippingCharge,
+      grandTotal,
+      orderDate,
+      submissionTime,
+    }).catch(() => {});
     return res.status(400).json({ message: 'Missing required fields' });
   }
 
   if (!orderId) {
+    logOrderError({
+      type: 'validation',
+      source: 'server',
+      statusCode: 400,
+      message: 'Order ID is required',
+      name,
+      phone,
+      deliveryZone,
+      address,
+      orderId,
+      items,
+      totalPrice,
+      shippingCharge,
+      grandTotal,
+      orderDate,
+      submissionTime,
+    }).catch(() => {});
     return res.status(400).json({ message: 'Order ID is required' });
   }
 
@@ -78,6 +113,25 @@ export default async function handler(req, res) {
         .status(409)
         .json({ message: 'Duplicate order ID. Please try again.' });
     }
+
+    logOrderError({
+      type: error.message === 'DB connection timeout' ? 'db_connection' : 'server',
+      source: 'server',
+      statusCode: 500,
+      message: error.message || 'Failed to submit order',
+      stack: error.stack,
+      name,
+      phone,
+      deliveryZone,
+      address,
+      orderId,
+      items,
+      totalPrice,
+      shippingCharge,
+      grandTotal,
+      orderDate,
+      submissionTime,
+    }).catch(() => {});
 
     return res
       .status(500)

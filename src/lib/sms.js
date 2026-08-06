@@ -150,33 +150,44 @@ async function getBalance() {
 }
 
 async function createLog(entry) {
-  try {
-    await SmsLog.create({
-      status: 'sent',
-      apiCode: 202,
-      ...entry,
-    });
-  } catch (error) {
-    console.error('[SMS] Failed to persist log:', error.message || error);
+  // Retry once on persistence failure so a flaky write doesn't lose the row.
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      await SmsLog.create({
+        status: 'sent',
+        apiCode: 202,
+        ...entry,
+      });
+      return true;
+    } catch (error) {
+      if (attempt === 0) {
+        console.error('[SMS] Persist log failed, retrying:', error.message || error);
+        await new Promise((resolve) => setTimeout(resolve, 300));
+        continue;
+      }
+      console.error('[SMS] Persist log failed permanently:', error.message || error);
+      return false;
+    }
   }
+  return false;
 }
 
 async function sendOrderConfirmationSMS(order) {
+  const base = {
+    name: order?.name,
+    phone: normalizePhone(order?.phone),
+    orderId: order?.orderId,
+    productNames: extractProductNames(order?.items),
+    orderValue: Number(order?.grandTotal) || 0,
+    sentDate: getTodayBD(),
+  };
+
   try {
     await connectDB();
 
-    const phone = normalizePhone(order.phone);
-    const sentDate = getTodayBD();
+    const phone = base.phone;
+    const sentDate = base.sentDate;
     const totalQty = countOrderQuantity(order.items);
-
-    const base = {
-      name: order.name,
-      phone,
-      orderId: order.orderId,
-      productNames: extractProductNames(order.items),
-      orderValue: Number(order.grandTotal) || 0,
-      sentDate,
-    };
 
     // Rule 1: suspicious order (single order quantity > 6) → skip
     if (totalQty > 6) {
@@ -222,8 +233,16 @@ async function sendOrderConfirmationSMS(order) {
       `[SMS] ${result.ok ? 'SENT' : 'FAILED'} ${order.orderId} → ${phone} (code ${result.code})`,
     );
   } catch (error) {
-    // Never propagate — background task must not break the order flow
+    // Never propagate — background task must not break the order flow.
+    // ALWAYS persist a failed row so the attempt is visible in the admin list.
     console.error('[SMS] sendOrderConfirmationSMS error:', error.message || error);
+    await createLog({
+      ...base,
+      status: 'failed',
+      apiCode: -1,
+      apiMessage: error.message || 'Background SMS task failed',
+      message: error.message || 'Background SMS task failed',
+    });
   }
 }
 

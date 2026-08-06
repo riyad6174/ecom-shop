@@ -250,6 +250,18 @@ function Cart() {
         const errorData = await response.json().catch(() => ({}));
         console.error('API error response:', errorData);
         setSubmissionError(errorData.message || 'Failed to submit order');
+        // Report the failure to the server (fire-and-forget).
+        fetch('/api/log-order-error', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ...sheetData,
+            type: response.status >= 500 ? 'server' : 'validation',
+            statusCode: response.status,
+            message: errorData.message || 'Failed to submit order',
+            url: typeof window !== 'undefined' ? window.location.href : '',
+          }),
+        }).catch(() => {});
       } else {
         console.log('Order Submitted:', order);
         setOrderDetails(order);
@@ -278,6 +290,18 @@ function Cart() {
     } catch (error) {
       console.error('Fetch error:', error.name, error.message);
       setSubmissionError('Error submitting order. Please try again.');
+      // Report the network/timeout failure to the server (fire-and-forget).
+      fetch('/api/log-order-error', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...sheetData,
+          type: error.name === 'AbortError' ? 'timeout' : 'network',
+          statusCode: 0,
+          message: error.name === 'AbortError' ? 'Request timeout' : error.message || 'Network error',
+          url: typeof window !== 'undefined' ? window.location.href : '',
+        }),
+      }).catch(() => {});
     } finally {
       setIsLoading(false);
     }
