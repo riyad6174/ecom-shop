@@ -564,7 +564,13 @@ export default function AdminOrders() {
                           <td className='px-6 py-4'>
                             <div className="flex flex-col">
                               <span className='font-bold text-slate-800 text-sm mb-0.5'>{order.name}</span>
-                              <span className='text-xs text-slate-500 font-medium selection:bg-blue-100'>{formatPhone(order.phone)}</span>
+                              <a
+                                href={`tel:${order.phone || ''}`}
+                                className='text-xs text-slate-500 font-medium hover:text-blue-600 hover:underline transition-colors w-fit'
+                                title={`Call ${formatPhone(order.phone)}`}
+                              >
+                                {formatPhone(order.phone)}
+                              </a>
                             </div>
                           </td>
                           <td className='px-6 py-4 max-w-[250px]'>
