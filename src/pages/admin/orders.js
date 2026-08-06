@@ -71,25 +71,13 @@ function parseItems(itemsStr) {
   try {
     const arr = JSON.parse(itemsStr || '[]');
     return arr.map((it) => (
-      <div key={Math.random()} className="flex items-center gap-2 mb-1 last:mb-0">
-        {it.image ? (
-          <img
-            src={it.image}
-            alt={it.title || it.name || 'Item'}
-            className="w-8 h-8 rounded-lg object-cover border border-slate-100 flex-shrink-0"
-            loading="lazy"
-          />
-        ) : (
-          <div className="w-8 h-8 rounded-lg bg-slate-100 flex-shrink-0" />
+      <div key={Math.random()} className="mb-1 last:mb-0">
+        <span className="font-medium">{it.title || it.name || 'Item'}</span>
+        <span className="text-gray-400 mx-1">×</span>
+        <span className="text-blue-600 font-semibold">{it.quantity || 1}</span>
+        {it.variant && (
+          <span className="block text-[10px] text-gray-500 uppercase tracking-tight">{it.variant}</span>
         )}
-        <div className="min-w-0">
-          <span className="font-medium">{it.title || it.name || 'Item'}</span>
-          <span className="text-gray-400 mx-1">×</span>
-          <span className="text-blue-600 font-semibold">{it.quantity || 1}</span>
-          {it.variant && (
-            <span className="block text-[10px] text-gray-500 uppercase tracking-tight">{it.variant}</span>
-          )}
-        </div>
       </div>
     ));
   } catch {
