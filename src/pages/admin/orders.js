@@ -314,6 +314,9 @@ export default function AdminOrders() {
               <Link href='/admin/products' className='text-sm px-4 py-1.5 rounded-md text-slate-600 hover:bg-slate-200 transition-colors font-medium'>
                 Manage Product
               </Link>
+              <Link href='/admin/sms' className='text-sm px-4 py-1.5 rounded-md text-slate-600 hover:bg-slate-200 transition-colors font-medium'>
+                SMS
+              </Link>
               <Link href='/admin/admins' className='text-sm px-4 py-1.5 rounded-md text-slate-600 hover:bg-slate-200 transition-colors font-medium'>
                 Admins
               </Link>

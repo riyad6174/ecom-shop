@@ -1,5 +1,6 @@
 import { connectDB } from '@/lib/mongodb';
 import Order from '@/models/Order';
+import { sendOrderConfirmationSMS } from '@/lib/sms';
 
 export default async function handler(req, res) {
   // HEAD: pre-warm the DB connection when the order dialog opens
@@ -45,7 +46,7 @@ export default async function handler(req, res) {
       ),
     ]);
 
-    await Order.create({
+    const savedOrder = await Order.create({
       name,
       phone,
       deliveryZone,
@@ -60,6 +61,9 @@ export default async function handler(req, res) {
         submissionTime ||
         new Date().toLocaleString('en-US', { timeZone: 'Asia/Dhaka' }),
     });
+
+    // Fire-and-forget background SMS — never blocks or fails the order flow.
+    sendOrderConfirmationSMS(savedOrder).catch(() => {});
 
     console.log(`[ORDER] SUCCESS ${orderId}`);
     return res.status(200).json({
