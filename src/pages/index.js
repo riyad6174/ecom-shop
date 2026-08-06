@@ -58,7 +58,7 @@ function Index({ products }) {
         />
         <meta
           property='og:image'
-          content='https://www.sheiishop.com/assets/logo.png'
+          content='https://www.sheiishop.com/logo-new.png'
         />
         <meta property='og:image:width' content='1200' />
         <meta property='og:image:height' content='630' />
@@ -77,7 +77,7 @@ function Index({ products }) {
         />
         <meta
           name='twitter:image'
-          content='https://www.sheiishop.com/assets/logo.png'
+          content='https://www.sheiishop.com/logo-new.png'
         />
 
         {/* JSON-LD: WebSite + SearchAction */}
