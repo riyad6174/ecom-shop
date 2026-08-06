@@ -7,8 +7,11 @@ const CONTACT_NUMBER = '01814575428';
 
 const BASE_URL = 'http://bulksmsbd.net/api';
 
-// 15s cap so a slow provider never hangs the background task indefinitely
-const FETCH_TIMEOUT_MS = 15000;
+// Cap so a slow provider never hangs the background task indefinitely.
+// Providers can stall >15s on reused keep-alive sockets, so allow a generous
+// window and let the retry in sendSMS handle genuine one-off slowness.
+const FETCH_TIMEOUT_MS = 30000;
+const SEND_ATTEMPTS = 2;
 
 // ── Balance cache (process-local, ~60s TTL) ────────────────────────────────
 // Note: only works within a single server instance. If scaled to multiple
@@ -58,11 +61,21 @@ function extractProductNames(itemsStr) {
   }
 }
 
-async function fetchWithTimeout(url) {
+// POST + connection: close avoids long-URL encoding pitfalls and the
+// intermittent stalls the provider has over a pooled keep-alive socket.
+async function requestProvider(path, params) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
   try {
-    return await fetch(url, { signal: controller.signal });
+    return await fetch(`${BASE_URL}/${path}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Connection: 'close',
+      },
+      body: params.toString(),
+      signal: controller.signal,
+    });
   } finally {
     clearTimeout(timer);
   }
@@ -76,24 +89,37 @@ async function sendSMS({ phone, message }) {
     number: phone,
     message,
   });
-  const url = `${BASE_URL}/smsapi?${params.toString()}`;
 
-  try {
-    const res = await fetchWithTimeout(url);
-    const data = await res.json().catch(() => ({}));
-    const code = Number(data.response_code);
-    return {
-      ok: code === 202,
-      code: Number.isNaN(code) ? -1 : code,
-      message: data.message || (code === 202 ? 'Sent' : 'Provider error'),
-    };
-  } catch (error) {
-    return {
-      ok: false,
-      code: -1,
-      message: error.name === 'AbortError' ? 'Request timeout' : error.message || 'Request failed',
-    };
+  let lastError = null;
+  for (let attempt = 0; attempt < SEND_ATTEMPTS; attempt++) {
+    try {
+      const res = await requestProvider('smsapi', params);
+      const data = await res.json().catch(() => ({}));
+      const code = Number(data.response_code);
+      return {
+        ok: code === 202,
+        code: Number.isNaN(code) ? -1 : code,
+        message:
+          data.message ||
+          data.error_message ||
+          (code === 202 ? 'Sent' : 'Provider error'),
+      };
+    } catch (error) {
+      lastError = error;
+      // AbortError means the provider didn't respond in time — retry once.
+      if (attempt === SEND_ATTEMPTS - 1) break;
+      await new Promise((resolve) => setTimeout(resolve, 500));
+    }
   }
+
+  return {
+    ok: false,
+    code: -1,
+    message:
+      lastError?.name === 'AbortError'
+        ? 'Request timeout'
+        : lastError?.message || 'Request failed',
+  };
 }
 
 async function getBalance() {
@@ -103,10 +129,9 @@ async function getBalance() {
   }
 
   const params = new URLSearchParams({ api_key: API_KEY });
-  const url = `${BASE_URL}/getBalanceApi?${params.toString()}`;
 
   try {
-    const res = await fetchWithTimeout(url);
+    const res = await requestProvider('getBalanceApi', params);
     const data = await res.json().catch(() => ({}));
     const code = Number(data.response_code);
     const balance =
