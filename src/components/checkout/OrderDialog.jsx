@@ -231,12 +231,11 @@ const OrderDialog = ({ isOpen, onClose }) => {
     // The DB has a unique index on orderId, so even if both attempts reach
     // the server, only one order is ever saved — the retry gets a 409 which
     // we treat as success. No duplicate orders possible.
-    // Format: {month}{day}-{last5DigitsOfPhone}-{2digitRandom}
-    // e.g. Jul 8, phone ...01455 -> "78-01455-31". The random suffix keeps
-    // the id unique if the same phone orders again the same day.
-    const nowBD = new Date();
+    // Format: {2random}-{last4DigitsOfPhone}-{2random}
+    // e.g. phone ...5428 -> "87-5428-77". The random digits keep the id
+    // unique if the same phone orders again the same day.
     const phoneDigits = (formData.phoneNumber || '').replace(/\D/g, '');
-    const uniqueId = `${nowBD.getMonth() + 1}${nowBD.getDate()}-${phoneDigits.slice(-5) || '00000'}-${Math.floor(10 + Math.random() * 90)}`;
+    const uniqueId = `${Math.floor(10 + Math.random() * 90)}-${phoneDigits.slice(-4) || '0000'}-${Math.floor(10 + Math.random() * 90)}`;
     const order = {
       user: { ...formData },
       order: {
