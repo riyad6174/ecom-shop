@@ -378,19 +378,6 @@ const OrderDialog = ({ isOpen, onClose }) => {
       'আপনার অর্ডারটি অনলাইনে সাবমিট করা সম্ভব হয়নি। অনুগ্রহ করে +8801814575428 নাম্বারে কল করুন অথবা WhatsApp এ মেসেজ দিন।',
     );
     setIsLoading(false);
-
-    // Report the definitive user-facing failure to the server once (fire-and-forget).
-    fetch('/api/log-order-error', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        ...sheetData,
-        type: 'network',
-        statusCode: 0,
-        message: 'Both order submit attempts failed',
-        url: typeof window !== 'undefined' ? window.location.href : '',
-      }),
-    }).catch(() => {});
   };
 
   // Handle close

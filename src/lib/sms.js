@@ -1,16 +1,17 @@
 import { connectDB } from '@/lib/mongodb';
 import SmsLog from '@/models/SmsLog';
+import Order from '@/models/Order';
 
 const API_KEY = process.env.BULKSMS_API_KEY || 'PH7HSfBBakv0S569DcUK';
 const SENDER_ID = process.env.BULKSMS_SENDER_ID || 'SHEII SHOP';
 
 const BASE_URL = 'http://bulksmsbd.net/api';
 
-// Cap so a slow provider never hangs the background task indefinitely.
-// Providers can stall >15s on reused keep-alive sockets, so allow a generous
-// window and let the retry in sendSMS handle genuine one-off slowness.
-const FETCH_TIMEOUT_MS = 30000;
-const SEND_ATTEMPTS = 2;
+// Single send attempt with a generous provider timeout. A retry here would
+// risk DUPLICATE SMS: if the provider already delivered but the response was
+// slow/lost, resending sends the same message twice. One attempt avoids that.
+const FETCH_TIMEOUT_MS = 15000;
+const SEND_ATTEMPTS = 1;
 
 // ── Balance cache (process-local, ~60s TTL) ────────────────────────────────
 // Note: only works within a single server instance. If scaled to multiple
@@ -172,6 +173,7 @@ async function createLog(entry) {
   return false;
 }
 
+// Returns the final smsStatus so the cron can decide whether to retry.
 async function sendOrderConfirmationSMS(order) {
   const base = {
     name: order?.name,
@@ -180,6 +182,17 @@ async function sendOrderConfirmationSMS(order) {
     productNames: extractProductNames(order?.items),
     orderValue: Number(order?.grandTotal) || 0,
     sentDate: getTodayBD(),
+  };
+
+  const setStatus = async (status) => {
+    if (order?._id) {
+      try {
+        await Order.updateOne({ _id: order._id }, { smsStatus: status });
+      } catch (error) {
+        console.error('[SMS] Failed to update order smsStatus:', error.message || error);
+      }
+    }
+    return status;
   };
 
   try {
@@ -198,7 +211,7 @@ async function sendOrderConfirmationSMS(order) {
         reason: `Total quantity ${totalQty} > 6`,
       });
       console.log(`[SMS] Skipped suspicious order ${order.orderId} (qty ${totalQty})`);
-      return;
+      return await setStatus('suspicious_skipped');
     }
 
     // Rule 2: same-day dedup (one sent SMS per phone per BD day)
@@ -215,7 +228,7 @@ async function sendOrderConfirmationSMS(order) {
         reason: 'Already sent today',
       });
       console.log(`[SMS] Dedup skip ${order.orderId} — already sent to ${phone} today`);
-      return;
+      return await setStatus('dedup_skipped');
     }
 
     const message = buildConfirmationMessage(order);
@@ -232,8 +245,9 @@ async function sendOrderConfirmationSMS(order) {
     console.log(
       `[SMS] ${result.ok ? 'SENT' : 'FAILED'} ${order.orderId} → ${phone} (code ${result.code})`,
     );
+    return await setStatus(result.ok ? 'sent' : 'failed');
   } catch (error) {
-    // Never propagate — background task must not break the order flow.
+    // Never propagate — a failed SMS must not break the order flow.
     // ALWAYS persist a failed row so the attempt is visible in the admin list.
     console.error('[SMS] sendOrderConfirmationSMS error:', error.message || error);
     await createLog({
@@ -243,6 +257,7 @@ async function sendOrderConfirmationSMS(order) {
       apiMessage: error.message || 'Background SMS task failed',
       message: error.message || 'Background SMS task failed',
     });
+    return await setStatus('failed');
   }
 }
 

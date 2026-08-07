@@ -258,9 +258,6 @@ export default function AdminSms() {
               <Link href='/admin/sms' className='text-sm px-4 py-1.5 rounded-md bg-white shadow-sm font-semibold text-blue-700'>
                 SMS
               </Link>
-              <Link href='/admin/order-errors' className='text-sm px-4 py-1.5 rounded-md text-slate-600 hover:bg-slate-200 transition-colors font-medium'>
-                Order Errors
-              </Link>
               <Link href='/admin/admins' className='text-sm px-4 py-1.5 rounded-md text-slate-600 hover:bg-slate-200 transition-colors font-medium'>
                 Admins
               </Link>
