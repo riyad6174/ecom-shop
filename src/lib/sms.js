@@ -5,7 +5,7 @@ import Order from '@/models/Order';
 const API_KEY = process.env.BULKSMS_API_KEY || 'PH7HSfBBakv0S569DcUK';
 const SENDER_ID = process.env.BULKSMS_SENDER_ID || 'SHEII SHOP';
 
-const BASE_URL = 'http://bulksmsbd.net/api';
+const BASE_URL = 'https://bulksmsbd.net/api';
 
 // Single send attempt with a generous provider timeout. A retry here would
 // risk DUPLICATE SMS: if the provider already delivered but the response was
@@ -62,8 +62,8 @@ function extractProductNames(itemsStr) {
   }
 }
 
-// POST + connection: close avoids long-URL encoding pitfalls and the
-// intermittent stalls the provider has over a pooled keep-alive socket.
+// POST via HTTPS. No custom Connection header — on Vercel's undici runtime the
+// 'Connection' header is restricted and can stall the request until timeout.
 async function requestProvider(path, params) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
@@ -72,7 +72,6 @@ async function requestProvider(path, params) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        Connection: 'close',
       },
       body: params.toString(),
       signal: controller.signal,
