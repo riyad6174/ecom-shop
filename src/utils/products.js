@@ -280,7 +280,7 @@ export const products = [
     title: 'JF132-Portable High-speed Cooling Fan',
     slug: 'portable-high-speed-cooling-fan',
     model: 'JF132',
-    price: 1599.0,
+    price: 1490.0,
     originalPrice: 1850.0,
     sectionType: 'hot',
     inStock: true,
