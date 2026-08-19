@@ -142,7 +142,7 @@ function ContactUs() {
         <title>Contact Us | Sheii Shop - Get in Touch</title>
         <meta
           name='description'
-          content='Contact Sheii Shop for any questions, feedback, or support. Reach us at Road 12A, Uttora Sector 10, Dhaka, Bangladesh. Call +8801814575428 or email helloseiishop@gmail.com.'
+          content='Contact Sheii Shop for any questions, feedback, or support. Reach us at House 12, Road 09, Sector 09, Uttara, Dhaka, Bangladesh. Call +8801814575428 or email helloseiishop@gmail.com.'
         />
         <meta
           name='keywords'
@@ -155,7 +155,7 @@ function ContactUs() {
         <meta property='og:title' content='Contact Us | Sheii Shop' />
         <meta
           property='og:description'
-          content='Contact Sheii Shop for any questions, feedback, or support. We are located in Uttora, Dhaka, Bangladesh.'
+          content='Contact Sheii Shop for any questions, feedback, or support. We are located in Uttara, Dhaka, Bangladesh.'
         />
         <meta
           property='og:image'
@@ -195,7 +195,7 @@ function ContactUs() {
                 email: 'helloseiishop@gmail.com',
                 address: {
                   '@type': 'PostalAddress',
-                  streetAddress: 'Road 12A, Uttora Sector 10',
+                  streetAddress: 'House 12, Road 09, Sector 09, Uttara',
                   addressLocality: 'Dhaka',
                   addressCountry: 'BD',
                 },
@@ -224,7 +224,7 @@ function ContactUs() {
                   ADDRESS
                 </h2>
                 <p className='mt-1'>
-                  Road 12A, Uttora Sector 10, Dhaka, Bangladesh
+                  House 12, Road 09, Sector 09, Uttara, Dhaka, Bangladesh
                 </p>
               </div>
               <div className='lg:w-1/2 px-6 mt-4 lg:mt-0'>

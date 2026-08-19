@@ -1,26 +1,5 @@
 export const products = [
   {
-    id: 13,
-    title: 'HOCO J164 Outdoor Solar Power Bank',
-    slug: 'hoco-j164-outdoor-solar-power-bank',
-    model: 'WL-C6103C(Touch)',
-    price: 1499.0,
-    originalPrice: 1650.0,
-    sectionType: 'hot',
-    inStock: true,
-    thumbnail: '/assets/product/solar/main.jpg',
-    description:
-      'বিদ্যুৎ না থাকলেও আর চিন্তা নয়! HOCO Waterproof Solar Energy Power Bank-এর 8000mAh ব্যাটারি, সোলার চার্জিং, Type-C পোর্ট, LED ফ্ল্যাশলাইট এবং বিল্ট-ইন কম্পাস আপনাকে দেবে যেকোনো সময়, যেকোনো জায়গায় নির্ভরযোগ্য ব্যাকআপ পাওয়ার।',
-    images: [
-      '/assets/product/solar/main.jpg',
-      '/assets/product/solar/image1.jpg',
-      '/assets/product/solar/image2.jpg',
-      '/assets/product/solar/image3.jpg',
-      '/assets/product/solar/image4.jpg',
-    ],
-    variants: [{ type: 'Standard' }],
-  },
-  {
     id: 12,
     title:
       'Multifunctional Remote Control Outdoor Wall Lamp Waterproof Courtyard Light',

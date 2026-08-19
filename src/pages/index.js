@@ -121,7 +121,7 @@ function Index({ products }) {
               },
               address: {
                 '@type': 'PostalAddress',
-                streetAddress: 'Road 12A, Uttora Sector 10',
+                streetAddress: 'House 12, Road 09, Sector 09, Uttara',
                 addressLocality: 'Dhaka',
                 addressCountry: 'BD',
               },
