@@ -123,6 +123,7 @@ function Index({ products }) {
                 '@type': 'PostalAddress',
                 streetAddress: 'House 12, Road 09, Sector 09, Uttara',
                 addressLocality: 'Dhaka',
+                postalCode: '1230',
                 addressCountry: 'BD',
               },
             }),

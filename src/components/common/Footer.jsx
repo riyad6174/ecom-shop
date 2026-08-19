@@ -74,7 +74,10 @@ function Footer() {
                   className='flex items-start gap-3 transition-all duration-300 hover:text-white'
                 >
                   <CiLocationOn className='text-2xl flex-shrink-0' />
-                  <span>House 12, Road 09, Sector 09, Uttara, Dhaka</span>
+                  <span>
+                    House 12, Road 09, Sector 09, Uttara, Dhaka 1230,
+                    Bangladesh
+                  </span>
                 </Link>
               </li>
               <li>

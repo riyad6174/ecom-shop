@@ -142,7 +142,7 @@ function ContactUs() {
         <title>Contact Us | Sheii Shop - Get in Touch</title>
         <meta
           name='description'
-          content='Contact Sheii Shop for any questions, feedback, or support. Reach us at House 12, Road 09, Sector 09, Uttara, Dhaka, Bangladesh. Call +8801814575428 or email helloseiishop@gmail.com.'
+          content='Contact Sheii Shop for any questions, feedback, or support. Reach us at House 12, Road 09, Sector 09, Uttara, Dhaka 1230, Bangladesh. Call +8801814575428 or email helloseiishop@gmail.com.'
         />
         <meta
           name='keywords'
@@ -197,6 +197,7 @@ function ContactUs() {
                   '@type': 'PostalAddress',
                   streetAddress: 'House 12, Road 09, Sector 09, Uttara',
                   addressLocality: 'Dhaka',
+                  postalCode: '1230',
                   addressCountry: 'BD',
                 },
               },
@@ -215,7 +216,7 @@ function ContactUs() {
               height='100%'
               className='absolute inset-0'
               title='Sheii Shop location map'
-              src='https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d3648.0880396672933!2d90.38499306467548!3d23.8864966!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2s!5e0!3m2!1sen!2sbd!4v1753963064745!5m2!1sen!2sbd'
+              src='https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d228.01953079692362!2d90.39933365937249!3d23.878535236536756!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3755c53c5546fc25%3A0x7198f678c25bcb01!2sShei%20Shop!5e0!3m2!1sen!2sbd!4v1787171489407!5m2!1sen!2sbd'
               style={{ filter: 'grayscale(1) contrast(1.2) opacity(0.4)' }}
             ></iframe>
             <div className='bg-white relative flex flex-wrap py-6 rounded shadow-md'>
@@ -224,7 +225,7 @@ function ContactUs() {
                   ADDRESS
                 </h2>
                 <p className='mt-1'>
-                  House 12, Road 09, Sector 09, Uttara, Dhaka, Bangladesh
+                  House 12, Road 09, Sector 09, Uttara, Dhaka 1230, Bangladesh
                 </p>
               </div>
               <div className='lg:w-1/2 px-6 mt-4 lg:mt-0'>
