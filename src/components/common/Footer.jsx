@@ -128,6 +128,14 @@ function Footer() {
                   Contact
                 </Link>
               </li>
+              <li>
+                <Link
+                  href='/return-policy'
+                  className='transition-all duration-300 hover:text-white'
+                >
+                  Return &amp; Refund Policy
+                </Link>
+              </li>
             </ul>
           </div>
         </div>
