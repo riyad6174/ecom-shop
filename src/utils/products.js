@@ -324,6 +324,68 @@ export const products = [
   //   ],
   //   variants: [{ color: 'Black' }, { color: 'White' }, { color: 'Red' }],
   // },
+  {
+    id: 13,
+    title: 'Hoco E103 & Borofone BC110',
+    slug: 'hoco-borofone-antilost-tracker',
+    model: 'E103/BC110',
+    price: 999.0,
+    originalPrice: 1250.0,
+    sectionType: 'hot',
+    inStock: true,
+    description:
+      'বাইক, সাইকেল, সিএনজি বা অটো চুরি/হারিয়ে যাওয়ার ভয়ে আছেন? সিটের নিচে বা টুলবক্সে লুকিয়ে রাখুন — Hoco E103 বা Borofone BC110, দুটোই একই ফিচার, একই দাম। চোর টের পাবে না, কিন্তু আপনি ফোনে শেষ লোকেশন দেখে খুঁজে নিতে পারবেন। হারালে Ring বাজিয়ে, চুরি হলে ম্যাপে লোকেশন ট্র্যাক করুন। iPhone ও Android দুটিতেই চলে।',
+    shortDescription:
+      'চুরি/হারানো থেকে সুরক্ষা — বাইক/সাইকেল/সিএনজি/অটোতে লুকিয়ে রাখুন। Hoco E103 ও Borofone BC110 — দুটোই একই, প্রতিটি ৯৯৯ টাকা।',
+    images: [
+      '/assets/product/tracker/borofone-bc110-product-dark-floating.png',
+      '/assets/product/tracker/hoco-e103-product-dark-floating.png',
+    ],
+    variants: [
+      { type: 'Borofone BC110' },
+      { type: 'HOCO E103' },
+    ],
+    specifications: [
+      { label: 'মডেল', value: 'Hoco E103 / Borofone BC110 — দুটোই একই ফিচার' },
+      { label: 'কম্প্যাটিবিলিটি', value: 'Apple Find My + Google Find Hub (iOS + Android)' },
+      { label: 'ব্যাটারি', value: 'CR2032 রিপ্লেসেবল (৬-১২ মাস)' },
+      { label: 'ওয়াটার রেজিস্ট্যান্স', value: 'IPX5 / IP65' },
+      { label: 'রেঞ্জ', value: '৩০-৫০ মিটার (ব্লুটুথ), বিশ্বব্যাপী (নেটওয়ার্ক)' },
+      { label: 'প্যাকেজ', value: 'HOCO E103-এ সিলিকন কভার সহ (ঐচ্ছিক)' },
+    ],
+    faqs: [
+      {
+        question: 'এই ট্র্যাকারগুলো কি Android এবং iOS-এর সাথে কাজ করে?',
+        answer:
+          'হ্যাঁ, দুটি ট্র্যাকারকেও Android এবং iOS উভয় প্ল্যাটফর্মেই ব্যবহার করা যাবে। Hoco E103 Google Find Hub (Android) এবং Apple Find My (iOS) উভয়ের সাথেই কাজ করে। Borofone BC110 Apple Find My নেটওয়ার্ক ব্যবহার করে।',
+      },
+      {
+        question: 'ট্র্যাকার হারিয়ে গেলে কি লোকেশন দেখা যাবে?',
+        answer:
+          'হ্যাঁ! Hoco E103 Google Find Hub (Android) এবং Apple Find My (iOS) নেটওয়ার্ক উভয়ের সাথেই কাজ করে। Borofone BC110 শুধুমাত্র Apple Find My নেটওয়ার্ক ব্যবহার করে। ফলে অন্য ব্যবহারকারীদের ডিভাইসের মাধ্যমে ট্র্যাকারটির লোকেশন ম্যাপে দেখা যাবে।',
+      },
+      {
+        question: 'ব্যাটারি কতদিন চলে এবং এটি কি পরিবর্তন করা যায়?',
+        answer:
+          'Hoco E103 একটি CR2032 (210 mAh) বোতাম ব্যাটারি ব্যবহার করে যা প্রায় ৬-৮ মাস পর্যন্ত চলে। Borofone BC110 ট্র্যাকারটিও CR2032 ব্যাটারি ব্যবহার করে যা ৯-১২ মাস পর্যন্ত চলে। ব্যাটারি শেষ হলে আপনি নিজেই খুব সহজে পরিবর্তন করতে পারবেন।',
+      },
+      {
+        question: 'ট্র্যাকারগুলো কি ওয়াটারপ্রুফ?',
+        answer:
+          'হ্যাঁ, Hoco E103 IPX5 ওয়াটার রেজিস্ট্যান্ট রেটিং পেয়েছে, যা হালকা বৃষ্টি এবং জলের ছিটা থেকে সুরক্ষা দেয়। Borofone BC110 ট্র্যাকারটি IP65 রেটিং সহ ওয়াটার-রেজিস্ট্যান্ট। তবে কোনোটিই সম্পূর্ণ জলে ডুবানোর জন্য নয়।',
+      },
+      {
+        question: 'একাধিক ট্র্যাকার একই অ্যাপে ম্যানেজ করা যাবে?',
+        answer:
+          'হ্যাঁ, আপনি Google Find Hub বা Apple Find My অ্যাপে একাধিক ট্র্যাকার যুক্ত করতে পারবেন। প্রতিটি ট্র্যাকার আলাদাভাবে ম্যানেজ এবং ট্র্যাক করা যাবে।',
+      },
+      {
+        question: 'ট্র্যাকারের রেঞ্জ কত দূরত্ব পর্যন্ত?',
+        answer:
+          'ব্লুটুথ রেঞ্জ প্রায় ৩০-৫০ মিটার (লাইন অফ সাইটে)। তবে নেটওয়ার্কের মাধ্যমে পুরো বিশ্বের যেকোনো জায়গা থেকে লোকেশন ট্র্যাক করা যাবে।',
+      },
+    ],
+  },
 ];
 
 export default products;
