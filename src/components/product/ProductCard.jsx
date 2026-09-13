@@ -44,7 +44,7 @@ const ProductCard = ({ product }) => {
             className='relative block w-full h-36 md:h-44 rounded-lg overflow-hidden'
           >
             <Image
-              src={product?.thumbnail}
+              src={product?.thumbnail || product?.images?.[0] || '/assets/product/tracker/borofone-bc110-product-dark-floating.png'}
               alt={product?.title}
               fill
               sizes='(max-width: 768px) 45vw, 220px'
@@ -54,7 +54,7 @@ const ProductCard = ({ product }) => {
         ) : (
           <div className='relative block w-full h-36 md:h-44 rounded-lg overflow-hidden opacity-70'>
             <Image
-              src={product?.thumbnail}
+              src={product?.thumbnail || product?.images?.[0] || '/assets/product/tracker/borofone-bc110-product-dark-floating.png'}
               alt={product?.title}
               fill
               sizes='(max-width: 768px) 45vw, 220px'

@@ -333,6 +333,7 @@ export const products = [
     originalPrice: 1250.0,
     sectionType: 'hot',
     inStock: true,
+    thumbnail: '/assets/product/tracker/borofone-bc110-product-dark-floating.png',
     description:
       'বাইক, সাইকেল, সিএনজি বা অটো চুরি/হারিয়ে যাওয়ার ভয়ে আছেন? সিটের নিচে বা টুলবক্সে লুকিয়ে রাখুন — Hoco E103 বা Borofone BC110, দুটোই একই ফিচার, একই দাম। চোর টের পাবে না, কিন্তু আপনি ফোনে শেষ লোকেশন দেখে খুঁজে নিতে পারবেন। হারালে Ring বাজিয়ে, চুরি হলে ম্যাপে লোকেশন ট্র্যাক করুন। iPhone ও Android দুটিতেই চলে।',
     shortDescription:

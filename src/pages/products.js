@@ -161,7 +161,7 @@ function Products() {
           {product.inStock ? (
             <Link href={`/product/${product.slug}`}>
               <img
-                src={product.thumbnail}
+                src={product.thumbnail || product.images?.[0] || '/assets/product/tracker/borofone-bc110-product-dark-floating.png'}
                 alt={product.title}
                 className={`object-cover ${
                   viewMode === 'list'
@@ -172,7 +172,7 @@ function Products() {
             </Link>
           ) : (
             <img
-              src={product.thumbnail}
+              src={product.thumbnail || product.images?.[0] || '/assets/product/tracker/borofone-bc110-product-dark-floating.png'}
               alt={product.title}
               className={`object-cover ${
                 viewMode === 'list'

@@ -17,6 +17,10 @@ import {
   FaTools,
   FaBox,
   FaCheckCircle,
+  FaCheck,
+  FaTimes,
+  FaInfoCircle,
+  FaPhoneAlt,
   FaSearch,
   FaShieldAlt,
   FaComments,
@@ -145,13 +149,6 @@ function ProductCard({ variant, isSelected, onToggle }) {
 }
 
 function QuantityPanel({ selectedItems, onQtyChange, onRemove, onCheckout, checkoutDisabled }) {
-  const subtotal = selectedItems.reduce(
-    (sum, item) => sum + (item.price || 0) * (item.quantity || 1),
-    0,
-  );
-  const shippingFrom = 60;
-  const totalFrom = subtotal + shippingFrom;
-
   return (
     <div className="bg-white/5 backdrop-blur-sm rounded-2xl shadow-lg border border-white/10 p-6 animate-[fadeIn_0.3s_ease-out]">
       <h3 className="text-xl font-bold text-white bangla mb-4">আপনার selection</h3>
@@ -198,21 +195,6 @@ function QuantityPanel({ selectedItems, onQtyChange, onRemove, onCheckout, check
             </button>
           </div>
         ))}
-      </div>
-      <div className="space-y-2 mb-4 text-sm text-[#D9E1F2]">
-        <div className="flex justify-between">
-          <span>Subtotal</span>
-          <span>৳{subtotal.toFixed(0)}</span>
-        </div>
-        <div className="flex justify-between">
-          <span>Delivery charge <span className="text-xs text-[#9BA8BF]"> (from ৳60)</span></span>
-          <span>৳{shippingFrom}*</span>
-        </div>
-        <div className="flex justify-between font-bold text-white pt-2 border-t border-white/10 text-base">
-          <span>Total <span className="font-normal text-xs text-[#9BA8BF]">(+ delivery)</span></span>
-          <span>৳{totalFrom.toFixed(0)}*</span>
-        </div>
-        <p className="text-[11px] text-[#9BA8BF] bangla">*Delivery charge নির্ভর করবে আপনার জোনের উপর (ঢাকার ভেতরে ৳60, বাহিরে ৳120)।</p>
       </div>
       <button
         type="button"
@@ -573,6 +555,109 @@ const GuaranteeSection = () => (
               <span className="inline-flex items-center gap-1.5 bg-white/10 border border-white/10 text-[#D9E1F2] px-3 py-1.5 rounded-full bangla"><FaShieldAlt className="text-cyan-400" /> আসল প্রোডাক্ট</span>
               <span className="inline-flex items-center gap-1.5 bg-white/10 border border-white/10 text-[#D9E1F2] px-3 py-1.5 rounded-full bangla"><FaHandshake className="text-violet-300" /> সাপোর্ট সহ</span>
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+);
+
+const AtAGlanceSection = () => (
+  <section className="bg-[#0B1020] py-10">
+    <div className="container mx-auto px-4 lg:px-8 max-w-3xl">
+      <div
+        data-reveal="scale"
+        className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.05] backdrop-blur-xl p-6 md:p-8 shadow-xl"
+      >
+        <div className="absolute inset-0 bg-gradient-to-br from-violet-600/10 via-transparent to-cyan-500/10 pointer-events-none" />
+        <div className="relative">
+          <h3 data-reveal className="text-xl md:text-2xl font-extrabold text-white bangla text-center mb-6">
+            এক নজরে দেখে নিন
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
+            {[
+              { text: 'সীমকার্ড লাগবে না', ok: false },
+              { text: 'কোন মাসিক চার্জ লাগবে না', ok: false },
+              { text: 'তার কাটাকাটির প্রয়োজন নাই', ok: false },
+              { text: 'ফোন থেকেই লোকেশন ট্রাক করতে পারবেন', ok: true },
+              { text: 'ব্যাটারি রিপ্লেস করে নিতে পারবেন', ok: true },
+              { text: 'ডেডিকেটেড সাপোর্ট টিম', ok: true },
+            ].map((item, i) => (
+              <div
+                key={i}
+                data-reveal
+                data-reveal-delay={String((i % 3) + 1)}
+                className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl px-4 py-3"
+              >
+                <span
+                  className={`flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs ${
+                    item.ok
+                      ? 'bg-emerald-500/20 border border-emerald-500/30 text-emerald-400'
+                      : 'bg-red-500/15 border border-red-500/25 text-red-400'
+                  }`}
+                >
+                  {item.ok ? <FaCheck className="text-[11px]" /> : <FaTimes className="text-[11px]" />}
+                </span>
+                <span className="text-sm font-medium text-white bangla leading-snug">{item.text}</span>
+              </div>
+            ))}
+          </div>
+          <div data-reveal className="text-center">
+            <button
+              type="button"
+              onClick={() => {
+                const el = document.getElementById('product-selection');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="inline-flex items-center justify-center bg-gradient-to-r from-violet-600 to-cyan-500 text-white font-extrabold px-8 py-3.5 rounded-xl text-sm hover:opacity-90 transition-opacity bangla shadow-lg shadow-violet-600/20"
+            >
+              অর্ডার করুন এখনি
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+);
+
+const LiveLocationNoteSection = () => (
+  <section className="bg-[#080B14] py-10">
+    <div className="container mx-auto px-4 lg:px-8 max-w-3xl">
+      <div
+        data-reveal
+        className="relative overflow-hidden rounded-3xl border border-amber-500/20 bg-gradient-to-br from-amber-500/[0.07] to-orange-500/[0.04] backdrop-blur-xl p-6 md:p-8 shadow-xl"
+      >
+        <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 via-transparent to-transparent pointer-events-none" />
+        <div className="absolute -top-10 -right-10 w-40 h-40 bg-amber-500/10 rounded-full blur-2xl pointer-events-none" />
+        <div className="relative">
+          <div className="flex items-start gap-3 mb-4">
+            <span className="flex-shrink-0 w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/25 flex items-center justify-center text-amber-400 mt-0.5">
+              <FaInfoCircle className="text-base" />
+            </span>
+            <div>
+              <h3 className="text-lg md:text-xl font-extrabold text-white bangla leading-snug">
+                গুরুত্বপূর্ণ — সৎ তথ্য জেনে নিন
+              </h3>
+              <p className="text-amber-200/70 text-xs bangla mt-1">ক্রয়ের আগে সত্যটা জানা জরুরি, তাই স্পষ্ট করে বলছি</p>
+            </div>
+          </div>
+          <div className="bg-[#0B1020]/70 border border-amber-500/15 rounded-2xl p-5 mb-5">
+            <p className="text-[#D9E1F2] bangla text-sm md:text-[15px] leading-relaxed">
+              এটি আপনাকে <span className="text-white font-bold">লাইভ লোকেশন আপডেট দিতে পারবে না</span>, ডিভাইসটি আপনাকে <span className="text-white font-bold">লাস্ট লোকেশন আর টাইম জানাবে</span>। মার্কেটে অনেকেই আপনাকে হয়তো লাইভ লোকেশন এর কথা বলে বিক্রির চেষ্টা করবে।
+            </p>
+            <p className="text-[#9BA8BF] bangla text-sm leading-relaxed mt-3">
+              ডিভাইসটি কিভাবে কাজ করে জানতে আমাদের কল করতে পারবেন — আমরা বুঝিয়ে দেব লাইভ vs লাস্ট লোকেশন এর পার্থক্য।
+            </p>
+          </div>
+          <div className="text-center">
+            <a
+              href="tel:+8801609596652"
+              className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-extrabold px-8 py-3.5 rounded-xl text-sm hover:opacity-90 transition-opacity bangla shadow-lg shadow-amber-500/20"
+            >
+              <FaPhoneAlt className="text-xs" />
+              বিস্তারিত জানতে কল করুন
+            </a>
+            <p className="text-[#9BA8BF] text-xs bangla mt-2">01609-596652 — সকাল ৯টা থেকে রাত ১০টা</p>
           </div>
         </div>
       </div>
@@ -1047,6 +1132,8 @@ export default function TrackerLandingPage({ product }) {
       )}
 
       <GuaranteeSection />
+      <AtAGlanceSection />
+      <LiveLocationNoteSection />
       <AuthenticSection />
       {/* Warranty / Trust */}
       <section className="bg-gradient-to-b from-[#0B1020] to-[#080B14] py-16">
