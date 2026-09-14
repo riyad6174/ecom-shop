@@ -1,10 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { sendGTMEvent } from '@next/third-parties/google';
 import { useDispatch } from 'react-redux';
-import Navbar from '@/components/common/Navbar';
 import { products } from '@/utils/products';
 import { addToCart, clearCart } from '@/store/cartSlice';
-import Footer from '@/components/common/Footer';
 import Head from 'next/head';
 import Image from 'next/image';
 import OrderDialog from '@/components/checkout/OrderDialog';
@@ -562,6 +560,46 @@ const GuaranteeSection = () => (
   </section>
 );
 
+const galleryImages = [
+  'WhatsApp Image 2026-07-22 at 7.02.59 PM (1).jpeg',
+  'WhatsApp Image 2026-07-22 at 7.03.00 PM (1).jpeg',
+  'WhatsApp Image 2026-07-22 at 7.03.01 PM.jpeg',
+];
+
+const ProductGallerySection = () => (
+  <section className="bg-[#0B1020] py-10">
+    <div className="container mx-auto px-4 lg:px-8 max-w-5xl">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+        {galleryImages.map((file, i) => (
+          <div
+            key={file}
+            data-reveal
+            data-reveal-delay={String((i % 3) + 1)}
+            className="relative w-full aspect-square rounded-2xl overflow-hidden border border-white/10 bg-white/5 card-hover"
+          >
+            <Image
+              src={`/assets/product/tracker/${encodeURIComponent(file)}`}
+              alt={`Product detail ${i + 1}`}
+              fill
+              className="object-cover"
+              sizes="(max-width: 1024px) 100vw, 33vw"
+            />
+          </div>
+        ))}
+      </div>
+      <div className="block lg:hidden rounded-2xl overflow-hidden border border-white/10">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/assets/motion.gif"
+          alt="Product in action"
+          className="w-full h-auto block"
+          loading="lazy"
+        />
+      </div>
+    </div>
+  </section>
+);
+
 const AtAGlanceSection = () => (
   <section className="bg-[#0B1020] py-10">
     <div className="container mx-auto px-4 lg:px-8 max-w-3xl">
@@ -953,13 +991,9 @@ export default function TrackerLandingPage({ product }) {
 
   if (!product) {
     return (
-      <>
-        <Navbar />
-        <div className='min-h-[60vh] flex flex-col items-center justify-center text-slate-500'>
-          <p className='text-2xl font-bold mb-2'>Product Not Found</p>
-        </div>
-        <Footer />
-      </>
+      <div className='min-h-[60vh] flex flex-col items-center justify-center text-slate-500'>
+        <p className='text-2xl font-bold mb-2'>Product Not Found</p>
+      </div>
     );
   }
 
@@ -1049,8 +1083,6 @@ export default function TrackerLandingPage({ product }) {
         }
       `}</style>
 
-      <Navbar />
-
       {/* Sticky progress bar */}
       <div className="sticky top-0 z-30 bg-[#080B14]/95 backdrop-blur-md border-b border-white/10">
         <div className="container mx-auto px-4 lg:px-8 py-2 flex items-center justify-between">
@@ -1132,6 +1164,7 @@ export default function TrackerLandingPage({ product }) {
       )}
 
       <GuaranteeSection />
+      <ProductGallerySection />
       <AtAGlanceSection />
       <LiveLocationNoteSection />
       <AuthenticSection />
@@ -1266,8 +1299,6 @@ export default function TrackerLandingPage({ product }) {
           </div>
         </div>
       </section>
-
-      <Footer />
 
       {/* Mobile sticky bottom bar */}
       <div className="fixed bottom-0 left-0 right-0 z-40 bg-[#080B14]/95 backdrop-blur-md border-t border-white/10 md:hidden safe-area-pb">
