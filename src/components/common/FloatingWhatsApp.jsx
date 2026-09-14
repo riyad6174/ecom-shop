@@ -18,6 +18,7 @@ function FloatingWhatsApp() {
         }
       `}</style>
       <a
+        id='floating-whatsapp-btn'
         href='https://wa.me/8801814575428'
         target='_blank'
         rel='noreferrer'

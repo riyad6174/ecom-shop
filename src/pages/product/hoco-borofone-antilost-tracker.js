@@ -1081,6 +1081,9 @@ export default function TrackerLandingPage({ product }) {
           [data-reveal], .hero-animate, .hero-animate-2, .hero-animate-3, .hero-glow, .float-img, .shimmer-btn, .cta-gradient, .hero-highlight-wrap::before, .hero-highlight-text { animation: none !important; transition: none !important; transform: none !important; opacity: 1 !important; }
           .hero-highlight-wrap::before { transform: translateY(-44%) skewX(-2deg) scaleX(1) !important; }
         }
+        @media (max-width: 767px) {
+          #floating-whatsapp-btn { bottom: 88px !important; }
+        }
       `}</style>
 
       {/* Sticky progress bar */}
