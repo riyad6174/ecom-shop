@@ -561,9 +561,10 @@ const GuaranteeSection = () => (
 );
 
 const galleryImages = [
-  'WhatsApp Image 2026-07-22 at 7.02.59 PM (1).jpeg',
-  'WhatsApp Image 2026-07-22 at 7.03.00 PM (1).jpeg',
-  'WhatsApp Image 2026-07-22 at 7.03.01 PM.jpeg',
+  'hoco-e103-location-caption-dark.png',
+  'tracker-customer-assurance-post-card.png',
+  'hoco-e103-android-apple-connect-dark.png',
+  'tracker-replacement-guarantee-postcard.png',
 ];
 
 const ProductGallerySection = () => (
