@@ -21,6 +21,8 @@ export default async function handler(req, res) {
       responseStatus = '',
       from = '',
       to = '',
+      source = '',
+      customerType = '',
     } = req.query;
 
     const pageNum = Math.max(1, parseInt(page));
@@ -43,6 +45,14 @@ export default async function handler(req, res) {
       filter.responseStatus = null;
     } else if (responseStatus && ['called', 'number_off', 'did_not_pick', 'call_later', 'fake_order'].includes(responseStatus)) {
       filter.responseStatus = responseStatus;
+    }
+
+    if (source && ['meta', 'google', 'tiktok', 'organic', 'referral'].includes(source)) {
+      filter.trafficSource = source;
+    }
+
+    if (customerType && ['new', 'repeat'].includes(customerType)) {
+      filter.customerType = customerType;
     }
 
     if (from || to) {

@@ -6,7 +6,8 @@ import {
   FiSearch, FiRefreshCw, FiFilter, FiTrash2, FiEdit3,
   FiCheckCircle, FiXCircle, FiClock, FiPhone, FiPhoneMissed,
   FiCopy, FiExternalLink, FiCalendar, FiArrowLeft, FiArrowRight,
-  FiAlertTriangle, FiMessageSquare, FiSave
+  FiAlertTriangle, FiMessageSquare, FiSave, FiUserPlus, FiRepeat,
+  FiFacebook, FiChrome, FiMusic, FiGlobe, FiLink
 } from 'react-icons/fi';
 import { Dialog, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
@@ -25,6 +26,20 @@ const RESPONSE_STATUS_CONFIG = {
   call_later: { label: 'Call Later', color: 'text-orange-600', icon: FiClock, badge: 'bg-orange-100 text-orange-700' },
   fake_order: { label: 'Fake Order', color: 'text-purple-600', icon: FiAlertTriangle, badge: 'bg-purple-100 text-purple-700' },
   null: { label: 'Not Called', color: 'text-yellow-600', icon: FiPhone, badge: 'bg-yellow-100 text-yellow-700' },
+};
+
+// ─── Traffic source + customer type badges ────────────────────────────────
+const SOURCE_CONFIG = {
+  meta: { label: 'Meta', badge: 'bg-blue-100 text-blue-700 border-blue-200', icon: FiFacebook },
+  google: { label: 'Google', badge: 'bg-emerald-100 text-emerald-700 border-emerald-200', icon: FiChrome },
+  tiktok: { label: 'TikTok', badge: 'bg-slate-800 text-white border-slate-700', icon: FiMusic },
+  organic: { label: 'Organic', badge: 'bg-slate-100 text-slate-600 border-slate-200', icon: FiGlobe },
+  referral: { label: 'Referral', badge: 'bg-purple-100 text-purple-700 border-purple-200', icon: FiLink },
+};
+
+const CUSTOMER_CONFIG = {
+  new: { label: 'New', badge: 'bg-cyan-100 text-cyan-800 border-cyan-200', icon: FiUserPlus },
+  repeat: { label: 'Repeat', badge: 'bg-amber-100 text-amber-800 border-amber-200', icon: FiRepeat },
 };
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -109,6 +124,8 @@ export default function AdminOrders() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [responseFilter, setResponseFilter] = useState('');
+  const [sourceFilter, setSourceFilter] = useState('');
+  const [customerFilter, setCustomerFilter] = useState('');
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
 
@@ -153,6 +170,8 @@ export default function AdminOrders() {
         search,
         status: statusFilter,
         responseStatus: responseFilter,
+        source: sourceFilter,
+        customerType: customerFilter,
         from: fromDate,
         to: toDate,
       });
@@ -180,7 +199,7 @@ export default function AdminOrders() {
     } finally {
       setLoading(false);
     }
-  }, [page, search, statusFilter, responseFilter, fromDate, toDate]);
+  }, [page, search, statusFilter, responseFilter, sourceFilter, customerFilter, fromDate, toDate]);
 
   useEffect(() => {
     if (authChecked) fetchOrders();
@@ -188,7 +207,7 @@ export default function AdminOrders() {
 
   useEffect(() => {
     setPage(1);
-  }, [search, statusFilter, responseFilter, fromDate, toDate]);
+  }, [search, statusFilter, responseFilter, sourceFilter, customerFilter, fromDate, toDate]);
 
   const handleSearchChange = (e) => {
     const val = e.target.value;
@@ -200,6 +219,8 @@ export default function AdminOrders() {
     setSearch('');
     setStatusFilter('');
     setResponseFilter('');
+    setSourceFilter('');
+    setCustomerFilter('');
     setFromDate('');
     setToDate('');
     setPage(1);
@@ -430,6 +451,37 @@ export default function AdminOrders() {
                 </div>
               </div>
 
+              {/* Source / Customer Filters Group */}
+              <div className="grid grid-cols-2 gap-3 xl:col-span-2">
+                <div>
+                  <label className='text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 block'>Source</label>
+                  <select
+                    value={sourceFilter}
+                    onChange={(e) => setSourceFilter(e.target.value)}
+                    className='w-full text-sm border border-slate-200 bg-slate-50/50 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all cursor-pointer font-medium text-slate-700'
+                  >
+                    <option value=''>All Sources</option>
+                    <option value='meta'>Meta</option>
+                    <option value='google'>Google</option>
+                    <option value='tiktok'>TikTok</option>
+                    <option value='organic'>Organic</option>
+                    <option value='referral'>Referral</option>
+                  </select>
+                </div>
+                <div>
+                  <label className='text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 block'>Customer</label>
+                  <select
+                    value={customerFilter}
+                    onChange={(e) => setCustomerFilter(e.target.value)}
+                    className='w-full text-sm border border-slate-200 bg-slate-50/50 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all cursor-pointer font-medium text-slate-700'
+                  >
+                    <option value=''>New + Repeat</option>
+                    <option value='new'>New Customer</option>
+                    <option value='repeat'>Repeat Customer</option>
+                  </select>
+                </div>
+              </div>
+
               {/* Date Filter */}
               <div>
                 <label className='text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 block'>Date Selection</label>
@@ -556,6 +608,30 @@ export default function AdminOrders() {
                               >
                                 {formatPhone(order.phone)}
                               </a>
+                              <div className="flex flex-wrap gap-1 mt-1.5">
+                                {(() => {
+                                  const src = SOURCE_CONFIG[order.trafficSource] || (order.trafficSource ? { label: order.trafficSource, badge: 'bg-slate-100 text-slate-600 border-slate-200', icon: FiGlobe } : null);
+                                  const cust = CUSTOMER_CONFIG[order.customerType];
+                                  const CustIcon = cust?.icon;
+                                  const SrcIcon = src?.icon;
+                                  return (
+                                    <>
+                                      {cust && CustIcon && (
+                                        <span className={`inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded border ${cust.badge}`} title={order.previousOrderCount ? `${order.previousOrderCount} previous order(s)` : 'First order'}>
+                                          <CustIcon className="w-3 h-3" />
+                                          {cust.label}
+                                        </span>
+                                      )}
+                                      {src && SrcIcon && (
+                                        <span className={`inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded border ${src.badge}`} title={order.landingUrl || order.referrer || ''}>
+                                          <SrcIcon className="w-3 h-3" />
+                                          {src.label}
+                                        </span>
+                                      )}
+                                    </>
+                                  );
+                                })()}
+                              </div>
                             </div>
                           </td>
                           <td className='px-6 py-4 max-w-[250px]'>
@@ -829,7 +905,49 @@ export default function AdminOrders() {
                           </div>
                        </div>
 
-                       {/* Order Note */}
+                        {/* Tracking & Attribution */}
+                        <div className="mb-8">
+                          <h4 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em] mb-3 flex items-center gap-2">
+                            <div className="w-1.5 h-4 bg-violet-500 rounded-full" />
+                            Tracking & Attribution
+                          </h4>
+                          <div className="bg-slate-50 rounded-2xl border border-slate-100 overflow-hidden">
+                            <table className="w-full text-sm">
+                              <tbody className="divide-y divide-slate-100">
+                                {[
+                                  { label: 'Customer Type', value: selectedOrder?.customerType === 'repeat' ? `Repeat (${selectedOrder?.previousOrderCount || 0} previous)` : 'New customer' },
+                                  { label: 'Traffic Source', value: selectedOrder?.trafficSource ? `${(SOURCE_CONFIG[selectedOrder.trafficSource] || {}).label || selectedOrder.trafficSource}${selectedOrder?.utmCampaign ? ` — ${selectedOrder.utmCampaign}` : ''}${selectedOrder?.utmSource ? ` (${selectedOrder.utmSource}${selectedOrder?.utmMedium ? ` / ${selectedOrder.utmMedium}` : ''})` : ''}` : '—' },
+                                  { label: 'First Touch', value: selectedOrder?.firstTouchSource ? `${selectedOrder.firstTouchSource}` : '—' },
+                                  { label: 'Device', value: [selectedOrder?.deviceType, selectedOrder?.deviceOS, selectedOrder?.browser].filter(Boolean).join(' · ') || '—' },
+                                  { label: 'Landing URL', value: selectedOrder?.landingUrl || selectedOrder?.pageUrl || '—', link: true },
+                                  { label: 'Referrer', value: selectedOrder?.referrer || '—', link: true },
+                                ].map((row) => (
+                                  <tr key={row.label} className="hover:bg-white transition-colors">
+                                    <td className="px-5 py-3 font-bold text-[11px] text-slate-400 uppercase tracking-wider w-1/3 border-r border-slate-100">{row.label}</td>
+                                    <td className="px-5 py-3 font-medium text-slate-700 text-xs break-all">
+                                      {row.link && row.value !== '—' ? (
+                                        <a href={row.value} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline inline-flex items-center gap-1">
+                                          <span className="truncate max-w-[280px] inline-block align-bottom">{row.value}</span>
+                                          <FiExternalLink className="w-3 h-3 flex-shrink-0" />
+                                        </a>
+                                      ) : (
+                                        row.value
+                                      )}
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                            {selectedOrder?.userAgent && (
+                              <div className="px-5 py-3 border-t border-slate-100">
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">User Agent</p>
+                                <p className="text-[11px] text-slate-500 font-mono break-all leading-relaxed">{selectedOrder.userAgent}</p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Order Note */}
                        <div className="mb-8">
                          <h4 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em] mb-3 flex items-center gap-2">
                            <div className="w-1.5 h-4 bg-amber-500 rounded-full" />

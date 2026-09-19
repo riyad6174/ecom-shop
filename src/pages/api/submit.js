@@ -24,6 +24,20 @@ export default async function handler(req, res) {
     orderId,
     orderDate,
     submissionTime,
+    // ── Attribution / device meta (optional — old clients don't send these)
+    userAgent,
+    deviceType,
+    deviceOS,
+    browser,
+    landingUrl,
+    pageUrl,
+    referrer,
+    trafficSource,
+    utmSource,
+    utmMedium,
+    utmCampaign,
+    firstTouchSource,
+    firstTouchUrl,
   } = req.body;
 
   console.log(`[ORDER] Attempt ${orderId} — ${name} — ${phone} — ৳${grandTotal}`);
@@ -41,6 +55,23 @@ export default async function handler(req, res) {
     // Connection is cached and reused, so this is fast after the first call.
     await connectDB();
 
+    // Authoritative repeat-customer check by phone number.
+    // Normalise to digits-only so "+8801..." and "01..." match each other.
+    const phoneDigits = String(phone || '').replace(/\D/g, '');
+    const phoneVariants = phoneDigits
+      ? [
+          ...new Set([
+            String(phone),
+            phoneDigits,
+            phoneDigits.startsWith('880') ? phoneDigits.slice(3) : `880${phoneDigits}`,
+          ]),
+        ]
+      : [String(phone)];
+    const previousOrderCount = await Order.countDocuments({
+      phone: { $in: phoneVariants },
+    });
+    const customerType = previousOrderCount > 0 ? 'repeat' : 'new';
+
     await Order.create({
       name,
       phone,
@@ -55,14 +86,31 @@ export default async function handler(req, res) {
       submissionTime:
         submissionTime ||
         new Date().toLocaleString('en-US', { timeZone: 'Asia/Dhaka' }),
+      userAgent: String(userAgent || '').slice(0, 500),
+      deviceType: String(deviceType || ''),
+      deviceOS: String(deviceOS || ''),
+      browser: String(browser || ''),
+      landingUrl: String(landingUrl || '').slice(0, 1000),
+      pageUrl: String(pageUrl || '').slice(0, 1000),
+      referrer: String(referrer || '').slice(0, 1000),
+      trafficSource: String(trafficSource || 'organic').slice(0, 50),
+      utmSource: String(utmSource || '').slice(0, 200),
+      utmMedium: String(utmMedium || '').slice(0, 200),
+      utmCampaign: String(utmCampaign || '').slice(0, 200),
+      firstTouchSource: String(firstTouchSource || '').slice(0, 50),
+      firstTouchUrl: String(firstTouchUrl || '').slice(0, 1000),
+      customerType,
+      previousOrderCount,
     });
 
     // Order saved. SMS is sent later by the background cron job — the order
     // response returns immediately and is never delayed by SMS work.
-    console.log(`[ORDER] SUCCESS ${orderId}`);
+    console.log(`[ORDER] SUCCESS ${orderId} (${customerType}, ${trafficSource || 'organic'})`);
     return res.status(200).json({
       message: 'Order submitted successfully',
       orderId,
+      customerType,
+      previousOrderCount,
     });
   } catch (error) {
     console.error(`[ORDER] FAIL ${orderId}:`, error.message || error);

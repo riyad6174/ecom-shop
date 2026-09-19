@@ -6,6 +6,7 @@ import { HiOutlineTrash } from 'react-icons/hi';
 import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import { clearCart, removeFromCart, updateQuantity } from '@/store/cartSlice';
+import { collectOrderMeta } from '@/utils/orderTracking';
 
 const OrderDialog = ({ isOpen, onClose }) => {
   const dispatch = useDispatch();
@@ -284,6 +285,7 @@ const OrderDialog = ({ isOpen, onClose }) => {
       orderDate: new Date().toISOString(),
       submissionTime: bdtTime,
       sheetName: 'Orders',
+      ...collectOrderMeta(),
     };
 
     if (
@@ -301,9 +303,11 @@ const OrderDialog = ({ isOpen, onClose }) => {
       setOrderDetails(order);
       setCurrentView('confirmation');
       setTimeout(() => setConfirmationAnimating(true), 50);
+      const orderMeta = collectOrderMeta();
       sendGTMEvent({ ecommerce: null });
       sendGTMEvent({
         event: 'purchase',
+        traffic_source: orderMeta.trafficSource || 'organic',
         ecommerce: {
           transaction_id: order.order.orderId || 'ORD-UNKNOWN',
           value: order.order.grandTotal || 0,
