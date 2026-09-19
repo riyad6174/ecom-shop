@@ -379,7 +379,7 @@ export default function FanRetargetOffer({ product }) {
               {product.title} — এবার পাচ্ছেন মাত্র{' '}
               <span className="text-white font-bold">৳{OFFER_PRICE} টাকায়</span>{' '}
               সাথে <span className="text-white font-bold">সম্পূর্ণ ফ্রি ডেলিভারি</span>।
-              এই লিংকটি শুধু আপনার জন্য, অন্য কোথাও পাবেন না।
+              এই অফারটি শুধু আপনার জন্য, এবং খুব সীমিত সময়ের জন্য।
             </p>
             <div className="flex flex-wrap justify-center gap-3 mb-2 text-sm text-[#9BA8BF] bangla hero-animate-2">
               <span className="bg-white/10 px-3 py-1.5 rounded-full backdrop-blur">৳{OFFER_PRICE} টাকা</span>
@@ -398,12 +398,12 @@ export default function FanRetargetOffer({ product }) {
               <div className="inline-block px-3 py-1 rounded-full text-xs font-bold mb-3 bg-amber-400/15 text-amber-300 border border-amber-400/25 bangla">
                 🔥 {discount}% ছাড় + ফ্রি ডেলিভারি
               </div>
-              <div className="relative w-full h-48 md:h-56 mb-4 rounded-xl overflow-hidden bg-[#0B1020] border border-white/10 p-2">
+              <div className="relative w-full h-72 sm:h-80 md:h-96 mb-4 rounded-xl overflow-hidden bg-[#0B1020] border border-white/10">
                 <Image
                   src={activeImage}
                   alt={product.title}
                   fill
-                  className="object-contain float-img"
+                  className="object-cover float-img"
                   sizes="(max-width: 768px) 100vw, 50vw"
                   priority
                 />

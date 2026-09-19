@@ -26,6 +26,8 @@ export async function getAllProducts() {
       images: p.images || [],
       variants: p.variants || [],
       category: p.category || '',
+      updatedAt: p.updatedAt || null,
+      createdAt: p.createdAt || null,
       source: 'db',
     }));
 
