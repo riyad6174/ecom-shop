@@ -7,7 +7,7 @@ import {
   FiCheckCircle, FiXCircle, FiClock, FiPhone, FiPhoneMissed,
   FiCopy, FiExternalLink, FiCalendar, FiArrowLeft, FiArrowRight,
   FiAlertTriangle, FiMessageSquare, FiSave, FiUserPlus, FiRepeat,
-  FiFacebook, FiChrome, FiMusic, FiGlobe, FiLink
+  FiFacebook, FiChrome, FiMusic, FiGlobe, FiLink, FiTruck, FiShield
 } from 'react-icons/fi';
 import { Dialog, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
@@ -41,6 +41,29 @@ const CUSTOMER_CONFIG = {
   new: { label: 'New', badge: 'bg-cyan-100 text-cyan-800 border-cyan-200', icon: FiUserPlus },
   repeat: { label: 'Repeat', badge: 'bg-amber-100 text-amber-800 border-amber-200', icon: FiRepeat },
 };
+
+// ─── FraudChecker QC badge colors (value-based) ──────────────────────────
+// Delivery rate: ≥80 emerald · 50–79 amber · <50 red · unknown grey.
+// Risk status (vendor string): low → emerald, medium → amber, high → red.
+function deliveryRateBadge(rate) {
+  if (rate === null || rate === undefined || rate === '') {
+    return 'bg-slate-100 text-slate-400 border-slate-200';
+  }
+  const n = Number(rate);
+  if (!Number.isFinite(n)) return 'bg-slate-100 text-slate-400 border-slate-200';
+  if (n >= 80) return 'bg-emerald-100 text-emerald-700 border-emerald-200';
+  if (n >= 50) return 'bg-amber-100 text-amber-800 border-amber-200';
+  return 'bg-red-100 text-red-700 border-red-200';
+}
+
+function riskStatusBadge(risk) {
+  const s = String(risk || '').toLowerCase();
+  if (!s) return 'bg-slate-100 text-slate-400 border-slate-200';
+  if (s.includes('low')) return 'bg-emerald-100 text-emerald-700 border-emerald-200';
+  if (s.includes('medium') || s.includes('moderate')) return 'bg-amber-100 text-amber-800 border-amber-200';
+  if (s.includes('high')) return 'bg-red-100 text-red-700 border-red-200';
+  return 'bg-slate-100 text-slate-600 border-slate-200';
+}
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 function formatPhone(phone) {
@@ -628,6 +651,31 @@ export default function AdminOrders() {
                                           {src.label}
                                         </span>
                                       )}
+                                      {(() => {
+                                        const rate = order.fraudCheck?.deliveryRate;
+                                        const risk = order.fraudCheck?.riskStatus;
+                                        const hasQc = order.qcStatus === 'ok' && (rate !== null && rate !== undefined || risk);
+                                        if (!hasQc) return null;
+                                        return (
+                                          <>
+                                            {rate !== null && rate !== undefined && (
+                                              <span
+                                                className={`inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded border ${deliveryRateBadge(rate)}`}
+                                                title={`${order.fraudCheck?.totalDelivered ?? 0}/${order.fraudCheck?.totalParcels ?? 0} delivered`}
+                                              >
+                                                <FiTruck className="w-3 h-3" />
+                                                {Number(rate).toFixed(rate % 1 ? 1 : 0)}%
+                                              </span>
+                                            )}
+                                            {risk && (
+                                              <span className={`inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded border ${riskStatusBadge(risk)}`}>
+                                                <FiShield className="w-3 h-3" />
+                                                {risk}
+                                              </span>
+                                            )}
+                                          </>
+                                        );
+                                      })()}
                                     </>
                                   );
                                 })()}
@@ -749,7 +797,7 @@ export default function AdminOrders() {
                   leaveFrom="opacity-100 scale-100"
                   leaveTo="opacity-0 scale-95"
                 >
-                  <Dialog.Panel className="w-full max-w-2xl transform overflow-hidden rounded-3xl bg-white text-left align-middle shadow-2xl transition-all border border-slate-100">
+                  <Dialog.Panel className="w-full max-w-5xl transform overflow-hidden rounded-3xl bg-white text-left align-middle shadow-2xl transition-all border border-slate-100 max-h-[90vh] overflow-y-auto">
                     <div className="relative p-8">
                        {/* Modal Header */}
                        <div className="flex items-center justify-between mb-8">
@@ -782,10 +830,13 @@ export default function AdminOrders() {
                          >
                            <FiXCircle className="w-6 h-6" />
                          </button>
-                       </div>
+                        </div>
 
-                       {/* Summary Table */}
-                       <div className="bg-slate-50 rounded-2xl border border-slate-100 overflow-hidden mb-8">
+                        {/* ── Two-column body: left = order data + actions, right = courier + tracking ── */}
+                        <div className="grid gap-6 lg:grid-cols-2 items-start">
+                          <div className="flex flex-col gap-6 min-w-0">
+                        {/* Summary Table */}
+                        <div className="bg-slate-50 rounded-2xl border border-slate-100 overflow-hidden">
                           <table className="w-full text-sm">
                              <tbody className="divide-y divide-slate-100">
                                {[
@@ -812,8 +863,8 @@ export default function AdminOrders() {
                           </table>
                        </div>
 
-                       {/* Items Detail */}
-                       <div className="mb-6">
+                        {/* Items Detail */}
+                        <div>
                          <div className="bg-slate-50 rounded-2xl border border-slate-100 overflow-hidden">
                            <div className="px-5 py-3 border-b border-slate-100">
                              <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Items Ordered</h4>
@@ -838,8 +889,8 @@ export default function AdminOrders() {
                          </div>
                        </div>
 
-                       {/* Status Update Sections */}
-                       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                        {/* Status Update Sections */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           {/* Order Status */}
                           <div>
                             <h4 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
@@ -905,8 +956,98 @@ export default function AdminOrders() {
                           </div>
                        </div>
 
+                          </div> {/* end left column */}
+
+                          {/* ── Right column: courier info (top) + tracking ── */}
+                          <div className="flex flex-col gap-6 min-w-0">
+                        {/* Courier Info (from DB — fetched once at order creation) */}
+                        <div>
+                          <h4 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em] mb-3 flex items-center gap-2">
+                            <div className="w-1.5 h-4 bg-red-500 rounded-full" />
+                            Courier History
+                          </h4>
+                          {(() => {
+                            const fc = selectedOrder?.fraudCheck;
+                            const qcOk = selectedOrder?.qcStatus === 'ok' && fc && (fc.deliveryRate !== null && fc.deliveryRate !== undefined || fc.riskStatus);
+                            if (!qcOk) {
+                              return (
+                                <div className="bg-slate-50 rounded-2xl border border-slate-100 px-5 py-6 text-center">
+                                  <FiShield className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+                                  <p className="text-sm font-bold text-slate-500">No courier data available</p>
+                                  <p className="text-[11px] text-slate-400 font-medium mt-1">
+                                    {selectedOrder?.qcStatus === 'skipped'
+                                      ? 'QC skipped — invalid phone format.'
+                                      : 'QC lookup failed — will retry automatically.'}
+                                  </p>
+                                </div>
+                              );
+                            }
+                            const rate = Number(fc.deliveryRate);
+                            const couriers = fc.couriers instanceof Map
+                              ? Array.from(fc.couriers.entries()).map(([name, v]) => ({ name, ...(v || {}) }))
+                              : Object.entries(fc.couriers || {}).map(([name, v]) => ({ name, ...(v || {}) }));
+                            return (
+                              <div className="bg-slate-50 rounded-2xl border border-slate-100 overflow-hidden">
+                                <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between gap-3 flex-wrap">
+                                  <div className="flex items-center gap-2">
+                                    <FiTruck className="w-4 h-4 text-slate-500" />
+                                    <span className="text-sm font-black text-slate-900">
+                                      {Number.isFinite(rate) ? `${rate % 1 ? rate.toFixed(1) : rate}%` : '—'}
+                                      <span className="text-[11px] font-bold text-slate-400 ml-1">delivered</span>
+                                    </span>
+                                  </div>
+                                  {fc.riskStatus && (
+                                    <span className={`inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg border ${riskStatusBadge(fc.riskStatus)}`}>
+                                      <FiShield className="w-3 h-3" />
+                                      {fc.riskStatus}
+                                    </span>
+                                  )}
+                                </div>
+                                <div className="grid grid-cols-3 divide-x divide-slate-100 text-center">
+                                  {[
+                                    { label: 'Parcels', value: fc.totalParcels ?? 0 },
+                                    { label: 'Delivered', value: fc.totalDelivered ?? 0 },
+                                    { label: 'Cancelled', value: fc.totalCancelled ?? 0 },
+                                  ].map((s) => (
+                                    <div key={s.label} className="px-2 py-3">
+                                      <p className="text-lg font-black text-slate-900 leading-none">{s.value}</p>
+                                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-1">{s.label}</p>
+                                    </div>
+                                  ))}
+                                </div>
+                                {couriers.length > 0 && (
+                                  <div className="border-t border-slate-100">
+                                    {couriers.map((c) => {
+                                      const pct = c.total > 0 ? Math.round((c.delivered / c.total) * 100) : 0;
+                                      return (
+                                        <div key={c.name} className="px-5 py-3 border-b border-slate-100 last:border-0">
+                                          <div className="flex items-center justify-between text-xs mb-1.5">
+                                            <span className="font-bold text-slate-700">{c.name}</span>
+                                            <span className="font-medium text-slate-500">{c.delivered ?? 0}/{c.total ?? 0} · {pct}%</span>
+                                          </div>
+                                          <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                                            <div
+                                              className={`h-full rounded-full ${pct >= 80 ? 'bg-emerald-500' : pct >= 50 ? 'bg-amber-500' : 'bg-red-500'}`}
+                                              style={{ width: `${pct}%` }}
+                                            />
+                                          </div>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                )}
+                                {selectedOrder?.qcCheckedAt && (
+                                  <p className="px-5 py-2.5 text-[10px] text-slate-400 font-medium border-t border-slate-100">
+                                    Checked: {new Date(selectedOrder.qcCheckedAt).toLocaleString('en-US', { timeZone: 'Asia/Dhaka' })}
+                                  </p>
+                                )}
+                              </div>
+                            );
+                          })()}
+                        </div>
+
                         {/* Tracking & Attribution */}
-                        <div className="mb-8">
+                        <div>
                           <h4 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em] mb-3 flex items-center gap-2">
                             <div className="w-1.5 h-4 bg-violet-500 rounded-full" />
                             Tracking & Attribution
@@ -946,6 +1087,8 @@ export default function AdminOrders() {
                             )}
                           </div>
                         </div>
+                          </div> {/* end right column */}
+                        </div> {/* end two-column grid */}
 
                         {/* Order Note */}
                        <div className="mb-8">

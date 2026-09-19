@@ -1,5 +1,6 @@
 import { connectDB } from '@/lib/mongodb';
 import Order from '@/models/Order';
+import { fetchCourierHistory, normalizePhoneForQC, emptyFraudCheck } from '@/lib/fraudChecker';
 
 export default async function handler(req, res) {
   // HEAD: pre-warm the DB connection when the order dialog opens
@@ -72,6 +73,26 @@ export default async function handler(req, res) {
     });
     const customerType = previousOrderCount > 0 ? 'repeat' : 'new';
 
+    // ── FraudChecker courier history (non-blocking by design).
+    // Runs BEFORE the response but inside its own guarded call: the helper
+    // never throws and has a hard timeout, so any vendor failure simply
+    // yields null and the order below still saves. No after-response work
+    // (unreliable on Vercel serverless).
+    let fraudCheck = emptyFraudCheck();
+    let qcStatus = 'pending';
+    try {
+      const qcData = await fetchCourierHistory(phone);
+      if (qcData) {
+        fraudCheck = qcData;
+        qcStatus = 'ok';
+      } else {
+        qcStatus = normalizePhoneForQC(phone) ? 'failed' : 'skipped';
+      }
+    } catch (qcErr) {
+      console.warn(`[ORDER] QC guard caught for ${orderId}:`, qcErr?.message || qcErr);
+      qcStatus = normalizePhoneForQC(phone) ? 'failed' : 'skipped';
+    }
+
     await Order.create({
       name,
       phone,
@@ -101,11 +122,16 @@ export default async function handler(req, res) {
       firstTouchUrl: String(firstTouchUrl || '').slice(0, 1000),
       customerType,
       previousOrderCount,
+      fraudCheck,
+      qcStatus,
+      qcCheckedAt: new Date(),
+      qcRetryCount: 0,
     });
 
     // Order saved. SMS is sent later by the background cron job — the order
     // response returns immediately and is never delayed by SMS work.
-    console.log(`[ORDER] SUCCESS ${orderId} (${customerType}, ${trafficSource || 'organic'})`);
+    // (QC failures are retried by /api/cron/backfill-qc, never by the client.)
+    console.log(`[ORDER] SUCCESS ${orderId} (${customerType}, ${trafficSource || 'organic'}, qc=${qcStatus})`);
     return res.status(200).json({
       message: 'Order submitted successfully',
       orderId,
