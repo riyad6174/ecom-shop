@@ -7,7 +7,7 @@ import {
   FiCheckCircle, FiXCircle, FiClock, FiPhone, FiPhoneMissed,
   FiCopy, FiExternalLink, FiCalendar, FiArrowLeft, FiArrowRight,
   FiAlertTriangle, FiMessageSquare, FiSave, FiUserPlus, FiRepeat,
-  FiFacebook, FiChrome, FiMusic, FiGlobe, FiLink, FiTruck, FiShield
+  FiFacebook, FiChrome, FiMusic, FiGlobe, FiLink, FiTruck, FiShield, FiChevronDown
 } from 'react-icons/fi';
 import { Dialog, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
@@ -160,6 +160,7 @@ export default function AdminOrders() {
   const [stats, setStats] = useState({ total: 0, today: 0, pendingToday: 0, confirmedToday: 0, cancelledToday: 0, totalPending: 0, totalConfirmed: 0, totalCancelled: 0 });
   const [noteText, setNoteText] = useState('');
   const [noteSaving, setNoteSaving] = useState(false);
+  const [trackingExpanded, setTrackingExpanded] = useState(false);
 
   const debounceRef = useRef(null);
 
@@ -257,6 +258,7 @@ export default function AdminOrders() {
   const openUpdateModal = (order) => {
     setSelectedOrder({ ...order });
     setNoteText(order.note || '');
+    setTrackingExpanded(false);
     setIsUpdateModalOpen(true);
   };
 
@@ -633,49 +635,27 @@ export default function AdminOrders() {
                               </a>
                               <div className="flex flex-wrap gap-1 mt-1.5">
                                 {(() => {
-                                  const src = SOURCE_CONFIG[order.trafficSource] || (order.trafficSource ? { label: order.trafficSource, badge: 'bg-slate-100 text-slate-600 border-slate-200', icon: FiGlobe } : null);
-                                  const cust = CUSTOMER_CONFIG[order.customerType];
-                                  const CustIcon = cust?.icon;
-                                  const SrcIcon = src?.icon;
+                                  const rate = order.fraudCheck?.deliveryRate;
+                                  const risk = order.fraudCheck?.riskStatus;
+                                  const hasQc = order.qcStatus === 'ok' && (rate !== null && rate !== undefined || risk);
+                                  if (!hasQc) return null;
                                   return (
                                     <>
-                                      {cust && CustIcon && (
-                                        <span className={`inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded border ${cust.badge}`} title={order.previousOrderCount ? `${order.previousOrderCount} previous order(s)` : 'First order'}>
-                                          <CustIcon className="w-3 h-3" />
-                                          {cust.label}
+                                      {rate !== null && rate !== undefined && (
+                                        <span
+                                          className={`inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded border ${deliveryRateBadge(rate)}`}
+                                          title={`${order.fraudCheck?.totalDelivered ?? 0}/${order.fraudCheck?.totalParcels ?? 0} delivered`}
+                                        >
+                                          <FiTruck className="w-3 h-3" />
+                                          {Number(rate).toFixed(rate % 1 ? 1 : 0)}%
                                         </span>
                                       )}
-                                      {src && SrcIcon && (
-                                        <span className={`inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded border ${src.badge}`} title={order.landingUrl || order.referrer || ''}>
-                                          <SrcIcon className="w-3 h-3" />
-                                          {src.label}
+                                      {risk && (
+                                        <span className={`inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded border ${riskStatusBadge(risk)}`}>
+                                          <FiShield className="w-3 h-3" />
+                                          {risk}
                                         </span>
                                       )}
-                                      {(() => {
-                                        const rate = order.fraudCheck?.deliveryRate;
-                                        const risk = order.fraudCheck?.riskStatus;
-                                        const hasQc = order.qcStatus === 'ok' && (rate !== null && rate !== undefined || risk);
-                                        if (!hasQc) return null;
-                                        return (
-                                          <>
-                                            {rate !== null && rate !== undefined && (
-                                              <span
-                                                className={`inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded border ${deliveryRateBadge(rate)}`}
-                                                title={`${order.fraudCheck?.totalDelivered ?? 0}/${order.fraudCheck?.totalParcels ?? 0} delivered`}
-                                              >
-                                                <FiTruck className="w-3 h-3" />
-                                                {Number(rate).toFixed(rate % 1 ? 1 : 0)}%
-                                              </span>
-                                            )}
-                                            {risk && (
-                                              <span className={`inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded border ${riskStatusBadge(risk)}`}>
-                                                <FiShield className="w-3 h-3" />
-                                                {risk}
-                                              </span>
-                                            )}
-                                          </>
-                                        );
-                                      })()}
                                     </>
                                   );
                                 })()}
@@ -1018,18 +998,26 @@ export default function AdminOrders() {
                                 {couriers.length > 0 && (
                                   <div className="border-t border-slate-100">
                                     {couriers.map((c) => {
-                                      const pct = c.total > 0 ? Math.round((c.delivered / c.total) * 100) : 0;
+                                      const total = c.total ?? 0;
+                                      const delivered = c.delivered ?? 0;
+                                      const cancelled = c.cancelled ?? 0;
+                                      const pct = total > 0 ? Math.round((delivered / total) * 100) : 0;
                                       return (
                                         <div key={c.name} className="px-5 py-3 border-b border-slate-100 last:border-0">
                                           <div className="flex items-center justify-between text-xs mb-1.5">
                                             <span className="font-bold text-slate-700">{c.name}</span>
-                                            <span className="font-medium text-slate-500">{c.delivered ?? 0}/{c.total ?? 0} · {pct}%</span>
+                                            <span className="font-black text-slate-700">{pct}% <span className="font-medium text-slate-400">delivered</span></span>
                                           </div>
-                                          <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                                          <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden mb-2">
                                             <div
                                               className={`h-full rounded-full ${pct >= 80 ? 'bg-emerald-500' : pct >= 50 ? 'bg-amber-500' : 'bg-red-500'}`}
                                               style={{ width: `${pct}%` }}
                                             />
+                                          </div>
+                                          <div className="flex items-center gap-3 text-[11px] font-medium">
+                                            <span className="text-slate-500">Received: <span className="font-bold text-slate-700">{total}</span></span>
+                                            <span className="text-emerald-600">Delivered: <span className="font-bold">{delivered}</span></span>
+                                            <span className="text-red-500">Cancelled: <span className="font-bold">{cancelled}</span></span>
                                           </div>
                                         </div>
                                       );
@@ -1046,12 +1034,43 @@ export default function AdminOrders() {
                           })()}
                         </div>
 
-                        {/* Tracking & Attribution */}
+                        {/* Tracking & Attribution (collapsed by default — tap to expand) */}
                         <div>
-                          <h4 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em] mb-3 flex items-center gap-2">
-                            <div className="w-1.5 h-4 bg-violet-500 rounded-full" />
-                            Tracking & Attribution
-                          </h4>
+                          <button
+                            onClick={() => setTrackingExpanded((v) => !v)}
+                            className="w-full flex items-center justify-between gap-2 mb-3 group"
+                          >
+                            <h4 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em] flex items-center gap-2">
+                              <div className="w-1.5 h-4 bg-violet-500 rounded-full" />
+                              Tracking & Attribution
+                            </h4>
+                            <span className="flex items-center gap-1.5">
+                              {(() => {
+                                const cust = CUSTOMER_CONFIG[selectedOrder?.customerType];
+                                const CustIcon = cust?.icon;
+                                const src = SOURCE_CONFIG[selectedOrder?.trafficSource];
+                                const SrcIcon = src?.icon;
+                                return (
+                                  <>
+                                    {cust && CustIcon && (
+                                      <span className={`inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded border ${cust.badge}`} title={selectedOrder?.previousOrderCount ? `${selectedOrder.previousOrderCount} previous order(s)` : 'First order'}>
+                                        <CustIcon className="w-3 h-3" />
+                                        {cust.label}
+                                      </span>
+                                    )}
+                                    {src && SrcIcon && (
+                                      <span className={`inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded border ${src.badge}`} title={selectedOrder?.landingUrl || selectedOrder?.referrer || ''}>
+                                        <SrcIcon className="w-3 h-3" />
+                                        {src.label}
+                                      </span>
+                                    )}
+                                  </>
+                                );
+                              })()}
+                              <FiChevronDown className={`w-4 h-4 text-slate-400 transition-transform group-hover:text-slate-600 ${trackingExpanded ? 'rotate-180' : ''}`} />
+                            </span>
+                          </button>
+                          {trackingExpanded && (
                           <div className="bg-slate-50 rounded-2xl border border-slate-100 overflow-hidden">
                             <table className="w-full text-sm">
                               <tbody className="divide-y divide-slate-100">
@@ -1086,6 +1105,7 @@ export default function AdminOrders() {
                               </div>
                             )}
                           </div>
+                          )}
                         </div>
                           </div> {/* end right column */}
                         </div> {/* end two-column grid */}
