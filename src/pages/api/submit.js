@@ -59,13 +59,14 @@ export default async function handler(req, res) {
     // Authoritative repeat-customer check by phone number.
     // Normalise to digits-only so "+8801..." and "01..." match each other.
     const phoneDigits = String(phone || '').replace(/\D/g, '');
+    // Local 11-digit form ("01XXXXXXXXX") used to build variants.
+    let localDigits = phoneDigits;
+    if (localDigits.startsWith('880')) localDigits = `0${localDigits.slice(3)}`;
     const phoneVariants = phoneDigits
       ? [
-          ...new Set([
-            String(phone),
-            phoneDigits,
-            phoneDigits.startsWith('880') ? phoneDigits.slice(3) : `880${phoneDigits}`,
-          ]),
+          ...new Set(
+            [String(phone), phoneDigits, localDigits, `880${localDigits.slice(1)}`].filter(Boolean),
+          ),
         ]
       : [String(phone)];
     const previousOrderCount = await Order.countDocuments({
@@ -73,27 +74,10 @@ export default async function handler(req, res) {
     });
     const customerType = previousOrderCount > 0 ? 'repeat' : 'new';
 
-    // ── FraudChecker courier history (non-blocking by design).
-    // Runs BEFORE the response but inside its own guarded call: the helper
-    // never throws and has a hard timeout, so any vendor failure simply
-    // yields null and the order below still saves. No after-response work
-    // (unreliable on Vercel serverless).
-    let fraudCheck = emptyFraudCheck();
-    let qcStatus = 'pending';
-    try {
-      const qcData = await fetchCourierHistory(phone);
-      if (qcData) {
-        fraudCheck = qcData;
-        qcStatus = 'ok';
-      } else {
-        qcStatus = normalizePhoneForQC(phone) ? 'failed' : 'skipped';
-      }
-    } catch (qcErr) {
-      console.warn(`[ORDER] QC guard caught for ${orderId}:`, qcErr?.message || qcErr);
-      qcStatus = normalizePhoneForQC(phone) ? 'failed' : 'skipped';
-    }
-
-    await Order.create({
+    // Save FIRST so the order can never be lost because of a slow/failing
+    // vendor lookup. Duplicate orderIds (client retry) hit the unique index
+    // here and return 409 before any vendor call is spent.
+    const doc = await Order.create({
       name,
       phone,
       deliveryZone,
@@ -122,15 +106,50 @@ export default async function handler(req, res) {
       firstTouchUrl: String(firstTouchUrl || '').slice(0, 1000),
       customerType,
       previousOrderCount,
-      fraudCheck,
-      qcStatus,
-      qcCheckedAt: new Date(),
+      fraudCheck: emptyFraudCheck(),
+      qcStatus: 'pending',
+      qcCheckedAt: null,
       qcRetryCount: 0,
     });
 
+    // ── FraudChecker courier history (guarded, hard timeout inside helper).
+    // Runs AFTER the save: any vendor failure only affects the QC fields and
+    // is retried later by /api/cron/backfill-qc — never by the client.
+    let qcStatus = 'pending';
+    try {
+      const qcData = await fetchCourierHistory(phone);
+      if (qcData) {
+        qcStatus = 'ok';
+        await Order.updateOne(
+          { _id: doc._id },
+          {
+            $set: {
+              fraudCheck: qcData,
+              qcStatus: 'ok',
+              qcCheckedAt: new Date(),
+            },
+          },
+        ).catch((e) => console.warn(`[ORDER] QC update failed for ${orderId}:`, e?.message || e));
+      } else {
+        qcStatus = normalizePhoneForQC(phone) ? 'failed' : 'skipped';
+        await Order.updateOne(
+          { _id: doc._id },
+          { $set: { qcStatus, qcCheckedAt: new Date() } },
+        ).catch(() => {});
+      }
+    } catch (qcErr) {
+      console.warn(`[ORDER] QC guard caught for ${orderId}:`, qcErr?.message || qcErr);
+      qcStatus = normalizePhoneForQC(phone) ? 'failed' : 'skipped';
+      await Order.updateOne(
+        { _id: doc._id },
+        { $set: { qcStatus, qcCheckedAt: new Date() } },
+      ).catch(() => {});
+    }
+
     // Order saved. SMS is sent later by the background cron job — the order
-    // response returns immediately and is never delayed by SMS work.
-    // (QC failures are retried by /api/cron/backfill-qc, never by the client.)
+    // response is never delayed by SMS work. The QC lookup above is bounded
+    // by a short timeout; its failures are retried by /api/cron/backfill-qc,
+    // never by the client.
     console.log(`[ORDER] SUCCESS ${orderId} (${customerType}, ${trafficSource || 'organic'}, qc=${qcStatus})`);
     return res.status(200).json({
       message: 'Order submitted successfully',

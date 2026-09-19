@@ -29,15 +29,17 @@ function num(v, fallback = 0) {
   return Number.isFinite(n) ? n : fallback;
 }
 
-function sanitizeCouriers(couriers) {
-  if (!couriers || typeof couriers !== 'object') return {};
+function sanitizeCouriers(apis) {
+  if (!apis || typeof apis !== 'object') return {};
   const out = {};
-  for (const [name, c] of Object.entries(couriers).slice(0, MAX_COURIERS)) {
+  for (const [key, c] of Object.entries(apis).slice(0, MAX_COURIERS)) {
     if (!c || typeof c !== 'object') continue;
-    out[String(name).slice(0, 60)] = {
-      total: num(c.total),
-      delivered: num(c.delivered),
-      cancelled: num(c.cancelled),
+    // Vendor shape: { courier_name, total_parcels, total_delivered_parcels, total_cancelled_parcels }
+    const name = String(c.courier_name || key).slice(0, 60);
+    out[name] = {
+      total: num(c.total_parcels ?? c.total),
+      delivered: num(c.total_delivered_parcels ?? c.delivered),
+      cancelled: num(c.total_cancelled_parcels ?? c.cancelled),
     };
   }
   return out;
@@ -55,19 +57,35 @@ export function emptyFraudCheck() {
 }
 
 export function sanitizeFraudResponse(json) {
-  if (!json || json.success !== true) return null;
-  let rate = json.delivery_rate === null || json.delivery_rate === undefined ? null : num(json.delivery_rate, null);
-  if (rate !== null && rate !== undefined) {
-    if (!Number.isFinite(rate)) rate = null;
-    else rate = Math.min(100, Math.max(0, Math.round(rate * 100) / 100));
+  if (!json || typeof json !== 'object') return null;
+  // Error payloads (e.g. { success: false, message }) carry no parcel data.
+  const hasData =
+    json.total_parcels !== undefined ||
+    json.total_delivered !== undefined ||
+    (json.apis && typeof json.apis === 'object') ||
+    (json.couriers && typeof json.couriers === 'object');
+  if (json.success === false || !hasData) return null;
+  const totalParcels = num(json.total_parcels);
+  const totalDelivered = num(json.total_delivered);
+  // Vendor uses "total_cancel" (also accept "total_cancelled").
+  const totalCancelled = num(json.total_cancel ?? json.total_cancelled);
+  let rate = null;
+  if (totalParcels > 0) {
+    rate = Math.min(100, Math.max(0, Math.round((totalDelivered / totalParcels) * 10000) / 100));
+  }
+  // Vendor supplies no risk label — derive one from the delivery rate.
+  let riskStatus = '';
+  if (totalParcels > 0 && rate !== null) {
+    riskStatus = rate >= 80 ? 'Low Risk' : rate >= 50 ? 'Medium Risk' : 'High Risk';
   }
   return {
-    totalParcels: num(json.total_parcels),
-    totalDelivered: num(json.total_delivered),
-    totalCancelled: num(json.total_cancelled),
-    deliveryRate: rate === undefined ? null : rate,
-    riskStatus: String(json.risk_status || '').slice(0, 50),
-    couriers: sanitizeCouriers(json.couriers),
+    totalParcels,
+    totalDelivered,
+    totalCancelled,
+    deliveryRate: rate,
+    riskStatus,
+    // Vendor nests per-courier stats under "apis".
+    couriers: sanitizeCouriers(json.apis ?? json.couriers),
   };
 }
 
