@@ -80,6 +80,11 @@ export default function HtmlEditor({ value, onChange }) {
         .dp-html-content th { background: #f8fafc; font-weight: 600; }
         .dp-html-content tr:nth-child(even) td { background: #fafafa; }
         .dp-html-content iframe { max-width: 100%; border-radius: 6px; }
+        .dp-html-content div[data-youtube-video] { width: 100%; margin: 1rem 0; }
+        .dp-html-content div[data-youtube-video] iframe,
+        .dp-html-content iframe[src*='youtube.com'],
+        .dp-html-content iframe[src*='youtube-nocookie.com'],
+        .dp-html-content iframe[src*='youtu.be'] { display: block; width: 100% !important; height: auto !important; aspect-ratio: 16 / 9; border: 0; }
       `}</style>
     </div>
   );
