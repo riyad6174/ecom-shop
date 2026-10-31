@@ -42,6 +42,13 @@ const CUSTOMER_CONFIG = {
   repeat: { label: 'Repeat', badge: 'bg-amber-100 text-amber-800 border-amber-200', icon: FiRepeat },
 };
 
+// ─── Coupon badge config ───────────────────────────────────────────────────
+const COUPON_CONFIG = {
+  percentage: { label: 'কুপন ডিস্কাউন্ট', badge: 'bg-purple-100 text-purple-800 border-purple-200' },
+  fixed: { label: 'কুপন ডিস্কাউন্ট', badge: 'bg-purple-100 text-purple-800 border-purple-200' },
+  free_shipping: { label: 'ফ্রি ডেলিভারি', badge: 'bg-emerald-100 text-emerald-800 border-emerald-200' },
+};
+
 // ─── FraudChecker QC badge colors (value-based) ──────────────────────────
 // Delivery rate: ≥80 emerald · 50–79 amber · <50 red · unknown grey.
 // Risk status (vendor string): low → emerald, medium → amber, high → red.
@@ -359,6 +366,9 @@ export default function AdminOrders() {
               </Link>
               <Link href='/admin/products' className='text-sm px-4 py-1.5 rounded-md text-slate-600 hover:bg-slate-200 transition-colors font-medium'>
                 Manage Product
+              </Link>
+              <Link href='/admin/coupons' className='text-sm px-4 py-1.5 rounded-md text-slate-600 hover:bg-slate-200 transition-colors font-medium'>
+                Coupons
               </Link>
               <Link href='/admin/sms' className='text-sm px-4 py-1.5 rounded-md text-slate-600 hover:bg-slate-200 transition-colors font-medium'>
                 SMS
@@ -678,13 +688,24 @@ export default function AdminOrders() {
                             </div>
                           </td>
                           <td className='px-6 py-4 text-right'>
-                            <div className="flex flex-col items-end">
+                            <div className="flex flex-col items-end gap-1">
                               <span className='font-black text-slate-900 text-sm'>
                                 ৳{Number(order.grandTotal || 0).toLocaleString('en-BD')}
                               </span>
                               <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tight">
                                 {parseItemQty(order.items)} Items
                               </span>
+                              {order.couponCode && (
+                                <span
+                                  className={`inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded border ${COUPON_CONFIG[order.couponType]?.badge || COUPON_CONFIG.percentage.badge}`}
+                                >
+                                  {COUPON_CONFIG[order.couponType]?.label || 'কুপন'}
+                                  <span className='ml-0.5'>{order.couponCode}</span>
+                                  {(order.couponSavings || order.couponDiscount) > 0 && (
+                                    <span className='ml-0.5'>-৳{Number(order.couponSavings || order.couponDiscount).toFixed(0)}</span>
+                                  )}
+                                </span>
+                              )}
                             </div>
                           </td>
                           <td className='px-6 py-4'>
@@ -819,12 +840,23 @@ export default function AdminOrders() {
                         <div className="bg-slate-50 rounded-2xl border border-slate-100 overflow-hidden">
                           <table className="w-full text-sm">
                              <tbody className="divide-y divide-slate-100">
-                               {[
-                                 { label: 'Customer Name', value: selectedOrder?.name, key: 'name' },
-                                 { label: 'Primary Contact', value: formatPhone(selectedOrder?.phone), key: 'phone' },
-                                 { label: 'Delivery Address', value: selectedOrder?.address, key: 'address' },
-                                 { label: 'Total Payable', value: `৳${selectedOrder?.grandTotal}`, key: 'price' }
-                               ].map((field) => (
+                                {[
+                                  { label: 'Customer Name', value: selectedOrder?.name, key: 'name' },
+                                  { label: 'Primary Contact', value: formatPhone(selectedOrder?.phone), key: 'phone' },
+                                  { label: 'Delivery Address', value: selectedOrder?.address, key: 'address' },
+                                  { label: 'Total Payable', value: `৳${selectedOrder?.grandTotal}`, key: 'price' },
+                                  {
+                                    label: 'Promo Coupon',
+                                    value: selectedOrder?.couponCode
+                                      ? `${selectedOrder.couponCode}${
+                                          selectedOrder.couponType === 'free_shipping'
+                                            ? ` (Free Delivery${selectedOrder.couponSavings > 0 ? ` - ৳${Number(selectedOrder.couponSavings).toFixed(0)} saved` : ''})`
+                                            : ` - ৳${Number(selectedOrder.couponDiscount || 0).toFixed(0)} off`
+                                        }`
+                                      : '—',
+                                    key: 'coupon',
+                                  },
+                                ].map((field) => (
                                  <tr key={field.key} className="group hover:bg-white transition-colors">
                                    <td className="px-5 py-4 font-bold text-[11px] text-slate-400 uppercase tracking-wider w-1/3 border-r border-slate-100">{field.label}</td>
                                    <td className="px-5 py-4 font-semibold text-slate-700 flex items-center justify-between">
@@ -909,6 +941,7 @@ export default function AdminOrders() {
                               {[
                                 { val: 'null', label: 'Not Called Yet', icon: FiClock, color: 'bg-slate-600' },
                                 { val: 'called', label: 'Call Successful', icon: FiPhone, color: 'bg-green-600' },
+                                { val: 'number_off', label: 'Number Off', icon: FiPhoneMissed, color: 'bg-slate-600' },
                                 { val: 'did_not_pick', label: 'Did Not Pick', icon: FiPhoneMissed, color: 'bg-red-600' },
                                 { val: 'call_later', label: 'Call Later', icon: FiClock, color: 'bg-orange-500' },
                                 { val: 'fake_order', label: 'Fake Order', icon: FiAlertTriangle, color: 'bg-purple-600' },

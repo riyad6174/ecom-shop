@@ -365,8 +365,8 @@ const ResetSection = () => {
             <a href="https://wa.me/8801814575428" target="_blank" rel="noreferrer" className="text-green-400 font-bold hover:text-green-300">
               WhatsApp: +880 1814-575428
             </a>
-            <a href="tel:8801609596652" className="text-cyan-400 font-bold hover:text-cyan-300">
-              Phone: +880 1609-596652
+            <a href="tel:+8801609599652" className="text-cyan-400 font-bold hover:text-cyan-300">
+              Phone: +880 1609-599652
             </a>
           </div>
         </div>
@@ -690,13 +690,13 @@ const LiveLocationNoteSection = () => (
           </div>
           <div className="text-center">
             <a
-              href="tel:+8801609596652"
+              href="tel:+8801609599652"
               className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-extrabold px-8 py-3.5 rounded-xl text-sm hover:opacity-90 transition-opacity bangla shadow-lg shadow-amber-500/20"
             >
               <FaPhoneAlt className="text-xs" />
               বিস্তারিত জানতে কল করুন
             </a>
-            <p className="text-[#9BA8BF] text-xs bangla mt-2">01609-596652 — সকাল ৯টা থেকে রাত ১০টা</p>
+            <p className="text-[#9BA8BF] text-xs bangla mt-2">01609-599652 — সকাল ৯টা থেকে রাত ১০টা</p>
           </div>
         </div>
       </div>

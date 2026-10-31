@@ -1,11 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { sendGTMEvent } from '@next/third-parties/google';
 import { useDispatch } from 'react-redux';
+import { useRouter } from 'next/router';
 import { products } from '@/utils/products';
 import { addToCart } from '@/store/cartSlice';
 import Head from 'next/head';
 import Image from 'next/image';
 import OrderDialog from '@/components/checkout/OrderDialog';
+import Confetti from '@/components/common/Confetti';
+import { calculateCouponPricing, normalizeCouponCode } from '@/utils/coupon';
 import Link from 'next/link';
 import {
   FaMotorcycle,
@@ -216,8 +219,8 @@ const ResetSection = () => {
             <a href="https://wa.me/8801814575428" target="_blank" rel="noreferrer" className="text-green-400 font-bold hover:text-green-300">
               WhatsApp: +880 1814-575428
             </a>
-            <a href="tel:8801609596652" className="text-cyan-400 font-bold hover:text-cyan-300">
-              Phone: +880 1609-596652
+            <a href="tel:+8801609599652" className="text-cyan-400 font-bold hover:text-cyan-300">
+              Phone: +880 1609-599652
             </a>
           </div>
         </div>
@@ -541,13 +544,13 @@ const LiveLocationNoteSection = () => (
           </div>
           <div className="text-center">
             <a
-              href="tel:+8801609596652"
+              href="tel:+8801609599652"
               className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-extrabold px-8 py-3.5 rounded-xl text-sm hover:opacity-90 transition-opacity bangla shadow-lg shadow-amber-500/20"
             >
               <FaPhoneAlt className="text-xs" />
               বিস্তারিত জানতে কল করুন
             </a>
-            <p className="text-[#9BA8BF] text-xs bangla mt-2">01609-596652 — সকাল ৯টা থেকে রাত ১০টা</p>
+            <p className="text-[#9BA8BF] text-xs bangla mt-2">01609-599652 — সকাল ৯টা থেকে রাত ১০টা</p>
           </div>
         </div>
       </div>
@@ -593,9 +596,107 @@ const AuthenticSection = () => (
 
 export default function HocoE103LandingPage({ product }) {
   const dispatch = useDispatch();
+  const router = useRouter();
   const [quantity, setQuantity] = useState(1);
   const [isOrderDialogOpen, setIsOrderDialogOpen] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
+  // Only set when checkout rejects a coupon that was valid on load
+  const [couponError, setCouponError] = useState(null);
+  const [confettiKey, setConfettiKey] = useState(0);
+  const couponBannerRef = useRef(null);
+
+  // Auto-apply ?coupon=CODE for campaign visitors. No code, a wrong code or a
+  // failed check all leave the page exactly as a normal visit — silently.
+  // Waits for router.isReady (static page: router.query is empty on the first
+  // render) and retries transient failures such as a cold DB start.
+  useEffect(() => {
+    if (!router.isReady) return;
+    const code =
+      normalizeCouponCode(router.query.coupon) ||
+      normalizeCouponCode(new URLSearchParams(window.location.search).get('coupon'));
+    setAppliedCoupon(null);
+    setCouponError(null);
+    if (!code) return;
+
+    const controller = new AbortController();
+    let cancelled = false;
+
+    const validate = async () => {
+      for (let attempt = 1; attempt <= 3; attempt++) {
+        try {
+          const r = await fetch(`/api/public/coupons/validate?code=${encodeURIComponent(code)}`, {
+            cache: 'no-store',
+            signal: controller.signal,
+          });
+          if (r.status >= 500) throw new Error(`HTTP ${r.status}`);
+          const data = await r.json();
+          if (cancelled) return;
+          if (data.valid) {
+            setAppliedCoupon({
+              code: data.code,
+              discountType: data.discountType,
+              discountValue: data.discountValue,
+              minPurchase: data.minPurchase,
+              // Discount only this product, even if the cart holds others
+              productId: product.id,
+            });
+          }
+          return;
+        } catch (err) {
+          if (cancelled || err?.name === 'AbortError') return;
+          if (attempt < 3) await new Promise((res) => setTimeout(res, 700 * attempt));
+        }
+      }
+    };
+    validate();
+
+    return () => {
+      cancelled = true;
+      controller.abort();
+    };
+  }, [router.isReady, router.query.coupon, product?.id]);
+
+  // Confetti bursts from the "coupon applied" banner as soon as it is on
+  // screen — right away if it is visible on load, otherwise when scrolled to.
+  useEffect(() => {
+    const el = couponBannerRef.current;
+    if (!appliedCoupon || !el) return;
+    let timer;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        io.disconnect();
+        // let the section's reveal animation finish first
+        timer = setTimeout(() => setConfettiKey((k) => k + 1), 350);
+      },
+      { threshold: 0.6 },
+    );
+    io.observe(el);
+    return () => {
+      io.disconnect();
+      clearTimeout(timer);
+    };
+  }, [appliedCoupon?.code]);
+
+  useEffect(() => {
+    if (!confettiKey) return;
+    const timer = setTimeout(() => setConfettiKey(0), 1600);
+    return () => clearTimeout(timer);
+  }, [confettiKey]);
+
+  // Same pricing function the OrderDialog and /api/submit use
+  const pricingFor = (qty) =>
+    calculateCouponPricing({
+      items: [{ id: product?.id, price: product?.price || 0, quantity: qty }],
+      coupon: appliedCoupon,
+    });
+  const unitPricing = pricingFor(1);
+  const linePricing = pricingFor(quantity);
+  const displayPrice = unitPricing.subtotal - unitPricing.discount;
+  const lineTotal = linePricing.subtotal - linePricing.discount;
+  const hasPriceDiscount = linePricing.applied && linePricing.discount > 0;
+  const minPurchaseMet = !appliedCoupon || linePricing.applied;
 
   useEffect(() => {
     if (typeof window !== 'undefined' && product) {
@@ -800,7 +901,9 @@ export default function HocoE103LandingPage({ product }) {
       {/* Sticky progress bar */}
       <div className="sticky top-0 z-30 bg-[#080B14]/95 backdrop-blur-md border-b border-white/10">
         <div className="container mx-auto px-4 lg:px-8 py-2 flex items-center justify-between">
-          <span className="text-sm font-bold text-white bangla">HOCO E103 Tracker — ৳৯৯৯ টাকা</span>
+          <span className="text-sm font-bold text-white bangla">
+            HOCO E103 Tracker — ৳{Number(displayPrice).toFixed(0)} টাকা
+          </span>
           <button
             type="button"
             onClick={() => {
@@ -832,7 +935,12 @@ export default function HocoE103LandingPage({ product }) {
               <span className="block mt-4 text-white font-semibold">HOCO E103 — নিচে বিস্তারিত শেয়ার করছি, দেখুন তো কাজের প্রোডাক্ট কিনা?</span>
             </p>
             <div className="flex flex-wrap justify-center gap-3 mb-2 text-sm text-[#9BA8BF] bangla hero-animate-3">
-              <span className="bg-white/10 px-3 py-1.5 rounded-full backdrop-blur">৳৯৯৯ টাকা</span>
+              <span className="bg-white/10 px-3 py-1.5 rounded-full backdrop-blur">
+                {hasPriceDiscount && (
+                  <span className="line-through text-[#9BA8BF] mr-1.5">৳{Number(product.price).toFixed(0)}</span>
+                )}
+                ৳{Number(displayPrice).toFixed(0)} টাকা
+              </span>
               <span className="bg-white/10 px-3 py-1.5 rounded-full backdrop-blur">Cash on Delivery</span>
               <span className="bg-white/10 px-3 py-1.5 rounded-full backdrop-blur">Original product</span>
               <span className="bg-white/10 px-3 py-1.5 rounded-full backdrop-blur">Support available</span>
@@ -849,6 +957,34 @@ export default function HocoE103LandingPage({ product }) {
             <p data-reveal data-reveal-delay="1" className="text-[#9BA8BF] bangla text-sm">HOCO E103 — বাইক/অটো/সাইকেল সবকিছুতেই লুকিয়ে রাখা যাবে</p>
           </div>
           <div data-reveal data-reveal-delay="2" className="max-w-md mx-auto">
+            {appliedCoupon && (
+              <div ref={couponBannerRef} className="relative mb-4 p-3 rounded-xl border border-green-500/30 bg-green-500/10 text-center">
+                {confettiKey > 0 && <Confetti key={confettiKey} contained />}
+                <p className="text-xs font-bold text-green-300 bangla uppercase tracking-wider mb-1">
+                  কুপন প্রয়োগ করা হয়েছে: {appliedCoupon.code}
+                </p>
+                {appliedCoupon.discountType === 'free_shipping' ? (
+                  <p className="text-sm text-white bangla font-medium">
+                    🎉 এই অর্ডারে ডেলিভারি চার্জ সম্পূর্ণ ফ্রি 🚚
+                  </p>
+                ) : (
+                  <p className="text-sm text-white bangla font-medium">
+                    🎉 ডিসকাউন্টের দাম:{' '}
+                    <span className="line-through text-[#9BA8BF] mr-1">৳{Number(product.price).toFixed(0)}</span>
+                    ৳{Number(displayPrice).toFixed(0)} টাকা
+                    {appliedCoupon.discountType === 'percentage' && ` (${appliedCoupon.discountValue}% ছাড়)`}
+                  </p>
+                )}
+                {!minPurchaseMet && (
+                  <p className="text-xs text-red-300 bangla mt-1">{linePricing.error}</p>
+                )}
+              </div>
+            )}
+            {couponError && !appliedCoupon && (
+              <div className="mb-4 p-3 rounded-xl border border-red-500/30 bg-red-500/10 text-center">
+                <p className="text-sm text-red-300 bangla font-medium">{couponError}</p>
+              </div>
+            )}
             <div className="rounded-2xl border-2 border-transparent bg-gradient-to-br from-violet-600/20 to-cyan-500/20 shadow-[0_0_20px_rgba(124,58,237,0.25)] p-5 md:p-6">
               <div className="inline-block px-3 py-1 rounded-full text-xs font-bold mb-3 bg-white/10 text-white border border-white/20">
                 HOCO E103
@@ -866,7 +1002,15 @@ export default function HocoE103LandingPage({ product }) {
                 <li className="text-xs text-[#9BA8BF] bangla">• Apple Find My + Google Find Hub — উভয় ফোনে চলে</li>
               </ul>
               <div className="flex items-center justify-between pt-3 mb-4 border-t border-white/10">
-                <span className="text-lg font-extrabold text-white">৳৯৯৯ <span className="text-sm font-normal text-[#9BA8BF]">টাকা</span></span>
+                <span className="text-lg font-extrabold text-white">
+                  {hasPriceDiscount && (
+                    <span className="block text-xs font-medium line-through text-[#9BA8BF]">
+                      ৳{Number(linePricing.subtotal).toFixed(0)}
+                    </span>
+                  )}
+                  ৳{Number(lineTotal).toFixed(0)}
+                  <span className="text-sm font-normal text-[#9BA8BF]">টাকা</span>
+                </span>
                 <QuantityStepper quantity={quantity} onChange={handleQtyChange} />
               </div>
               <button
@@ -992,7 +1136,7 @@ export default function HocoE103LandingPage({ product }) {
             }}
           >
             <h3 className="text-2xl md:text-3xl font-extrabold text-white bangla mb-2">চোরের আগেই প্রস্তুত থাকুন — আজই লুকিয়ে রাখুন</h3>
-            <p className="text-white/80 bangla text-sm md:text-base mb-6">চুরি/হারানোর পরে আফসোস নয় — এখনই বাইক/অটোতে লুকিয়ে রাখুন, মাত্র ৳৯৯৯ টাকা, ব্যাটারি ৬-৮ মাস</p>
+            <p className="text-white/80 bangla text-sm md:text-base mb-6">চুরি/হারানোর পরে আফসোস নয় — এখনই বাইক/অটোতে লুকিয়ে রাখুন, মাত্র ৳{Number(displayPrice).toFixed(0)} টাকা, ব্যাটারি ৬-৮ মাস</p>
             <div className="flex flex-col sm:flex-row justify-center gap-3 mb-6">
               <button
                 onClick={() => {
@@ -1026,8 +1170,12 @@ export default function HocoE103LandingPage({ product }) {
       <div className="fixed bottom-0 left-0 right-0 z-40 bg-[#080B14]/95 backdrop-blur-md border-t border-white/10 md:hidden safe-area-pb">
         <div className="flex items-center justify-between px-4 py-3 gap-3">
           <div className="text-sm">
-            <p className="text-white font-bold bangla">৳{(product.price || 0) * quantity} টাকা</p>
-            <p className="text-[#9BA8BF] text-xs bangla">HOCO E103 — {quantity}টি</p>
+            <p className="text-white font-bold bangla">
+              ৳{Number(lineTotal).toFixed(0)} টাকা
+            </p>
+            <p className="text-[#9BA8BF] text-xs bangla">
+              HOCO E103 — {quantity}টি
+            </p>
           </div>
           <button
             type="button"
@@ -1045,6 +1193,11 @@ export default function HocoE103LandingPage({ product }) {
       <OrderDialog
         isOpen={isOrderDialogOpen}
         onClose={() => setIsOrderDialogOpen(false)}
+        coupon={appliedCoupon}
+        onCouponInvalid={() => {
+          setAppliedCoupon(null);
+          setCouponError('দুঃখিত, কুপনটি এখন আর প্রযোজ্য নয়।');
+        }}
       />
     </>
   );

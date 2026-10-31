@@ -70,6 +70,12 @@ const orderSchema = new mongoose.Schema(
       enum: ['pending', 'sent', 'failed', 'suspicious_skipped', 'dedup_skipped'],
       default: 'pending',
     },
+    // ── Promo coupon applied to this order ──
+    couponCode: { type: String, default: '' },
+    couponDiscount: { type: Number, default: 0 },
+    couponSavings: { type: Number, default: 0 },
+    // '' must be in the enum — orders without a coupon save couponType: ''
+    couponType: { type: String, enum: ['', 'percentage', 'fixed', 'free_shipping'], default: '' },
   },
   { timestamps: true },
 );
@@ -87,16 +93,19 @@ orderSchema.index({ 'fraudCheck.riskStatus': 1 });
 orderSchema.index({ qcStatus: 1 });
 
 // If cached model is missing new fields (e.g. after schema change), rebuild it
-if (
-  mongoose.models.Order &&
-  (!mongoose.models.Order.schema.path('note') ||
-    !mongoose.models.Order.schema.path('smsStatus') ||
-    !mongoose.models.Order.schema.path('trafficSource') ||
-    !mongoose.models.Order.schema.path('customerType') ||
-    !mongoose.models.Order.schema.path('fraudCheck') ||
-    !mongoose.models.Order.schema.path('qcStatus'))
-) {
-  delete mongoose.models.Order;
-}
+  if (
+    mongoose.models.Order &&
+    (!mongoose.models.Order.schema.path('note') ||
+      !mongoose.models.Order.schema.path('smsStatus') ||
+      !mongoose.models.Order.schema.path('trafficSource') ||
+      !mongoose.models.Order.schema.path('customerType') ||
+      !mongoose.models.Order.schema.path('fraudCheck') ||
+      !mongoose.models.Order.schema.path('qcStatus') ||
+      !mongoose.models.Order.schema.path('couponCode') ||
+      !mongoose.models.Order.schema.path('couponSavings') ||
+      !mongoose.models.Order.schema.path('couponType').enumValues.includes(''))
+  ) {
+    delete mongoose.models.Order;
+  }
 
 export default mongoose.models.Order || mongoose.model('Order', orderSchema);

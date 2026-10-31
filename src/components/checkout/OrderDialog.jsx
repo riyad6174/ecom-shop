@@ -7,8 +7,11 @@ import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import { clearCart, removeFromCart, updateQuantity } from '@/store/cartSlice';
 import { collectOrderMeta } from '@/utils/orderTracking';
+import { calculateCouponPricing, shippingChargeForZone } from '@/utils/coupon';
+import Confetti from '@/components/common/Confetti';
 
-const OrderDialog = ({ isOpen, onClose }) => {
+
+const OrderDialog = ({ isOpen, onClose, coupon: initialCoupon, onCouponInvalid }) => {
   const dispatch = useDispatch();
   const cartItems = useSelector((state) => state.cart.items);
   const dialogRef = useRef(null);
@@ -37,6 +40,29 @@ const OrderDialog = ({ isOpen, onClose }) => {
   const [totalPrice, setTotalPrice] = useState(0);
   const [shippingCharge, setShippingCharge] = useState(60);
   const [grandTotal, setGrandTotal] = useState(0);
+
+  // Coupon state
+  const [appliedCoupon, setAppliedCoupon] = useState(
+    initialCoupon && initialCoupon.code ? initialCoupon : null,
+  );
+  const [couponDiscount, setCouponDiscount] = useState(0);
+  const [couponSavings, setCouponSavings] = useState(0);
+  const [effectiveShipping, setEffectiveShipping] = useState(60);
+  const [couponError, setCouponError] = useState(null);
+  // Incrementing key remounts <Confetti/> → one fresh burst (coupon orders only)
+  const [confettiKey, setConfettiKey] = useState(0);
+
+  // Sync with the coupon the page validated (it may arrive after mount)
+  useEffect(() => {
+    setAppliedCoupon(initialCoupon && initialCoupon.code ? initialCoupon : null);
+  }, [initialCoupon]);
+
+  // Burst ends on its own; unmount it so a later order can fire it again
+  useEffect(() => {
+    if (!confettiKey) return;
+    const timer = setTimeout(() => setConfettiKey(0), 1600);
+    return () => clearTimeout(timer);
+  }, [confettiKey]);
 
   // Pre-warm the server connection so the first order submit is fast
   useEffect(() => {
@@ -95,15 +121,20 @@ const OrderDialog = ({ isOpen, onClose }) => {
     };
   }, [isOpen]);
 
-  // Calculate totals based on cart items
+  // Calculate totals based on cart items + applied coupon
   useEffect(() => {
-    const total = cartItems.reduce(
-      (sum, item) => sum + (item.price || 0) * (item.quantity || 1),
-      0,
-    );
-    setTotalPrice(total);
-    setGrandTotal(total + shippingCharge);
-  }, [cartItems, shippingCharge]);
+    const pricing = calculateCouponPricing({
+      items: cartItems,
+      shippingCharge,
+      coupon: appliedCoupon,
+    });
+    setTotalPrice(pricing.subtotal);
+    setCouponDiscount(pricing.discount);
+    setCouponSavings(pricing.savings);
+    setEffectiveShipping(pricing.shipping);
+    setCouponError(pricing.error);
+    setGrandTotal(pricing.grandTotal);
+  }, [cartItems, shippingCharge, appliedCoupon]);
 
   // Handle click outside to close
   useEffect(() => {
@@ -140,9 +171,7 @@ const OrderDialog = ({ isOpen, onClose }) => {
     const value = e.target.value;
     setFormData({ ...formData, deliveryZone: value });
     validateField('deliveryZone', value);
-    const newShippingCharge = value === 'ঢাকার ভেতরে' ? 60 : 120;
-    setShippingCharge(newShippingCharge);
-    setGrandTotal(totalPrice + newShippingCharge);
+    setShippingCharge(shippingChargeForZone(value));
   };
 
   // Validate individual field
@@ -237,13 +266,19 @@ const OrderDialog = ({ isOpen, onClose }) => {
     // unique if the same phone orders again the same day.
     const phoneDigits = (formData.phoneNumber || '').replace(/\D/g, '');
     const uniqueId = `${Math.floor(10 + Math.random() * 90)}-${phoneDigits.slice(-4) || '0000'}-${Math.floor(10 + Math.random() * 90)}`;
+    // A coupon blocked by its minimum purchase must not be sent/badged.
+    const activeCoupon = appliedCoupon && !couponError ? appliedCoupon : null;
     const order = {
       user: { ...formData },
       order: {
         items: [...cartItems],
         totalPrice,
-        shippingCharge,
+        shippingCharge: effectiveShipping,
         grandTotal,
+        couponCode: activeCoupon?.code || '',
+        couponDiscount: activeCoupon ? couponDiscount : 0,
+        couponSavings: activeCoupon ? couponSavings : 0,
+        couponType: activeCoupon?.discountType || '',
         orderDate: new Date().toISOString(),
         orderId: uniqueId,
       },
@@ -266,6 +301,7 @@ const OrderDialog = ({ isOpen, onClose }) => {
       address: formData.address || '',
       items: JSON.stringify(
         cartItems.map((item) => ({
+          id: item.id || '',
           title: item.title || 'Unknown',
           price: item.price || 0,
           quantity: item.quantity || 1,
@@ -279,12 +315,18 @@ const OrderDialog = ({ isOpen, onClose }) => {
         })),
       ),
       totalPrice: totalPrice || 0,
-      shippingCharge: shippingCharge || 0,
+      shippingCharge: effectiveShipping || 0,
       grandTotal: grandTotal || 0,
       orderId: uniqueId,
       orderDate: new Date().toISOString(),
       submissionTime: bdtTime,
       sheetName: 'Orders',
+      couponCode: activeCoupon?.code || '',
+      couponProductId: activeCoupon?.productId || '',
+      // Only used by the server if its own coupon check fails unexpectedly
+      couponDiscount: activeCoupon ? couponDiscount : 0,
+      couponSavings: activeCoupon ? couponSavings : 0,
+      couponType: activeCoupon?.discountType || '',
       ...collectOrderMeta(),
     };
 
@@ -299,9 +341,20 @@ const OrderDialog = ({ isOpen, onClose }) => {
       return;
     }
 
-    const onSuccess = () => {
+    const onSuccess = (serverOrder) => {
+      // The server re-prices coupon orders — show exactly what it saved
+      if (serverOrder && activeCoupon && serverOrder.couponCode) {
+        Object.assign(order.order, {
+          totalPrice: serverOrder.totalPrice,
+          shippingCharge: serverOrder.shippingCharge,
+          grandTotal: serverOrder.grandTotal,
+          couponDiscount: serverOrder.couponDiscount,
+          couponSavings: serverOrder.couponSavings,
+        });
+      }
       setOrderDetails(order);
       setCurrentView('confirmation');
+      if (order.order.couponCode) setConfettiKey((k) => k + 1);
       setTimeout(() => setConfirmationAnimating(true), 50);
       const orderMeta = collectOrderMeta();
       sendGTMEvent({ ecommerce: null });
@@ -345,7 +398,7 @@ const OrderDialog = ({ isOpen, onClose }) => {
         });
 
         if (response.ok) {
-          onSuccess();
+          onSuccess(await response.json().catch(() => null));
           return;
         }
 
@@ -360,6 +413,11 @@ const OrderDialog = ({ isOpen, onClose }) => {
         // 4xx (except 409) = bad request data, no point retrying
         if (response.status >= 400 && response.status < 500) {
           const errorData = await response.json().catch(() => ({}));
+          if (errorData.code === 'COUPON_INVALID') {
+            // Show the full price so the customer can confirm and resubmit
+            setAppliedCoupon(null);
+            onCouponInvalid?.();
+          }
           setSubmissionError(errorData.message || 'Failed to submit order.');
           setIsLoading(false);
           return;
@@ -457,6 +515,8 @@ const OrderDialog = ({ isOpen, onClose }) => {
   if (!isVisible) return null;
 
   return (
+    <>
+    {confettiKey > 0 && <Confetti key={confettiKey} />}
     <div
       className={`fixed inset-0 z-50 transition-opacity duration-400 ease-out ${
         isAnimating ? 'opacity-100' : 'opacity-0'
@@ -639,15 +699,42 @@ const OrderDialog = ({ isOpen, onClose }) => {
 
                   {/* Pricing Summary - Mobile Only */}
                   <div className='mt-4 p-4 bg-blue-50 rounded-xl md:hidden'>
+                    {appliedCoupon && (
+                      <div className='flex items-center gap-2 mb-2 px-3 py-1.5 bg-green-50 rounded-lg border border-green-100'>
+                        <span className='text-[10px] font-bold text-green-700 uppercase tracking-wider'>
+                          Coupon applied: {appliedCoupon.code}
+                        </span>
+                        {couponError && (
+                          <span className='ml-auto text-[10px] font-bold text-red-700'>
+                            {couponError}
+                          </span>
+                        )}
+                      </div>
+                    )}
                     <div className='flex justify-between text-sm text-gray-700 mb-2'>
                       <span>Subtotal</span>
                       <span>৳{totalPrice.toFixed(2)}</span>
                     </div>
+                    {appliedCoupon && couponSavings > 0 && !couponError && (
+                      <div className='flex justify-between text-sm text-green-700 mb-2'>
+                        {appliedCoupon.discountType === 'free_shipping' ? (
+                          <>
+                            <span>Free Delivery ({appliedCoupon.code})</span>
+                            <span>-৳{couponSavings.toFixed(2)}</span>
+                          </>
+                        ) : (
+                          <>
+                            <span>Discount ({appliedCoupon.code})</span>
+                            <span>-৳{couponSavings.toFixed(2)}</span>
+                          </>
+                        )}
+                      </div>
+                    )}
                     <div className='flex justify-between text-sm text-gray-700 mb-2'>
                       <span>Shipping</span>
-                      <span>৳{shippingCharge.toFixed(2)}</span>
+                      <span>৳{effectiveShipping.toFixed(2)}</span>
                     </div>
-                    <div className='flex justify-between font-semibold text-gray-900 pt-2 border-t border-blue-200'>
+                    <div className='flex justify-between font-black text-gray-900 pt-2 border-t border-blue-200 text-lg'>
                       <span>Total</span>
                       <span>৳{grandTotal.toFixed(2)}</span>
                     </div>
@@ -795,15 +882,42 @@ const OrderDialog = ({ isOpen, onClose }) => {
 
                     {/* Pricing Summary - Desktop Only */}
                     <div className='hidden md:block p-4 bg-blue-50 rounded-xl'>
+                      {appliedCoupon && (
+                        <div className='flex items-center gap-2 mb-2 px-3 py-1.5 bg-green-50 rounded-lg border border-green-100'>
+                          <span className='text-[10px] font-bold text-green-700 uppercase tracking-wider'>
+                            Coupon applied: {appliedCoupon.code}
+                          </span>
+                          {couponError && (
+                            <span className='ml-auto text-[10px] font-bold text-red-700'>
+                              {couponError}
+                            </span>
+                          )}
+                        </div>
+                      )}
                       <div className='flex justify-between text-sm text-gray-700 mb-2'>
                         <span>Subtotal</span>
                         <span>৳{totalPrice.toFixed(2)}</span>
                       </div>
+                      {appliedCoupon && couponSavings > 0 && !couponError && (
+                        <div className='flex justify-between text-sm text-green-700 mb-2'>
+                          {appliedCoupon.discountType === 'free_shipping' ? (
+                            <>
+                              <span>Free Delivery ({appliedCoupon.code})</span>
+                              <span>-৳{couponSavings.toFixed(2)}</span>
+                            </>
+                          ) : (
+                            <>
+                              <span>Discount ({appliedCoupon.code})</span>
+                              <span>-৳{couponSavings.toFixed(2)}</span>
+                            </>
+                          )}
+                        </div>
+                      )}
                       <div className='flex justify-between text-sm text-gray-700 mb-2'>
                         <span>Shipping</span>
-                        <span>৳{shippingCharge.toFixed(2)}</span>
+                        <span>৳{effectiveShipping.toFixed(2)}</span>
                       </div>
-                      <div className='flex justify-between font-semibold text-gray-900 pt-2 border-t border-blue-200'>
+                      <div className='flex justify-between font-black text-gray-900 pt-2 border-t border-blue-200 text-lg'>
                         <span>Total</span>
                         <span>৳{grandTotal.toFixed(2)}</span>
                       </div>
@@ -1046,16 +1160,38 @@ const OrderDialog = ({ isOpen, onClose }) => {
                     <span>Subtotal</span>
                     <span>৳{orderDetails?.order?.totalPrice?.toFixed(2)}</span>
                   </div>
+                  {orderDetails?.order?.couponSavings > 0 && (
+                    <div className='flex justify-between text-sm text-green-700 mb-2'>
+                      {orderDetails?.order?.couponType === 'free_shipping' ? (
+                        <>
+                          <span>Free Delivery ({orderDetails?.order?.couponCode})</span>
+                          <span>-৳{orderDetails?.order?.couponSavings?.toFixed(2)}</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>Discount ({orderDetails?.order?.couponCode})</span>
+                          <span>
+                            -৳{orderDetails?.order?.couponSavings?.toFixed(2)}
+                          </span>
+                        </>
+                      )}
+                    </div>
+                  )}
                   <div className='flex justify-between text-sm text-gray-700 mb-2'>
                     <span>Shipping</span>
                     <span>
                       ৳{orderDetails?.order?.shippingCharge?.toFixed(2)}
                     </span>
                   </div>
-                  <div className='flex justify-between font-bold text-lg text-gray-900 pt-2 border-t border-blue-200'>
+                  <div className='flex justify-between font-black text-lg text-gray-900 pt-2 border-t border-blue-200'>
                     <span>Total</span>
                     <span>৳{orderDetails?.order?.grandTotal?.toFixed(2)}</span>
                   </div>
+                  {orderDetails?.order?.couponCode && (
+                    <p className='text-[10px] text-green-600 font-medium mt-2 bangla'>
+                      কুপন '{orderDetails?.order?.couponCode}' প্রয়োগ করা হয়েছে
+                    </p>
+                  )}
                 </div>
 
                 {/* Continue Shopping Button */}
@@ -1088,6 +1224,7 @@ const OrderDialog = ({ isOpen, onClose }) => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

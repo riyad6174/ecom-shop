@@ -535,7 +535,7 @@ export default function FanRetargetOffer({ product }) {
                   <p className="text-slate-900 font-bold bangla pt-1 border-t border-slate-200">সর্বমোট: ৳{grandTotal}</p>
                 </div>
                 <p className="text-xs text-slate-500 bangla mt-4">
-                  সাহায্য লাগলে: <a href="tel:+8801609596652" className="text-cyan-600 font-bold">01609-596652</a>
+                  সাহায্য লাগলে: <a href="tel:+8801609599652" className="text-cyan-600 font-bold">01609-599652</a>
                 </p>
               </div>
             ) : (
