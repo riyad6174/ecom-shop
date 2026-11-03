@@ -47,6 +47,7 @@ export default async function handler(req, res) {
     couponDiscount,
     couponSavings,
     couponType,
+    couponLinkCode,
   } = req.body;
 
   console.log(`[ORDER] Attempt ${orderId} — ${name} — ${phone} — ৳${grandTotal}`);
@@ -182,6 +183,7 @@ export default async function handler(req, res) {
       customerType,
       previousOrderCount,
       ...couponFields,
+      couponLinkCode: normalizeCouponCode(couponLinkCode) || '',
       fraudCheck: emptyFraudCheck(),
       qcStatus: 'pending',
       qcCheckedAt: null,

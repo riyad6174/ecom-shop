@@ -219,8 +219,8 @@ const ResetSection = () => {
             <a href="https://wa.me/8801814575428" target="_blank" rel="noreferrer" className="text-green-400 font-bold hover:text-green-300">
               WhatsApp: +880 1814-575428
             </a>
-            <a href="tel:+8801609599652" className="text-cyan-400 font-bold hover:text-cyan-300">
-              Phone: +880 1609-599652
+            <a href="tel:+8801814575428" className="text-cyan-400 font-bold hover:text-cyan-300">
+              Phone: +880 1814-575428
             </a>
           </div>
         </div>
@@ -544,13 +544,13 @@ const LiveLocationNoteSection = () => (
           </div>
           <div className="text-center">
             <a
-              href="tel:+8801609599652"
+              href="tel:+8801814575428"
               className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-extrabold px-8 py-3.5 rounded-xl text-sm hover:opacity-90 transition-opacity bangla shadow-lg shadow-amber-500/20"
             >
               <FaPhoneAlt className="text-xs" />
               বিস্তারিত জানতে কল করুন
             </a>
-            <p className="text-[#9BA8BF] text-xs bangla mt-2">01609-599652 — সকাল ৯টা থেকে রাত ১০টা</p>
+            <p className="text-[#9BA8BF] text-xs bangla mt-2">01814-575428 — সকাল ৯টা থেকে রাত ১০টা</p>
           </div>
         </div>
       </div>
@@ -603,6 +603,9 @@ export default function HocoE103LandingPage({ product }) {
   const [appliedCoupon, setAppliedCoupon] = useState(null);
   // Only set when checkout rejects a coupon that was valid on load
   const [couponError, setCouponError] = useState(null);
+  // Raw ?coupon= code from the URL, kept even when it fails validation so the
+  // order is still marked as coming from a coupon link in admin.
+  const [couponLinkCode, setCouponLinkCode] = useState('');
   const [confettiKey, setConfettiKey] = useState(0);
   const couponBannerRef = useRef(null);
 
@@ -617,6 +620,7 @@ export default function HocoE103LandingPage({ product }) {
       normalizeCouponCode(new URLSearchParams(window.location.search).get('coupon'));
     setAppliedCoupon(null);
     setCouponError(null);
+    setCouponLinkCode(code || '');
     if (!code) return;
 
     const controller = new AbortController();
@@ -1194,6 +1198,7 @@ export default function HocoE103LandingPage({ product }) {
         isOpen={isOrderDialogOpen}
         onClose={() => setIsOrderDialogOpen(false)}
         coupon={appliedCoupon}
+        couponLinkCode={couponLinkCode}
         onCouponInvalid={() => {
           setAppliedCoupon(null);
           setCouponError('দুঃখিত, কুপনটি এখন আর প্রযোজ্য নয়।');

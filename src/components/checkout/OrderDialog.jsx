@@ -11,7 +11,7 @@ import { calculateCouponPricing, shippingChargeForZone } from '@/utils/coupon';
 import Confetti from '@/components/common/Confetti';
 
 
-const OrderDialog = ({ isOpen, onClose, coupon: initialCoupon, onCouponInvalid }) => {
+const OrderDialog = ({ isOpen, onClose, coupon: initialCoupon, couponLinkCode = '', onCouponInvalid }) => {
   const dispatch = useDispatch();
   const cartItems = useSelector((state) => state.cart.items);
   const dialogRef = useRef(null);
@@ -327,6 +327,8 @@ const OrderDialog = ({ isOpen, onClose, coupon: initialCoupon, onCouponInvalid }
       couponDiscount: activeCoupon ? couponDiscount : 0,
       couponSavings: activeCoupon ? couponSavings : 0,
       couponType: activeCoupon?.discountType || '',
+      // Sent even if the coupon was not applied — marks coupon-link orders
+      couponLinkCode: couponLinkCode || '',
       ...collectOrderMeta(),
     };
 

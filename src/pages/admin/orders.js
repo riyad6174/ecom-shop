@@ -706,6 +706,17 @@ export default function AdminOrders() {
                                   )}
                                 </span>
                               )}
+                              {/* Came from a ?coupon= link but the coupon was not applied */}
+                              {!order.couponCode && order.couponLinkCode && (
+                                <span
+                                  title='Ordered from a coupon link, but the coupon was not applied (invalid, expired, limit reached or minimum not met)'
+                                  className='inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded border bg-amber-100 text-amber-800 border-amber-200'
+                                >
+                                  কুপন লিংক
+                                  <span className='ml-0.5'>{order.couponLinkCode}</span>
+                                  <span className='ml-0.5'>(not applied)</span>
+                                </span>
+                              )}
                             </div>
                           </td>
                           <td className='px-6 py-4'>
@@ -853,7 +864,9 @@ export default function AdminOrders() {
                                             ? ` (Free Delivery${selectedOrder.couponSavings > 0 ? ` - ৳${Number(selectedOrder.couponSavings).toFixed(0)} saved` : ''})`
                                             : ` - ৳${Number(selectedOrder.couponDiscount || 0).toFixed(0)} off`
                                         }`
-                                      : '—',
+                                      : selectedOrder?.couponLinkCode
+                                        ? `${selectedOrder.couponLinkCode} (from coupon link — not applied)`
+                                        : '—',
                                     key: 'coupon',
                                   },
                                 ].map((field) => (

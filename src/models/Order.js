@@ -76,6 +76,8 @@ const orderSchema = new mongoose.Schema(
     couponSavings: { type: Number, default: 0 },
     // '' must be in the enum — orders without a coupon save couponType: ''
     couponType: { type: String, enum: ['', 'percentage', 'fixed', 'free_shipping'], default: '' },
+    // ?coupon= code from the landing URL, saved even if the coupon was not applied
+    couponLinkCode: { type: String, default: '' },
   },
   { timestamps: true },
 );
@@ -103,6 +105,7 @@ orderSchema.index({ qcStatus: 1 });
       !mongoose.models.Order.schema.path('qcStatus') ||
       !mongoose.models.Order.schema.path('couponCode') ||
       !mongoose.models.Order.schema.path('couponSavings') ||
+      !mongoose.models.Order.schema.path('couponLinkCode') ||
       !mongoose.models.Order.schema.path('couponType').enumValues.includes(''))
   ) {
     delete mongoose.models.Order;
