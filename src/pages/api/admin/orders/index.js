@@ -23,6 +23,7 @@ export default async function handler(req, res) {
       to = '',
       source = '',
       customerType = '',
+      coupon = '',
     } = req.query;
 
     const pageNum = Math.max(1, parseInt(page));
@@ -34,7 +35,13 @@ export default async function handler(req, res) {
 
     if (search.trim()) {
       const regex = new RegExp(search.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
-      filter.$or = [{ name: regex }, { phone: regex }, { orderId: regex }];
+      filter.$or = [
+        { name: regex },
+        { phone: regex },
+        { orderId: regex },
+        { couponCode: regex },
+        { couponLinkCode: regex },
+      ];
     }
 
     if (status && ['pending', 'confirmed', 'cancel'].includes(status)) {
@@ -53,6 +60,22 @@ export default async function handler(req, res) {
 
     if (customerType && ['new', 'repeat'].includes(customerType)) {
       filter.customerType = customerType;
+    }
+
+    // Coupon filter. Old orders may lack the fields, so "has a code" is
+    // matched as a non-empty string and "no code" as missing or ''.
+    const hasCode = { $nin: ['', null] };
+    const noCode = { $in: ['', null] };
+    if (coupon === 'any') {
+      filter.$and = [{ $or: [{ couponCode: hasCode }, { couponLinkCode: hasCode }] }];
+    } else if (coupon === 'applied') {
+      filter.couponCode = hasCode;
+    } else if (coupon === 'link_only') {
+      filter.couponCode = noCode;
+      filter.couponLinkCode = hasCode;
+    } else if (coupon === 'none') {
+      filter.couponCode = noCode;
+      filter.couponLinkCode = noCode;
     }
 
     if (from || to) {

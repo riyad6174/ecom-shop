@@ -183,7 +183,7 @@ export default async function handler(req, res) {
       customerType,
       previousOrderCount,
       ...couponFields,
-      couponLinkCode: normalizeCouponCode(couponLinkCode) || '',
+      couponLinkCode: normalizeCouponCode(couponLinkCode).slice(0, 50),
       fraudCheck: emptyFraudCheck(),
       qcStatus: 'pending',
       qcCheckedAt: null,

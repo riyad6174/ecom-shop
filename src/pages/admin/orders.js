@@ -156,6 +156,7 @@ export default function AdminOrders() {
   const [responseFilter, setResponseFilter] = useState('');
   const [sourceFilter, setSourceFilter] = useState('');
   const [customerFilter, setCustomerFilter] = useState('');
+  const [couponFilter, setCouponFilter] = useState('');
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
 
@@ -203,6 +204,7 @@ export default function AdminOrders() {
         responseStatus: responseFilter,
         source: sourceFilter,
         customerType: customerFilter,
+        coupon: couponFilter,
         from: fromDate,
         to: toDate,
       });
@@ -230,7 +232,7 @@ export default function AdminOrders() {
     } finally {
       setLoading(false);
     }
-  }, [page, search, statusFilter, responseFilter, sourceFilter, customerFilter, fromDate, toDate]);
+  }, [page, search, statusFilter, responseFilter, sourceFilter, customerFilter, couponFilter, fromDate, toDate]);
 
   useEffect(() => {
     if (authChecked) fetchOrders();
@@ -238,7 +240,7 @@ export default function AdminOrders() {
 
   useEffect(() => {
     setPage(1);
-  }, [search, statusFilter, responseFilter, sourceFilter, customerFilter, fromDate, toDate]);
+  }, [search, statusFilter, responseFilter, sourceFilter, customerFilter, couponFilter, fromDate, toDate]);
 
   const handleSearchChange = (e) => {
     const val = e.target.value;
@@ -252,6 +254,7 @@ export default function AdminOrders() {
     setResponseFilter('');
     setSourceFilter('');
     setCustomerFilter('');
+    setCouponFilter('');
     setFromDate('');
     setToDate('');
     setPage(1);
@@ -447,7 +450,7 @@ export default function AdminOrders() {
                     type='text'
                     defaultValue={search}
                     onChange={handleSearchChange}
-                    placeholder='Customer name, phone, or order number...'
+                    placeholder='Customer name, phone, order number or coupon...'
                     className='w-full text-sm border border-slate-200 bg-slate-50/50 rounded-xl pl-10 pr-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all'
                   />
                 </div>
@@ -486,8 +489,8 @@ export default function AdminOrders() {
                 </div>
               </div>
 
-              {/* Source / Customer Filters Group */}
-              <div className="grid grid-cols-2 gap-3 xl:col-span-2">
+              {/* Source / Customer / Coupon Filters Group */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 xl:col-span-2">
                 <div>
                   <label className='text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 block'>Source</label>
                   <select
@@ -513,6 +516,20 @@ export default function AdminOrders() {
                     <option value=''>New + Repeat</option>
                     <option value='new'>New Customer</option>
                     <option value='repeat'>Repeat Customer</option>
+                  </select>
+                </div>
+                <div>
+                  <label className='text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 block'>Coupon</label>
+                  <select
+                    value={couponFilter}
+                    onChange={(e) => setCouponFilter(e.target.value)}
+                    className='w-full text-sm border border-slate-200 bg-slate-50/50 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all cursor-pointer font-medium text-slate-700'
+                  >
+                    <option value=''>All Orders</option>
+                    <option value='any'>Any Coupon</option>
+                    <option value='applied'>Coupon Applied</option>
+                    <option value='link_only'>Link Only (Not Applied)</option>
+                    <option value='none'>No Coupon</option>
                   </select>
                 </div>
               </div>
