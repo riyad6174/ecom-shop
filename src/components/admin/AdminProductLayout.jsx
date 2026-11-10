@@ -3,10 +3,12 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import {
   FiPackage, FiTag, FiPlus, FiList, FiLogOut,
-  FiGrid, FiChevronDown, FiChevronRight, FiArrowLeft, FiMenu, FiX,
+  FiGrid, FiChevronDown, FiChevronRight, FiArrowLeft, FiMenu, FiX, FiShoppingCart,
 } from 'react-icons/fi';
+import { CountBadge } from '@/components/admin/AbandonedBadge';
+import useAbandonedCount from '@/hooks/useAbandonedCount';
 
-function NavItem({ href, label, icon: Icon, active, sub }) {
+function NavItem({ href, label, icon: Icon, active, sub, badge = 0 }) {
   return (
     <Link
       href={href}
@@ -18,7 +20,8 @@ function NavItem({ href, label, icon: Icon, active, sub }) {
         }`}
     >
       {Icon && <Icon className={`w-4 h-4 flex-shrink-0 ${active ? 'text-amber-600' : ''}`} />}
-      {label}
+      <span className="flex-1">{label}</span>
+      <CountBadge count={badge} />
     </Link>
   );
 }
@@ -45,6 +48,7 @@ export default function AdminProductLayout({ children, title }) {
   const router = useRouter();
   const [admin, setAdmin] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const abandonedCount = useAbandonedCount();
 
   useEffect(() => {
     fetch('/api/admin/me')
@@ -84,7 +88,14 @@ export default function AdminProductLayout({ children, title }) {
         </SidebarSection>
 
         <div className="pt-2 border-t border-slate-200">
-          <NavItem href="/admin/orders" label="Orders" icon={FiGrid} active={false} />
+          <NavItem href="/admin/orders" label="Orders" icon={FiGrid} active={path === '/admin/orders'} />
+          <NavItem
+            href="/admin/abandoned-orders"
+            label="Abandoned Orders"
+            icon={FiShoppingCart}
+            active={path === '/admin/abandoned-orders'}
+            badge={abandonedCount}
+          />
           <NavItem href="/admin/admins" label="Admins" icon={FiGrid} active={false} />
         </div>
       </nav>
@@ -109,8 +120,9 @@ export default function AdminProductLayout({ children, title }) {
     <div className="min-h-screen flex flex-col bg-white">
       {/* Mobile top bar */}
       <div className="lg:hidden flex items-center justify-between px-4 py-3 bg-slate-100 border-b border-slate-200">
-        <button onClick={() => setSidebarOpen(true)} className="p-2 text-slate-600">
+        <button onClick={() => setSidebarOpen(true)} className="relative p-2 text-slate-600">
           <FiMenu className="w-5 h-5" />
+          <CountBadge count={abandonedCount} className="absolute -top-0.5 -right-1" />
         </button>
         <span className="font-bold text-slate-900 text-sm">{title}</span>
         <div className="w-9" />

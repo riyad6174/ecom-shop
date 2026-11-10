@@ -7,6 +7,10 @@
     {
       "path": "/api/cron/backfill-qc",
       "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/cron/detect-abandoned",
+      "schedule": "*/1 * * * *"
     }
   ]
 }

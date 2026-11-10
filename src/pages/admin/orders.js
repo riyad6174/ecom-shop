@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import Head from 'next/head';
 import {
-  FiSearch, FiRefreshCw, FiFilter, FiTrash2, FiEdit3,
+  FiSearch, FiRefreshCw, FiEdit3,
   FiCheckCircle, FiXCircle, FiClock, FiPhone, FiPhoneMissed,
   FiCopy, FiExternalLink, FiCalendar, FiArrowLeft, FiArrowRight,
   FiAlertTriangle, FiMessageSquare, FiSave, FiUserPlus, FiRepeat,
@@ -11,6 +11,12 @@ import {
 } from 'react-icons/fi';
 import { Dialog, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
+import AbandonedNavLink from '@/components/admin/AbandonedNavLink';
+import AbandonedOrdersTable from '@/components/admin/AbandonedOrdersTable';
+import { CountBadge } from '@/components/admin/AbandonedBadge';
+import useAbandonedCount from '@/hooks/useAbandonedCount';
+import FilterToolbar from '@/components/admin/orders/FilterToolbar';
+import StatusTabs from '@/components/admin/orders/StatusTabs';
 
 // ─── Status configuration ──────────────────────────────────────────────────
 const ORDER_STATUS_CONFIG = {
@@ -48,6 +54,69 @@ const COUPON_CONFIG = {
   fixed: { label: 'কুপন ডিস্কাউন্ট', badge: 'bg-purple-100 text-purple-800 border-purple-200' },
   free_shipping: { label: 'ফ্রি ডেলিভারি', badge: 'bg-emerald-100 text-emerald-800 border-emerald-200' },
 };
+
+// ─── Toolbar "Filters" popover fields ('' = no filter) ─────────────────────
+const FILTER_FIELDS = [
+  {
+    key: 'response',
+    label: 'Response',
+    options: [
+      { value: '', label: 'All responses' },
+      { value: 'none', label: 'No response yet' },
+      { value: 'called', label: 'Called' },
+      { value: 'number_off', label: 'Number off' },
+      { value: 'did_not_pick', label: 'Did not pick' },
+      { value: 'call_later', label: 'Call later' },
+      { value: 'fake_order', label: 'Fake order' },
+    ],
+  },
+  {
+    key: 'source',
+    label: 'Source',
+    options: [
+      { value: '', label: 'All sources' },
+      { value: 'meta', label: 'Meta' },
+      { value: 'google', label: 'Google' },
+      { value: 'tiktok', label: 'TikTok' },
+      { value: 'organic', label: 'Organic' },
+      { value: 'referral', label: 'Referral' },
+    ],
+  },
+  {
+    key: 'customer',
+    label: 'Customer',
+    options: [
+      { value: '', label: 'New + repeat' },
+      { value: 'new', label: 'New customer' },
+      { value: 'repeat', label: 'Repeat customer' },
+    ],
+  },
+  {
+    key: 'coupon',
+    label: 'Coupon',
+    options: [
+      { value: '', label: 'All orders' },
+      { value: 'any', label: 'Any coupon' },
+      { value: 'applied', label: 'Coupon applied' },
+      { value: 'link_only', label: 'Link only (not applied)' },
+      { value: 'none', label: 'No coupon' },
+    ],
+  },
+];
+
+const PAGE_SIZE = 30;
+
+/** Page numbers to show: first, last and a window around the current page. */
+function pageWindow(page, totalPages) {
+  const pages = new Set([1, totalPages, page - 1, page, page + 1]);
+  const sorted = [...pages].filter((p) => p >= 1 && p <= totalPages).sort((a, b) => a - b);
+  const out = [];
+  sorted.forEach((p, i) => {
+    if (i > 0 && p - sorted[i - 1] > 1) out.push(`gap-${p}`);
+    out.push(p);
+  });
+  return out;
+}
 
 // ─── FraudChecker QC badge colors (value-based) ──────────────────────────
 // Delivery rate: ≥80 emerald · 50–79 amber · <50 red · unknown grey.
@@ -146,19 +215,36 @@ export default function AdminOrders() {
   const [orders, setOrders] = useState([]);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
-  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [hasLoaded, setHasLoaded] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState(null);
   const [authChecked, setAuthChecked] = useState(false);
+  const requestIdRef = useRef(0);
 
-  // Filters
-  const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
-  const [responseFilter, setResponseFilter] = useState('');
-  const [sourceFilter, setSourceFilter] = useState('');
-  const [customerFilter, setCustomerFilter] = useState('');
-  const [couponFilter, setCouponFilter] = useState('');
-  const [fromDate, setFromDate] = useState('');
-  const [toDate, setToDate] = useState('');
+  // ── Filters live in the URL (?q=&status=&from=…) so they survive a refresh
+  // and filtered views can be shared. These are derived, not state.
+  const qv = (key) => (typeof router.query[key] === 'string' ? router.query[key] : '');
+  const search = qv('q');
+  const statusFilter = qv('status');
+  const responseFilter = qv('response');
+  const sourceFilter = qv('source');
+  const customerFilter = qv('customer');
+  const couponFilter = qv('coupon');
+  const fromDate = qv('from');
+  const toDate = qv('to');
+  const page = Math.max(1, parseInt(qv('page')) || 1);
+
+  /** Merge changes into the URL. Any filter change goes back to page 1. */
+  const updateQuery = (changes, { resetPage = true } = {}) => {
+    const next = { ...router.query, ...changes };
+    if (resetPage) delete next.page;
+    Object.keys(next).forEach((k) => {
+      if (next[k] === '' || next[k] == null || (k === 'page' && Number(next[k]) <= 1)) delete next[k];
+    });
+    router.replace({ pathname: '/admin/orders', query: next }, undefined, { shallow: true, scroll: false });
+  };
+  const setPage = (v) => updateQuery({ page: typeof v === 'function' ? v(page) : v }, { resetPage: false });
+  const filterValues = { response: responseFilter, source: sourceFilter, customer: customerFilter, coupon: couponFilter };
 
   // Modal State
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
@@ -170,7 +256,10 @@ export default function AdminOrders() {
   const [noteSaving, setNoteSaving] = useState(false);
   const [trackingExpanded, setTrackingExpanded] = useState(false);
 
-  const debounceRef = useRef(null);
+  // Completed orders ↔ abandoned orders tab (?tab=abandoned keeps it on refresh)
+  const activeTab = router.query.tab === 'abandoned' ? 'abandoned' : 'orders';
+  const abandonedCount = useAbandonedCount();
+  const switchTab = (tab) => updateQuery({ tab: tab === 'abandoned' ? 'abandoned' : '' });
 
   const showToast = (message, type = 'success') => {
     setToast({ message, type });
@@ -194,11 +283,12 @@ export default function AdminOrders() {
 
   // ── Fetch orders ────────────────────────────────────────────────────────
   const fetchOrders = useCallback(async () => {
+    const requestId = ++requestIdRef.current;
     setLoading(true);
     try {
       const params = new URLSearchParams({
         page,
-        limit: 30,
+        limit: PAGE_SIZE,
         search,
         status: statusFilter,
         responseStatus: responseFilter,
@@ -212,6 +302,8 @@ export default function AdminOrders() {
       const res = await fetch(`/api/admin/orders?${params}`);
       if (!res.ok) throw new Error('Failed');
       const data = await res.json();
+      // A newer request (filter changed meanwhile) wins
+      if (requestId !== requestIdRef.current) return;
       setOrders(data.orders);
       setTotal(data.total);
       setTotalPages(data.totalPages);
@@ -227,38 +319,31 @@ export default function AdminOrders() {
           totalCancelled: data.stats.totalCancelled,
         });
       }
+      setHasLoaded(true);
+      setLastUpdated(new Date());
     } catch {
       // keep previous state
     } finally {
-      setLoading(false);
+      if (requestId === requestIdRef.current) setLoading(false);
     }
   }, [page, search, statusFilter, responseFilter, sourceFilter, customerFilter, couponFilter, fromDate, toDate]);
 
   useEffect(() => {
-    if (authChecked) fetchOrders();
-  }, [authChecked, fetchOrders]);
+    if (authChecked && router.isReady && activeTab === 'orders') fetchOrders();
+  }, [authChecked, router.isReady, activeTab, fetchOrders]);
 
-  useEffect(() => {
-    setPage(1);
-  }, [search, statusFilter, responseFilter, sourceFilter, customerFilter, couponFilter, fromDate, toDate]);
-
-  const handleSearchChange = (e) => {
-    const val = e.target.value;
-    clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => setSearch(val), 400);
-  };
-
+  // Clears search + every filter (keeps the current tab)
   const handleResetFilters = () => {
-    setSearch('');
-    setStatusFilter('');
-    setResponseFilter('');
-    setSourceFilter('');
-    setCustomerFilter('');
-    setCouponFilter('');
-    setFromDate('');
-    setToDate('');
-    setPage(1);
+    router.replace(
+      { pathname: '/admin/orders', query: activeTab === 'abandoned' ? { tab: 'abandoned' } : {} },
+      undefined,
+      { shallow: true, scroll: false },
+    );
   };
+
+  // Clears the popover filters + date, keeps search and status tab
+  const clearToolbarFilters = () =>
+    updateQuery({ response: '', source: '', customer: '', coupon: '', from: '', to: '' });
 
   const handleLogout = async () => {
     await fetch('/api/admin/logout', { method: 'POST' });
@@ -367,6 +452,7 @@ export default function AdminOrders() {
               <Link href='/admin/orders' className='text-sm px-4 py-1.5 rounded-md bg-white shadow-sm font-semibold text-blue-700'>
                 Orders
               </Link>
+              <AbandonedNavLink count={abandonedCount} />
               <Link href='/admin/products' className='text-sm px-4 py-1.5 rounded-md text-slate-600 hover:bg-slate-200 transition-colors font-medium'>
                 Manage Product
               </Link>
@@ -382,13 +468,6 @@ export default function AdminOrders() {
             </nav>
           </div>
           <div className='flex items-center gap-4'>
-            <button 
-              onClick={fetchOrders}
-              className="hidden lg:flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-slate-600 text-[11px] font-black uppercase tracking-widest hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm group active:scale-95"
-            >
-              <FiRefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-700'}`} />
-              Reload
-            </button>
             <div className="flex flex-col items-end leading-none">
               <span className='text-xs font-semibold text-slate-900 uppercase tracking-wider mb-1'>Administrator</span>
               <span className='text-[10px] text-slate-500 font-mono'>{admin?.email}</span>
@@ -403,174 +482,83 @@ export default function AdminOrders() {
         </header>
 
         <main className='p-4 sm:p-6 max-w-[1800px] mx-auto w-full flex-grow'>
-          {/* ── Page Title & Stats ── */}
-          <div className='flex flex-wrap items-end justify-between gap-4 mb-8'>
-            <div>
-              <h1 className='text-3xl font-black text-slate-900 flex items-center gap-3'>
-                Order Management
-              </h1>
-              <p className="text-slate-500 text-sm mt-1 font-medium tracking-tight">Real-time control center for your shop's operations.</p>
+          {/* ── Title row: Orders / Abandoned + reload ── */}
+          <div className='flex flex-wrap items-center justify-between gap-3 mb-4'>
+            <div className='inline-flex items-center bg-slate-200/60 p-1 rounded-xl'>
+              {[
+                { key: 'orders', label: 'Orders' },
+                { key: 'abandoned', label: 'Abandoned', badge: abandonedCount },
+              ].map((t) => (
+                <button
+                  key={t.key}
+                  onClick={() => switchTab(t.key)}
+                  className={`flex items-center gap-2 px-4 py-1.5 text-sm font-bold rounded-lg transition-all ${
+                    activeTab === t.key ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-800'
+                  }`}
+                >
+                  {t.label}
+                  <CountBadge count={t.badge} />
+                </button>
+              ))}
             </div>
+            {activeTab === 'orders' ? (
+              <div className='flex items-center gap-3'>
+                {lastUpdated && (
+                  <span className='hidden sm:inline text-[11px] text-slate-400 font-medium'>
+                    Updated {lastUpdated.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
+                  </span>
+                )}
+                <button
+                  onClick={fetchOrders}
+                  className='group flex items-center gap-2 h-9 px-3 bg-white border border-slate-200 rounded-xl text-slate-600 text-xs font-semibold hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm active:scale-95'
+                >
+                  <FiRefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-700'}`} />
+                  Reload
+                </button>
+              </div>
+            ) : (
+              <Link href='/admin/abandoned-orders' className='text-xs font-bold text-blue-600 hover:underline'>
+                Open dedicated page →
+              </Link>
+            )}
           </div>
 
-          {/* ── Stats Row ── */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            {[
-              { todayLabel: "Today's Orders", todayValue: stats.today, totalLabel: 'Total Orders', totalValue: stats.total, color: 'text-blue-600', bg: 'bg-blue-50', border: 'hover:border-blue-200', icon: FiCalendar },
-              { todayLabel: "Today's Pending", todayValue: stats.pendingToday, totalLabel: 'Total Pending', totalValue: stats.totalPending, color: 'text-yellow-600', bg: 'bg-yellow-50', border: 'hover:border-yellow-200', icon: FiClock },
-              { todayLabel: "Today's Confirmed", todayValue: stats.confirmedToday, totalLabel: 'Total Confirmed', totalValue: stats.totalConfirmed, color: 'text-green-600', bg: 'bg-green-50', border: 'hover:border-green-200', icon: FiCheckCircle },
-              { todayLabel: "Today's Cancelled", todayValue: stats.cancelledToday, totalLabel: 'Total Cancelled', totalValue: stats.totalCancelled, color: 'text-red-600', bg: 'bg-red-50', border: 'hover:border-red-200', icon: FiXCircle },
-            ].map((stat, idx) => (
-              <div key={idx} className={`bg-white p-5 rounded-3xl border border-slate-200 shadow-sm flex items-center justify-between group ${stat.border} transition-colors`}>
-                <div>
-                  <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.15em] mb-0.5">{stat.todayLabel}</p>
-                  <p className={`text-3xl font-black ${stat.color} leading-none mb-1`}>{stat.todayValue}</p>
-                  <p className="text-[10px] text-slate-400 font-semibold">{stat.totalLabel}: <span className="text-slate-600 font-black">{stat.totalValue}</span></p>
-                </div>
-                <div className={`${stat.bg} ${stat.color} w-12 h-12 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform shrink-0`}>
-                  <stat.icon className="w-6 h-6" />
-                </div>
-              </div>
-            ))}
-          </div>
+          {activeTab === 'abandoned' ? (
+            <AbandonedOrdersTable />
+          ) : (
+          <>
+          {/* ── Status tabs (counts + status filter) ── */}
+          <StatusTabs
+            value={statusFilter}
+            onChange={(key) => updateQuery({ status: key })}
+            tabs={[
+              { key: '', label: 'All Orders', total: stats.total, today: stats.today, tone: 'blue' },
+              { key: 'pending', label: 'Pending', total: stats.totalPending, today: stats.pendingToday, tone: 'yellow' },
+              { key: 'confirmed', label: 'Confirmed', total: stats.totalConfirmed, today: stats.confirmedToday, tone: 'green' },
+              { key: 'cancel', label: 'Cancelled', total: stats.totalCancelled, today: stats.cancelledToday, tone: 'red' },
+            ]}
+          />
 
-          {/* ── Advanced Filters ── */}
-          <div className='bg-white rounded-2xl shadow-sm border border-slate-200 p-5 mb-6'>
-            <div className="flex items-center gap-2 mb-4 text-slate-900 font-bold text-sm border-b border-slate-100 pb-3">
-              <FiFilter className="w-4 h-4 text-blue-600" />
-              Advanced Filters
-            </div>
-            <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-6'>
-              {/* Search */}
-              <div className='xl:col-span-2 relative'>
-                <label className='text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 block'>Quick Search</label>
-                <div className="relative">
-                  <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
-                  <input
-                    type='text'
-                    defaultValue={search}
-                    onChange={handleSearchChange}
-                    placeholder='Customer name, phone, order number or coupon...'
-                    className='w-full text-sm border border-slate-200 bg-slate-50/50 rounded-xl pl-10 pr-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all'
-                  />
-                </div>
-              </div>
-
-              {/* Status Filters Group */}
-              <div className="grid grid-cols-2 gap-3 xl:col-span-2">
-                <div>
-                  <label className='text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 block'>Order Status</label>
-                  <select
-                    value={statusFilter}
-                    onChange={(e) => setStatusFilter(e.target.value)}
-                    className='w-full text-sm border border-slate-200 bg-slate-50/50 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all cursor-pointer font-medium text-slate-700 italic placeholder:text-slate-200'
-                  >
-                    <option value=''>All Orders</option>
-                    <option value='pending'>⏳ Pending</option>
-                    <option value='confirmed'>✅ Confirmed</option>
-                    <option value='cancel'>❌ Cancelled</option>
-                  </select>
-                </div>
-                <div>
-                  <label className='text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 block'>Response</label>
-                  <select
-                    value={responseFilter}
-                    onChange={(e) => setResponseFilter(e.target.value)}
-                    className='w-full text-sm border border-slate-200 bg-slate-50/50 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all cursor-pointer font-medium text-slate-700'
-                  >
-                    <option value=''>All Attempts</option>
-                    <option value='none'>⚪ No Response</option>
-                    <option value='called'>📞 Called</option>
-                    <option value='number_off'>📵 Number Off</option>
-                    <option value='did_not_pick'>📵 Did Not Pick</option>
-                    <option value='call_later'>🕐 Call Later</option>
-                    <option value='fake_order'>⚠️ Fake Order</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Source / Customer / Coupon Filters Group */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 xl:col-span-2">
-                <div>
-                  <label className='text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 block'>Source</label>
-                  <select
-                    value={sourceFilter}
-                    onChange={(e) => setSourceFilter(e.target.value)}
-                    className='w-full text-sm border border-slate-200 bg-slate-50/50 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all cursor-pointer font-medium text-slate-700'
-                  >
-                    <option value=''>All Sources</option>
-                    <option value='meta'>Meta</option>
-                    <option value='google'>Google</option>
-                    <option value='tiktok'>TikTok</option>
-                    <option value='organic'>Organic</option>
-                    <option value='referral'>Referral</option>
-                  </select>
-                </div>
-                <div>
-                  <label className='text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 block'>Customer</label>
-                  <select
-                    value={customerFilter}
-                    onChange={(e) => setCustomerFilter(e.target.value)}
-                    className='w-full text-sm border border-slate-200 bg-slate-50/50 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all cursor-pointer font-medium text-slate-700'
-                  >
-                    <option value=''>New + Repeat</option>
-                    <option value='new'>New Customer</option>
-                    <option value='repeat'>Repeat Customer</option>
-                  </select>
-                </div>
-                <div>
-                  <label className='text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 block'>Coupon</label>
-                  <select
-                    value={couponFilter}
-                    onChange={(e) => setCouponFilter(e.target.value)}
-                    className='w-full text-sm border border-slate-200 bg-slate-50/50 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all cursor-pointer font-medium text-slate-700'
-                  >
-                    <option value=''>All Orders</option>
-                    <option value='any'>Any Coupon</option>
-                    <option value='applied'>Coupon Applied</option>
-                    <option value='link_only'>Link Only (Not Applied)</option>
-                    <option value='none'>No Coupon</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Date Filter */}
-              <div>
-                <label className='text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 block'>Date Selection</label>
-                <div className="flex gap-2 items-center">
-                  <div className="relative flex-1">
-                    <FiCalendar className="absolute left-2 top-1/2 -translate-y-1/2 text-slate-400 w-3 h-3 pointer-events-none" />
-                    <input
-                      type='date'
-                      value={fromDate}
-                      onChange={(e) => setFromDate(e.target.value)}
-                      className='w-full text-[10px] border border-slate-200 bg-slate-50/50 rounded-lg pl-7 pr-2 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all uppercase'
-                    />
-                  </div>
-                  <div className="text-slate-300">—</div>
-                  <div className="relative flex-1">
-                    <FiCalendar className="absolute left-2 top-1/2 -translate-y-1/2 text-slate-400 w-3 h-3 pointer-events-none" />
-                    <input
-                      type='date'
-                      value={toDate}
-                      onChange={(e) => setToDate(e.target.value)}
-                      className='w-full text-[10px] border border-slate-200 bg-slate-50/50 rounded-lg pl-7 pr-2 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all uppercase'
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-            {/* Filter Actions */}
-            <div className="mt-4 pt-4 border-t border-slate-100 flex justify-end gap-3">
-              <button 
-                onClick={handleResetFilters}
-                className="text-xs font-bold text-slate-500 hover:text-slate-800 transition-colors uppercase tracking-widest flex items-center gap-1.5"
-              >
-                <FiTrash2 className="w-3 h-3" />
-                Reset All Filters
-              </button>
-            </div>
-          </div>
+          {/* ── Search + filters ── */}
+          <FilterToolbar
+            search={search}
+            onSearch={(val) => updateQuery({ q: val })}
+            searchPlaceholder='Search name, phone, order ID or coupon…'
+            from={fromDate}
+            to={toDate}
+            onDateChange={(from, to) => updateQuery({ from, to })}
+            fields={FILTER_FIELDS}
+            values={filterValues}
+            onFieldChange={(key, val) => updateQuery({ [key]: val })}
+            onClearAll={clearToolbarFilters}
+            resultText={
+              hasLoaded
+                ? total === 0
+                  ? 'No orders'
+                  : `Showing ${(page - 1) * PAGE_SIZE + 1}–${Math.min(page * PAGE_SIZE, total)} of ${total.toLocaleString('en-US')}`
+                : ''
+            }
+          />
 
           {/* ── Modern Table Container ── */}
           <div className='bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col min-h-[500px]'>
@@ -587,8 +575,8 @@ export default function AdminOrders() {
                     <th className='px-6 py-4'>Timestamp</th>
                   </tr>
                 </thead>
-                <tbody className='divide-y divide-slate-100'>
-                  {loading ? (
+                <tbody className={`divide-y divide-slate-100 transition-opacity ${loading && hasLoaded ? 'opacity-50' : ''}`}>
+                  {loading && !hasLoaded ? (
                     <tr>
                       <td colSpan="7" className="py-32 text-center">
                         <div className="flex flex-col items-center gap-4">
@@ -755,7 +743,7 @@ export default function AdminOrders() {
                      Page <span className="text-blue-600">{page}</span> of {totalPages}
                    </div>
                    <div className="hidden lg:block text-[10px] text-slate-400 font-medium uppercase tracking-wider">
-                     Displaying order range {(page-1)*30 + 1} - {Math.min(page*30, total)}
+                     Displaying order range {(page-1)*PAGE_SIZE + 1} - {Math.min(page*PAGE_SIZE, total)}
                    </div>
                 </div>
                 <div className='flex items-center gap-1.5'>
@@ -767,24 +755,25 @@ export default function AdminOrders() {
                     <FiArrowLeft className="w-5 h-5" />
                   </button>
                   
-                  {/* Page Numbers - Limited view */}
+                  {/* Page numbers: first, last and a window around the current page */}
                   <div className="flex items-center gap-1 mx-2">
-                    {[...Array(Math.min(5, totalPages))].map((_, i) => {
-                      const pNum = i + 1; // Simplistic view
-                      return (
+                    {pageWindow(page, totalPages).map((pNum) =>
+                      typeof pNum === 'string' ? (
+                        <span key={pNum} className="w-6 text-center text-slate-400 text-xs">…</span>
+                      ) : (
                         <button
                           key={pNum}
                           onClick={() => setPage(pNum)}
-                          className={`h-10 w-10 text-xs font-bold rounded-xl transition-all ${
-                            page === pNum 
-                              ? 'bg-blue-600 text-white shadow-lg shadow-blue-100 translate-y-[-2px]' 
+                          className={`h-10 min-w-[2.5rem] px-2 text-xs font-bold rounded-xl transition-all ${
+                            page === pNum
+                              ? 'bg-blue-600 text-white shadow-lg shadow-blue-100 translate-y-[-2px]'
                               : 'bg-white border border-slate-200 text-slate-500 hover:bg-slate-50'
                           }`}
                         >
                           {pNum}
                         </button>
-                      );
-                    })}
+                      ),
+                    )}
                   </div>
 
                   <button
@@ -798,6 +787,8 @@ export default function AdminOrders() {
               </div>
             )}
           </div>
+          </>
+          )}
         </main>
 
         {/* ── Update Order Modal ── */}

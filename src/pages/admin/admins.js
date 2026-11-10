@@ -1,6 +1,7 @@
 import { useState, useEffect, Fragment } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import AbandonedBadge from '@/components/admin/AbandonedBadge';
 import Head from 'next/head';
 import { 
   FiUsers, FiUserPlus, FiTrash2, FiLogOut, FiShoppingBag, 
@@ -159,6 +160,13 @@ export default function AdminsManagement() {
             >
               <FiShoppingBag className="w-3.5 h-3.5" />
               Orders
+            </Link>
+            <Link
+              href='/admin/abandoned-orders'
+              className='flex items-center gap-2 text-xs font-black uppercase tracking-widest px-4 py-2 rounded-lg text-slate-500 hover:text-slate-900 transition-all'
+            >
+              Abandoned
+              <AbandonedBadge />
             </Link>
             <Link
               href='/admin/products'

@@ -13,6 +13,7 @@ import DeliveryAndReturnPolicy from '@/components/CartPolicy';
 import Link from 'next/link';
 import { clearCart } from '@/store/cartSlice';
 import { useRouter } from 'next/router';
+import useCheckoutTracking, { toTrackedItems } from '@/hooks/useCheckoutTracking';
 
 function Cart() {
   const dispatch = useDispatch();
@@ -70,6 +71,21 @@ function Cart() {
     setTotalPrice(total);
     setGrandTotal(total + shippingCharge);
   }, [cartItems, shippingCharge]);
+
+  // Abandoned-cart tracking: starts once a valid phone is entered
+  const checkoutTracking = useCheckoutTracking(
+    {
+      name: formData.fullName,
+      phone: formData.phoneNumber,
+      deliveryZone: formData.deliveryZone,
+      address: formData.address,
+      items: toTrackedItems(cartItems),
+      totalPrice,
+      shippingCharge,
+      grandTotal,
+    },
+    { enabled: !showPopup },
+  );
 
   // Handle form input changes
   const handleInputChange = (e) => {
@@ -213,6 +229,7 @@ function Cart() {
       orderDate: new Date().toISOString(),
       submissionTime: bdtTime,
       sheetName: 'Orders',
+      checkoutSessionId: checkoutTracking.getSessionId(),
     };
 
     if (
@@ -251,6 +268,7 @@ function Cart() {
         setSubmissionError(errorData.message || 'Failed to submit order');
       } else {
         console.log('Order Submitted:', order);
+        checkoutTracking.markCompleted();
         setOrderDetails(order);
         setShowPopup(true);
 

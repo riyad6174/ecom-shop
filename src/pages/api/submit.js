@@ -3,6 +3,18 @@ import Order from '@/models/Order';
 import { fetchCourierHistory, normalizePhoneForQC, emptyFraudCheck } from '@/lib/fraudChecker';
 import { findUsableCoupon, claimCouponUse, releaseCouponUse } from '@/lib/coupon';
 import { calculateCouponPricing, normalizeCouponCode, shippingChargeForZone, COUPON_TYPES } from '@/utils/coupon';
+import { completeCheckoutSession } from '@/lib/abandonedCheckout';
+
+// Mark the abandoned-cart tracking session as completed. Never blocks or
+// fails the order — the cron sweep also matches orders by phone as a backup.
+async function completeCheckout(checkoutSessionId, fields) {
+  if (!checkoutSessionId) return;
+  try {
+    await completeCheckoutSession(checkoutSessionId, fields);
+  } catch (err) {
+    console.warn(`[ORDER] Checkout session completion failed for ${fields.orderId}:`, err?.message || err);
+  }
+}
 
 export default async function handler(req, res) {
   // HEAD: pre-warm the DB connection when the order dialog opens
@@ -48,6 +60,8 @@ export default async function handler(req, res) {
     couponSavings,
     couponType,
     couponLinkCode,
+    // ── Abandoned-cart tracking session (optional)
+    checkoutSessionId,
   } = req.body;
 
   console.log(`[ORDER] Attempt ${orderId} — ${name} — ${phone} — ৳${grandTotal}`);
@@ -88,6 +102,7 @@ export default async function handler(req, res) {
         // A retry of an order that was already saved must still get its 409,
         // even if that first save used up the coupon's last slot.
         if (await Order.exists({ orderId })) {
+          await completeCheckout(checkoutSessionId, { orderId, name, phone });
           return res.status(409).json({ message: 'Duplicate order ID. Please try again.' });
         }
 
@@ -190,6 +205,9 @@ export default async function handler(req, res) {
       qcRetryCount: 0,
     });
 
+    // The order exists — this checkout can no longer become "abandoned".
+    await completeCheckout(checkoutSessionId, { orderId, name, phone });
+
     // ── FraudChecker courier history (guarded, hard timeout inside helper).
     // Runs AFTER the save: any vendor failure only affects the QC fields and
     // is retried later by /api/cron/backfill-qc — never by the client.
@@ -243,6 +261,8 @@ export default async function handler(req, res) {
     if (claimedCoupon) await releaseCouponUse(claimedCoupon);
 
     if (error.code === 11000) {
+      // Retry of an order that was already saved
+      await completeCheckout(checkoutSessionId, { orderId, name, phone });
       return res
         .status(409)
         .json({ message: 'Duplicate order ID. Please try again.' });

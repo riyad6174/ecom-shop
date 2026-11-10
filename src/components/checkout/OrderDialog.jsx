@@ -9,6 +9,7 @@ import { clearCart, removeFromCart, updateQuantity } from '@/store/cartSlice';
 import { collectOrderMeta } from '@/utils/orderTracking';
 import { calculateCouponPricing, shippingChargeForZone } from '@/utils/coupon';
 import Confetti from '@/components/common/Confetti';
+import useCheckoutTracking, { toTrackedItems } from '@/hooks/useCheckoutTracking';
 
 
 const OrderDialog = ({ isOpen, onClose, coupon: initialCoupon, couponLinkCode = '', onCouponInvalid }) => {
@@ -135,6 +136,22 @@ const OrderDialog = ({ isOpen, onClose, coupon: initialCoupon, couponLinkCode = 
     setCouponError(pricing.error);
     setGrandTotal(pricing.grandTotal);
   }, [cartItems, shippingCharge, appliedCoupon]);
+
+  // Abandoned-cart tracking: starts once a valid phone is entered
+  const checkoutTracking = useCheckoutTracking(
+    {
+      name: formData.fullName,
+      phone: formData.phoneNumber,
+      deliveryZone: formData.deliveryZone,
+      address: formData.address,
+      items: toTrackedItems(cartItems),
+      totalPrice,
+      shippingCharge: effectiveShipping,
+      grandTotal,
+      couponCode: appliedCoupon && !couponError ? appliedCoupon.code : '',
+    },
+    { enabled: isOpen && currentView === 'cart' },
+  );
 
   // Handle click outside to close
   useEffect(() => {
@@ -329,6 +346,7 @@ const OrderDialog = ({ isOpen, onClose, coupon: initialCoupon, couponLinkCode = 
       couponType: activeCoupon?.discountType || '',
       // Sent even if the coupon was not applied — marks coupon-link orders
       couponLinkCode: couponLinkCode || '',
+      checkoutSessionId: checkoutTracking.getSessionId(),
       ...collectOrderMeta(),
     };
 
@@ -344,6 +362,7 @@ const OrderDialog = ({ isOpen, onClose, coupon: initialCoupon, couponLinkCode = 
     }
 
     const onSuccess = (serverOrder) => {
+      checkoutTracking.markCompleted();
       // The server re-prices coupon orders — show exactly what it saved
       if (serverOrder && activeCoupon && serverOrder.couponCode) {
         Object.assign(order.order, {

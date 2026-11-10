@@ -6,6 +6,7 @@ import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import { products } from '@/utils/products';
 import { collectOrderMeta } from '@/utils/orderTracking';
+import useCheckoutTracking from '@/hooks/useCheckoutTracking';
 
 const baseProduct = products.find(
   (p) => p.slug === 'portable-high-speed-cooling-fan',
@@ -136,6 +137,33 @@ export default function FanRetargetOffer({ product }) {
     fetch('/api/submit', { method: 'HEAD' }).catch(() => {});
   }, []);
 
+  // Abandoned-cart tracking: starts once a valid phone is entered.
+  // (Hook must run before the early return below.)
+  const checkoutTracking = useCheckoutTracking(
+    {
+      name: formData.fullName,
+      phone: formData.phoneNumber,
+      deliveryZone: FREE_ZONE_LABEL,
+      address: formData.address,
+      items: product
+        ? [
+            {
+              id: String(product.id || ''),
+              title: `${product.title} (VIP অফার)`,
+              price: OFFER_PRICE,
+              quantity,
+              image: activeImage || product.images?.[0] || '',
+              variant: selectedColor ? `Color: ${selectedColor}` : 'Standard',
+            },
+          ]
+        : [],
+      totalPrice: OFFER_PRICE * quantity,
+      shippingCharge: SHIPPING_CHARGE,
+      grandTotal: OFFER_PRICE * quantity,
+    },
+    { enabled: !placedOrder },
+  );
+
   if (!product) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center text-slate-400 bg-[#080B14]">
@@ -226,10 +254,12 @@ export default function FanRetargetOffer({ product }) {
       orderDate: new Date().toISOString(),
       submissionTime: bdtTime,
       sheetName: 'Orders',
+      checkoutSessionId: checkoutTracking.getSessionId(),
       ...collectOrderMeta(),
     };
 
     const onSuccess = (serverMeta) => {
+      checkoutTracking.markCompleted();
       setPlacedOrder({ ...sheetData, orderId: uniqueId, customerType: serverMeta?.customerType });
       const meta = collectOrderMeta();
       sendGTMEvent({ ecommerce: null });

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import AbandonedNavLink from '@/components/admin/AbandonedNavLink';
 import Head from 'next/head';
 import {
   FiSearch, FiRefreshCw, FiFilter, FiTrash2, FiCheckCircle,
@@ -252,6 +253,7 @@ export default function AdminSms() {
               <Link href='/admin/orders' className='text-sm px-4 py-1.5 rounded-md text-slate-600 hover:bg-slate-200 transition-colors font-medium'>
                 Orders
               </Link>
+              <AbandonedNavLink />
               <Link href='/admin/products' className='text-sm px-4 py-1.5 rounded-md text-slate-600 hover:bg-slate-200 transition-colors font-medium'>
                 Manage Product
               </Link>

@@ -80,11 +80,11 @@ export default async function handler(req, res) {
 
     if (from || to) {
       filter.createdAt = {};
-      if (from) filter.createdAt.$gte = new Date(from);
+      // YYYY-MM-DD = a Bangladesh calendar day (UTC+6), not a UTC day
+      const isDay = (v) => /^\d{4}-\d{2}-\d{2}$/.test(v);
+      if (from) filter.createdAt.$gte = isDay(from) ? new Date(`${from}T00:00:00+06:00`) : new Date(from);
       if (to) {
-        const toDate = new Date(to);
-        toDate.setHours(23, 59, 59, 999);
-        filter.createdAt.$lte = toDate;
+        filter.createdAt.$lte = isDay(to) ? new Date(`${to}T23:59:59.999+06:00`) : new Date(to);
       }
     }
 
