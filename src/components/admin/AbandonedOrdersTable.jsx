@@ -274,21 +274,21 @@ export default function AbandonedOrdersTable({ markSeen = false }) {
         <div className='overflow-x-auto flex-grow'>
           <table className='w-full min-w-[1080px] text-sm text-left border-collapse table-fixed'>
             <colgroup>
+              <col className='w-[110px]' />
               <col className='w-[210px]' />
               <col className='w-[260px]' />
               <col className='w-[220px]' />
               <col className='w-[220px]' />
               <col className='w-[130px]' />
-              <col className='w-[100px]' />
             </colgroup>
             <thead>
               <tr className='bg-slate-50 border-b border-slate-200'>
+                <th className={TH}>Action</th>
                 <th className={TH}>Customer</th>
                 <th className={TH}>Cart</th>
                 <th className={TH}>Delivery address</th>
                 <th className={TH}>Follow-up</th>
                 <th className={TH}>Abandoned</th>
-                <th className={`${TH} text-right`}>Action</th>
               </tr>
             </thead>
             <tbody className={`divide-y divide-slate-100 transition-opacity ${loading && hasLoaded ? 'opacity-50' : ''}`}>
@@ -324,6 +324,17 @@ export default function AbandonedOrdersTable({ markSeen = false }) {
                         today ? 'bg-amber-50/50' : ''
                       } hover:bg-slate-50 transition-colors`}
                     >
+                      {/* Action */}
+                      <td className={TD}>
+                        <button
+                          onClick={() => openModal(s)}
+                          className='inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-blue-600 text-white text-xs font-bold shadow-sm hover:bg-blue-700 transition-colors'
+                          title='Update status, call result, callback time and note'
+                        >
+                          <FiEdit3 className='w-3.5 h-3.5' /> Manage
+                        </button>
+                      </td>
+
                       {/* Customer */}
                       <td className={TD}>
                         <div className='flex items-center gap-1.5 min-w-0'>
@@ -456,17 +467,6 @@ export default function AbandonedOrdersTable({ markSeen = false }) {
                             {[s.trafficSource, s.deviceType].filter(Boolean).join(' · ')}
                           </div>
                         )}
-                      </td>
-
-                      {/* Action */}
-                      <td className={`${TD} text-right`}>
-                        <button
-                          onClick={() => openModal(s)}
-                          className='inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-blue-600 text-white text-xs font-bold shadow-sm hover:bg-blue-700 transition-colors'
-                          title='Update status, call result, callback time and note'
-                        >
-                          <FiEdit3 className='w-3.5 h-3.5' /> Manage
-                        </button>
                       </td>
                     </tr>
                   );
