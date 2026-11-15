@@ -1,8 +1,10 @@
 import { connectDB } from '@/lib/mongodb';
 import { verifyAdmin } from '@/lib/auth';
-import CheckoutSession from '@/models/CheckoutSession';
+import CheckoutSession, { CALL_RESPONSES, FOLLOW_UP_STATUSES } from '@/models/CheckoutSession';
 import Order from '@/models/Order';
 import { countNewAbandoned, phoneVariants, sweepIfDue, toLocalPhone } from '@/lib/abandonedCheckout';
+
+const SCHEDULED = ['call_later', 'order_later'];
 
 export default async function handler(req, res) {
   if (!verifyAdmin(req)) return res.status(401).json({ message: 'Unauthorized' });
@@ -14,7 +16,10 @@ export default async function handler(req, res) {
     // Taken after the sweep: everything in this response was detected by now
     const serverTime = new Date();
 
-    const { page = 1, limit = 30, search = '', from = '', to = '' } = req.query;
+    const {
+      page = 1, limit = 30, search = '', from = '', to = '',
+      followUp = '', response = '', schedule = '',
+    } = req.query;
     const pageNum = Math.max(1, parseInt(page) || 1);
     const limitNum = Math.min(100, Math.max(1, parseInt(limit) || 30));
 
@@ -22,7 +27,32 @@ export default async function handler(req, res) {
     const filter = { status: 'abandoned' };
     if (search.trim()) {
       const regex = new RegExp(search.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
-      filter.$or = [{ name: regex }, { phone: regex }, { phoneLocal: regex }, { address: regex }, { 'items.title': regex }];
+      filter.$or = [
+        { name: regex }, { phone: regex }, { phoneLocal: regex }, { address: regex },
+        { 'items.title': regex }, { note: regex },
+      ];
+    }
+
+    // Follow-up status tab. Sessions from before this feature have no field → pending.
+    if (followUp === 'pending') {
+      filter.followUpStatus = { $in: ['pending', null] };
+    } else if (FOLLOW_UP_STATUSES.includes(followUp)) {
+      filter.followUpStatus = followUp;
+    }
+
+    if (response === 'none') {
+      filter.callResponse = null; // also matches a missing field
+    } else if (CALL_RESPONSES.includes(response)) {
+      filter.callResponse = response;
+    }
+
+    // Callback schedule: due = time reached, upcoming = still in the future
+    // Combined with a status tab: only call_later / order_later can be scheduled.
+    const now = new Date();
+    if (schedule === 'due' || schedule === 'upcoming') {
+      if (!followUp) filter.followUpStatus = { $in: SCHEDULED };
+      else if (!SCHEDULED.includes(followUp)) filter.followUpStatus = '__none__';
+      filter.followUpAt = schedule === 'due' ? { $ne: null, $lte: now } : { $gt: now };
     }
     if (from || to) {
       filter.abandonedAt = {};
@@ -41,9 +71,13 @@ export default async function handler(req, res) {
       Date.UTC(nowBD.getUTCFullYear(), nowBD.getUTCMonth(), nowBD.getUTCDate()) - BD_OFFSET_MS,
     );
 
-    const [sessions, total, today, globalTotal, newCount] = await Promise.all([
+    // Scheduled lists are worked through by callback time, the rest newest first
+    const sort = schedule === 'due' || schedule === 'upcoming' ? { followUpAt: 1 } : { abandonedAt: -1 };
+
+    const [sessions, total, today, globalTotal, newCount, byFollowUp, dueCount] = await Promise.all([
       CheckoutSession.find(filter)
-        .sort({ abandonedAt: -1 })
+        .select('-activity')
+        .sort(sort)
         .skip((pageNum - 1) * limitNum)
         .limit(limitNum)
         .lean(),
@@ -51,7 +85,29 @@ export default async function handler(req, res) {
       CheckoutSession.countDocuments({ status: 'abandoned', abandonedAt: { $gte: todayStartUTC } }),
       CheckoutSession.countDocuments({ status: 'abandoned' }),
       countNewAbandoned(),
+      // Per follow-up status: total + abandoned today (for the status tabs)
+      CheckoutSession.aggregate([
+        { $match: { status: 'abandoned' } },
+        {
+          $group: {
+            _id: { $ifNull: ['$followUpStatus', 'pending'] },
+            total: { $sum: 1 },
+            today: { $sum: { $cond: [{ $gte: ['$abandonedAt', todayStartUTC] }, 1, 0] } },
+          },
+        },
+      ]),
+      CheckoutSession.countDocuments({
+        status: 'abandoned',
+        followUpStatus: { $in: SCHEDULED },
+        followUpAt: { $ne: null, $lte: now },
+      }),
     ]);
+    const followUpStats = Object.fromEntries(
+      FOLLOW_UP_STATUSES.map((s) => {
+        const row = byFollowUp.find((r) => r._id === s);
+        return [s, { total: row?.total || 0, today: row?.today || 0 }];
+      }),
+    );
 
     // Informational only (records are never merged): flag customers who
     // placed an order later from another checkout session.
@@ -63,7 +119,12 @@ export default async function handler(req, res) {
       const later = laterOrders.find(
         (o) => toLocalPhone(o.phone) === s.phoneLocal && o.createdAt >= s.createdAt,
       );
-      return { ...s, laterOrderId: later?.orderId || '' };
+      return {
+        ...s,
+        followUpStatus: s.followUpStatus || 'pending',
+        callResponse: s.callResponse || null,
+        laterOrderId: later?.orderId || '',
+      };
     });
 
     res.setHeader('Cache-Control', 'no-store');
@@ -72,7 +133,7 @@ export default async function handler(req, res) {
       total,
       page: pageNum,
       totalPages: Math.max(1, Math.ceil(total / limitNum)),
-      stats: { today, total: globalTotal, new: newCount },
+      stats: { today, total: globalTotal, new: newCount, due: dueCount, followUp: followUpStats },
       serverTime: serverTime.toISOString(),
     });
   } catch (error) {

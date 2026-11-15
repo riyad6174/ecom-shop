@@ -27,6 +27,18 @@ const TONES = {
     box: 'bg-red-50 text-red-600',
     label: 'text-red-600',
   },
+  orange: {
+    tab: 'border-orange-500 bg-orange-50 ring-1 ring-orange-500',
+    boxActive: 'bg-orange-500 text-white',
+    box: 'bg-orange-50 text-orange-700',
+    label: 'text-orange-700',
+  },
+  purple: {
+    tab: 'border-violet-500 bg-violet-50 ring-1 ring-violet-500',
+    boxActive: 'bg-violet-600 text-white',
+    box: 'bg-violet-50 text-violet-700',
+    label: 'text-violet-700',
+  },
 };
 
 const fmt = (n) => Number(n || 0).toLocaleString('en-US');
